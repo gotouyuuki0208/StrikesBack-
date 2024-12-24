@@ -1,0 +1,6 @@
+fade=5
+object2D=4
+billboard=3
+motionmodel=2
+objectX=1
+object3D=0

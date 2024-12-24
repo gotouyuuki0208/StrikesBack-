@@ -1,0 +1,12 @@
+pos_x:-911
+pos_y:0
+pos_z:939
+scale_x:1000
+scale_y:0
+scale_z:1000
+rot_x:0
+rot_y:0
+rot_z:0
+type:5
+END_DATA
+
