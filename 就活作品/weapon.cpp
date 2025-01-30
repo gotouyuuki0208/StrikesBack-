@@ -10,7 +10,8 @@
 #include "manager.h"
 #include "model.h"
 #include "enemy.h"
-#include"player.h"
+#include "player.h"
+#include "fild.h"
 
 //静的メンバ初期化
 const int CWeapon::PRIORITY = 2;//描画順
@@ -29,8 +30,15 @@ m_WeaponPoint(nullptr),//武器の位置表示
 m_Transparent(false),//透明度の上下判定
 m_visual(nullptr),//当たり判定の可視化
 m_Garb(false),//キャラクターが持ってるか判定
-m_Durability(0)//耐久値
+m_Durability(0),//耐久値
+m_RotKeep(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),//向き保存用
+m_ScaleKeep(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),//向き保存用
+m_ThrowAngle(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),
+m_Throw(false)
 {
+	//ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&m_rot);
+	D3DXMatrixIdentity(&m_scale);
 	
 }
 
@@ -87,17 +95,12 @@ void  CWeapon::Uninit()
 //==========================
 void CWeapon::Update()
 {
-	if (m_Garb)
-	{//掴まれてるとき
-		return;
-	}
-
 	ColisionPlayer();
 
-	//更新処理
-	CObjectX::Update();
+	Move();
 
-	
+	//更新処理
+	CObjectX::Update();	
 }
 
 //==========================
@@ -105,18 +108,41 @@ void CWeapon::Update()
 //==========================
 void CWeapon::Draw()
 {
-	if (m_Garb)
-	{//掴まれてるとき
-		return;
+	LPDIRECT3DDEVICE9 pDevice;//デバイスへのポインタ
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();//デバイスの取得
+
+	D3DXMATRIX mtxRot, mtxTrans, mtxScale;//計算用マトリックス
+
+	//ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&GetMtxWorld());
+
+	//スケール設定
+	D3DXMatrixScaling(&mtxScale, GetScale().x, GetScale().y, GetScale().z);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxScale);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &m_scale);
+
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, GetRot().y, GetRot().x, GetRot().z);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxRot);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &m_rot);
+
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTrans, GetPos().x, GetPos().y, GetPos().z);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxTrans);
+
+	if (m_Parent != nullptr)
+	{//階層構造の設定
+
+		D3DXMATRIX mtxParent;
+		
+		mtxParent = m_Parent->GetMtxWorld();
+		D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxParent);
 	}
 
-	//描画処理
-	CObjectX::Draw();
+	//ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &GetMtxWorld());
 
-	if (m_visual != nullptr)
-	{
-		//m_visual->Draw();
-	}
+	DrawModel();//モデルの描画
 }
 
 //==========================
@@ -159,6 +185,54 @@ CWeapon* CWeapon::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 void CWeapon::SetParent(CModelParts* Parent)
 {
 	m_Parent = Parent;
+	m_Garb = true;
+
+	if (Parent != nullptr)
+	{
+		m_RotKeep = GetRot();//向きを保存
+		m_ScaleKeep = GetScale();//向きを保存
+
+		SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		SetScale(D3DXVECTOR3(1.0f, 1.0f, 1.0f));
+	}
+	
+}
+
+//==========================
+//情報を戻す
+//==========================
+void CWeapon::CorrectInfo()
+{
+	SetRot(m_RotKeep);
+	SetScale(m_ScaleKeep);
+	m_Garb = false;
+}
+
+//==========================
+//移動処理
+//==========================
+void CWeapon::Move()
+{
+	if (!m_Throw)
+	{
+		return;
+	}
+
+	SetPosOld(GetPos());
+
+	//慣性と重力
+	SetMove(D3DXVECTOR3(GetMove().x += (0 - GetMove().x) * 0.01f,
+		GetMove().y - 0.15f,
+		GetMove().z += (0 - GetMove().z) * 0.01f));
+
+	//位置の設定
+	SetPos(GetPos() + GetMove());
+
+	//敵との当たり判定
+	HitEnemy();
+
+	//地面との当たり判定
+	CollisionFild();
 }
 
 //==========================
@@ -324,9 +398,14 @@ void CWeapon::ColisionPlayer()
 
 			//位置を変更
 			pPlayer->SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+			
 			pPlayer->SetPos(D3DXVECTOR3(GetPos().x + NormalizeVec.x * floor((GetRadius() - 1.0f + pPlayer->GetRadius())),
 				GetPos().y,
 				GetPos().z + NormalizeVec.z * floor((GetRadius()-1.0f + pPlayer->GetRadius()))));
+			
+			pPlayer->SetPosOld(pPlayer->GetPos());
+
 		}
 
 		Colision = ColisionSphere(GetPos(),
@@ -342,6 +421,57 @@ void CWeapon::ColisionPlayer()
 		{
 			Reset();//透明度をリセット
 		}
+		break;
+	}
+}
+
+//==========================
+//敵への攻撃時の判定
+//==========================
+void CWeapon::HitEnemy()
+{
+	//オブジェクトを取得
+	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
+	
+	while (pObj != nullptr)
+	{
+		if (pObj == nullptr)
+		{//オブジェクトがない
+			pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
+			continue;
+		}
+
+		//種類の取得
+		CObject::TYPE type = pObj->GetType();
+
+		if (type != CObject::TYPE::ENEMY)
+		{//オブジェクトが敵ではない
+			pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
+			continue;
+		}
+
+		CEnemy* pEnemy = dynamic_cast<CEnemy*>(pObj);
+
+		bool Colision = ColisionSphere(D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42, GetMtxWorld()._43),
+			D3DXVECTOR3(pEnemy->GetPartsMtx(1)._41, pEnemy->GetPartsMtx(1)._42, pEnemy->GetPartsMtx(1)._43),
+			30.0f,
+			30.0f);
+
+		if (Colision)
+		{
+			if (m_weapontype == WEAPONTYPE::SMALL)
+			{
+				pEnemy->Damage(2);
+			}
+			else
+			{
+				pEnemy->Damage(3);
+			}
+
+			//武器の耐久値を減らす
+			SubDurability();
+		}
+
 		break;
 	}
 }
@@ -375,6 +505,7 @@ void CWeapon::ReleseCharacter(D3DXVECTOR3 pos)
 {
 	//位置を変更
 	SetPos(pos);
+
 	//m_visual->SetPos(GetPos());
 
 	//UIを生成
@@ -414,4 +545,122 @@ int CWeapon::GetDurability()
 void CWeapon::SubDurability()
 {
 	m_Durability--;
+
+	if (m_Durability <= 0)
+	{
+		Uninit();
+	}
+}
+
+//==========================
+//地面との当たり判定
+//==========================
+void CWeapon::CollisionFild()
+{
+	//オブジェクトを取得
+	CObject* pObj = CObject::GetObj(nullptr, CFild::PRIORITY);
+
+	while (pObj != nullptr)
+	{
+		if (pObj == nullptr)
+		{//オブジェクトがない
+			pObj = CObject::GetObj(pObj, CFild::PRIORITY);
+			continue;
+		}
+
+		//種類の取得
+		CObject::TYPE type = pObj->GetType();
+
+		if (type != CObject::TYPE::FILD)
+		{//オブジェクトが地面ではない
+			pObj = CObject::GetObj(pObj, CFild::PRIORITY);
+			continue;
+		}
+
+		CFild* pFild = dynamic_cast<CFild*>(pObj);
+
+		if (GetPosOld().y >= pFild->GetPos().y
+			&& GetPos().y < pFild->GetPos().y)
+		{
+			SetMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			SetPos(D3DXVECTOR3(GetPos().x, pFild->GetPos().y, GetPos().z));
+			CManager::GetInstance()->GetStageManager()->DeleteObj(*this);
+			Uninit();
+			break;
+		}
+
+		pObj = CObject::GetObj(pObj, CFild::PRIORITY);
+	}
+}
+
+//==========================
+//投げられる時の角度を求める
+//==========================
+void CWeapon::ThrowAngle(CMotionModel* Charactar)
+{
+	if (m_Parent == nullptr)
+	{
+		return;
+	}
+
+	m_Throw = true;
+
+	D3DXMATRIX mtxRot,mtxScale;//親モデルの向きを保存
+	
+	CModelParts* parent = m_Parent;
+
+	SetScale(parent->GetScale());
+	
+	while (1)
+	{
+		//向きを反映
+		D3DXMatrixRotationYawPitchRoll(&mtxRot, parent->GetRot().y, parent->GetRot().x, parent->GetRot().z);
+		D3DXMatrixMultiply(&m_rot, &m_rot, &mtxRot);
+
+		//スケールを反映
+		//D3DXMatrixScaling(&mtxScale, parent->GetScale().x, parent->GetScale().y, parent->GetScale().z);
+		//D3DXMatrixMultiply(&m_scale, &m_scale, &mtxScale);
+
+		parent = parent->GetParent();
+
+		//ワールドマトリックスの初期化
+		D3DXMatrixIdentity(&mtxRot);
+		D3DXMatrixIdentity(&mtxScale);
+
+		if (parent == nullptr)
+		{
+			break;
+		}
+	}
+
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, Charactar->GetRot().y, Charactar->GetRot().x, Charactar->GetRot().z);
+	D3DXMatrixMultiply(&m_rot, &m_rot, &mtxRot);
+
+	//スケールを反映
+	D3DXMatrixScaling(&mtxScale, Charactar->GetScale().x, Charactar->GetScale().y, Charactar->GetScale().z);
+	D3DXMatrixMultiply(&m_scale, &m_scale, &mtxScale);
+
+	//CreateMtx();//行列の生成
+
+	//D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &m_a);
+
+	//LPDIRECT3DDEVICE9 pDevice;//デバイスへのポインタ
+	//pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();//デバイスの取得
+
+	//ワールドマトリックスの設定
+	//pDevice->SetTransform(D3DTS_WORLD, &GetMtxWorld());
+
+	//D3DXMATRIX a = GetMtxWorld();
+	//D3DXVECTOR3 pos = D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42, GetMtxWorld()._43);
+	SetPos(D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42, GetMtxWorld()._43));
+	
+}
+
+//==========================
+//武器を投げた時の当たり判定
+//==========================
+void CWeapon::CollisionThrow()
+{
+
 }

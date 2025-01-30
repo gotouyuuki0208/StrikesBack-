@@ -36,7 +36,8 @@ public:
 	DWORD& GetNumMat();//マテリアルの数
 	void SetTransparent(float cor);//透明度を設定
 	float GetTransparent();//透明度を取得
-
+	void CreateMtx();//行列の生成
+	void DrawModel();//モデルの描画
 private:
 	//メンバ変数
 	LPD3DXMESH m_pMesh;//メッシュ(頂点情報)へのポインタ

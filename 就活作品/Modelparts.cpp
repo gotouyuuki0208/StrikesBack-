@@ -244,6 +244,14 @@ D3DXVECTOR3& CModelParts::GetMotionPos()
 }
 
 //========================
+//スケールの取得
+//========================
+D3DXVECTOR3& CModelParts::GetScale()
+{
+	return m_scale;
+}
+
+//========================
 //位置の設定
 //========================
 void CModelParts::SetPos(D3DXVECTOR3 pos)

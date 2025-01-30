@@ -27,6 +27,7 @@
     <ClCompile Include="board.cpp" />
     <ClCompile Include="bossgaugeframe.cpp" />
     <ClCompile Include="bosshpgauge.cpp" />
+    <ClCompile Include="character.cpp" />
     <ClCompile Include="clear.cpp" />
     <ClCompile Include="cone.cpp" />
     <ClCompile Include="construction_fence.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="buil.h" />
     <ClInclude Include="building.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="character.h" />
     <ClInclude Include="clear.h" />
     <ClInclude Include="cone.h" />
     <ClInclude Include="construction_fence.h" />

@@ -14,9 +14,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 //グローバル変数
 int g_nCountFPS = 0;
 
-//===========
+//==========================
 //メイン関数
-//===========
+//==========================
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hInstancePrev, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 
@@ -131,9 +131,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hInstancePrev, _
 	return (int)msg.wParam;
 }
 
-//===========
+//==========================
 //ウインドウプロシージャ
-//===========
+//==========================
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	int nID;

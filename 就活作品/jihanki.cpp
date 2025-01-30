@@ -205,6 +205,7 @@ void CJihanki::Damage(int Damage)
 
 	if (m_Life <= 0)
 	{
+		CManager::GetInstance()->GetStageManager()->DeleteObj(*this);
 		Uninit();
 		CDrink::Create(GetPos(), D3DXVECTOR3(0.5f, 0.5f, 0.5f));
 	}

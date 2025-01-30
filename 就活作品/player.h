@@ -8,7 +8,7 @@
 #define _PLAYER_H_
 
 //include
-#include "motionmodel.h"
+#include "character.h"
 #include "weapon.h"
 #include "enemy.h"
 #include "collisionvisual.h"
@@ -17,18 +17,9 @@
 class CEnemy;
 
 //クラスの定義
-class CPlayer :public CMotionModel
+class CPlayer :public CCharacter
 {
 public:
-
-	enum class STATE
-	{
-		NEUTRAL=0,//待機
-		ATTACK,//攻撃
-		MOVE,//移動
-		GUARD,//ガード
-		MAX,
-	};
 
 	//定数
 	static const int PRIORITY;//描画順
@@ -54,18 +45,16 @@ public:
 	void Draw() override;//描画処理
 	static CPlayer* Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale);//オブジェクト生成
 	void Damage(int damage);//ダメージ処理
-	void DamageBlow(D3DXVECTOR3 pos);//吹っ飛び処理
-	int GetLife();//ライフを取得
-	void SetLife(int Life);//ライフを設定
 	void AddItem();//アイテムの数を増やす
 	int GetInputFrame();//入力受付時間を取得
-	STATE GetState();//状態を取得
 	void GetBoss(CEnemy* boss);//ボスを取得
 	bool GetHaveWeapon();//武器所持判定
+	void DeleteWeapon();//武器を消す
 private:
-
+	
 	//メンバ関数
 	void Attack();//攻撃処理
+	void Avoidance();//回避
 	void AttackWeapon();//武器での攻撃
 	void CollisionEnemy();//敵との当たり判定
 	void CollisionFild();//地面との当たり判定
@@ -89,30 +78,30 @@ private:
 	void ReleaseWeapon();//武器を手放す
 	void ResetStak();//スタックの情報を戻す
 	void SetComboList();//コンボリストの生成
-	void SetState(STATE state);//状態の設定
+	void SetWeaponMotion(MOTION_TYPE motion);//武器所持時のモーションを設定
 	void CorrectionAngle();//角度の補正
+	void MotionUpdate();//モーションの更新
+	void ThrowWeapon();//武器を投げる
 
 	//メンバ変数
-	bool m_Jump;//ジャンプの判定
 	bool m_grab;//掴み判定
 	bool m_Attack;//攻撃判定
 	CWeapon* m_weapon;//持ってる武器
 	CEnemy* m_GrabEnemy;//掴んでいる敵
 	CEnemy* m_boss;//ボス
-	STATE m_state;//現在の状態
 	MOTION_TYPE m_ComboList[3];//攻撃のコンボリスト
 	MOTION_TYPE m_ComboStack[3];//攻撃コンボのスタック
 	int m_FlameCount;//フレーム数のカウント
 	int m_StackIdx;//TOPの位置
 	int m_CountAttack;//コンボ中に攻撃を当てた回数
-	int m_Life;//寿命
 	bool m_testdeth;
 	int m_DamageCount;//
 	int m_RecoveryItemStock;//アイテムのストック数
+	int m_Avoidance;//回避フレーム
 	bool m_WeaponType;//武器の種類(false:両手 true:片手)
-	CCollisionVisual* m_Visual;//当たり判定の情報
 	bool m_VisualCor;//当たり判定の色の設定
-	D3DXVECTOR3 m_DamageMove;//被弾時の吹き飛ぶ移動値
-	bool m_Damage;//ダメージ状態の判定
+	float LeftStickAngle;//左スティックの角度
 };
+
+//class C :public CPlayer
 #endif

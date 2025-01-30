@@ -169,7 +169,7 @@ CWeaponEnemy* CWeaponEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 //==========================
 void CWeaponEnemy::Move()
 {
-	if (GetState() != STATE::USUALLY)
+	if (GetState() != STATE::NEUTRAL)
 	{//攻撃状態の時終了
 		return;
 	}
@@ -201,7 +201,7 @@ void CWeaponEnemy::Count()
 		{
 			m_NearAction = false;
 			m_NearCount = 0;
-			SetState(STATE::USUALLY);
+			SetState(STATE::NEUTRAL);
 		}
 	}
 
@@ -223,7 +223,7 @@ void CWeaponEnemy::Count()
 //==========================
 void CWeaponEnemy::MoveAction()
 {
-	if ((GetState() != STATE::USUALLY)
+	if ((GetState() != STATE::NEUTRAL)
 		|| m_AttackCoolTime > (ATTACKFINISH_COOLTIME - 60))
 	{//通常状態以外の時または攻撃終了してから1秒たっていない時終了
 		return;
@@ -318,7 +318,7 @@ void CWeaponEnemy::Attack()
 	{//プレイヤーが遠いまたはコンボできない
 
 		SetOldMotion(GetMotion());//今のモーションを保存
-		SetState(STATE::USUALLY);//通常状態に変更
+		SetState(STATE::NEUTRAL);//通常状態に変更
 		SetAttackState(ATTACK_STATE::ATTACK);
 		if (GetPartsExistence(15))
 		{
@@ -350,7 +350,7 @@ void CWeaponEnemy::ColisionWeaponAttack()
 
 		if (m_StackIdx <= 0)
 		{
-			GetPlayer()->DamageBlow(GetPos());
+			GetPlayer()->DamegeBlow(GetPos());
 		}
 	}
 }

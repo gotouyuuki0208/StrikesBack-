@@ -200,6 +200,8 @@ void CBuilding::ColisionPlayer()
 			&& pPlayer->GetPos().x - 10.0f < GetPos().x + GetVtxMax().x
 			&& pPlayer->GetPos().x + 10.0f > GetPos().x + GetVtxMin().x)
 		{//Žè‘O
+			pPlayer->SetPosOld(pPlayer->GetPos());
+
 			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, pPlayer->GetMove().y, 0.0f));
 			pPlayer->SetPos(D3DXVECTOR3(pPlayer->GetPos().x, pPlayer->GetPos().y, GetPos().z + GetVtxMin().z - 10.0f));
 		}
@@ -208,6 +210,8 @@ void CBuilding::ColisionPlayer()
 			&& pPlayer->GetPos().x - 10.0f < GetPos().x + GetVtxMax().x
 			&& pPlayer->GetPos().x + 10.0f > GetPos().x + GetVtxMin().x)
 		{//‰œ
+			pPlayer->SetPosOld(pPlayer->GetPos());
+
 			pPlayer->SetMove(D3DXVECTOR3(pPlayer->GetMove().x, pPlayer->GetMove().y, 0.0f));
 			pPlayer->SetPos(D3DXVECTOR3(pPlayer->GetPos().x, pPlayer->GetPos().y, GetPos().z + GetVtxMax().z + 10.0f));
 		}
@@ -216,6 +220,8 @@ void CBuilding::ColisionPlayer()
 			&& pPlayer->GetPos().z - 10.0f < GetPos().z + GetVtxMax().z
 			&& pPlayer->GetPos().z + 10.0f > GetPos().z + GetVtxMin().z)
 		{//‰E
+			pPlayer->SetPosOld(pPlayer->GetPos());
+
 			pPlayer->SetMove(D3DXVECTOR3(0.0f, pPlayer->GetMove().y, pPlayer->GetMove().z));
 			pPlayer->SetPos(D3DXVECTOR3(GetPos().x+ GetVtxMax().x+10.0f, pPlayer->GetPos().y, pPlayer->GetPos().z));
 		}
@@ -224,6 +230,8 @@ void CBuilding::ColisionPlayer()
 			&& pPlayer->GetPos().z - 10.0f < GetPos().z + GetVtxMax().z
 			&& pPlayer->GetPos().z + 10.0f > GetPos().z + GetVtxMin().z)
 		{//¶
+			pPlayer->SetPosOld(pPlayer->GetPos());
+
 			pPlayer->SetMove(D3DXVECTOR3(0.0f, pPlayer->GetMove().y, pPlayer->GetMove().z));
 			pPlayer->SetPos(D3DXVECTOR3(GetPos().x + GetVtxMin().x - 10.0f, pPlayer->GetPos().y, pPlayer->GetPos().z));
 		}

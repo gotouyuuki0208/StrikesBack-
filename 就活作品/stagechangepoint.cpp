@@ -145,8 +145,9 @@ void CStageChangePoint::ColisionPlayer()
 
 		if (Colision)
 		{
-			CManager::GetInstance()->GetStageManager()->SetStage();
-			Uninit();
+			CManager::GetInstance()->GetStageManager()->SetStage();//ステージフラグを立てる
+			CManager::GetInstance()->GetStageManager()->DeleteObj(*this);//オブジェクト管理リストから消す
+			Uninit();//終了処理
 		}
 
 		break;

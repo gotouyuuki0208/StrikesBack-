@@ -9,9 +9,10 @@
 
 //include
 #include "objectX.h"
-#include"modelparts.h"
+#include "modelparts.h"
 #include "weaponpoint.h"
-#include"collisionvisual.h"
+#include "collisionvisual.h"
+#include "motionmodel.h"
 
 //クラスの定義
 class CWeapon :public CObjectX
@@ -52,11 +53,16 @@ public:
 	void SetDurability(int Num);//耐久値の設定
 	int GetDurability();//耐久値の取得
 	void SubDurability();//耐久値を減らす
-
+	void CorrectInfo();//情報を戻す
+	void ThrowAngle(CMotionModel* Charactar);//投げられる時の角度を求める
 private:
 
 	//メンバ関数
 	void ColisionPlayer();//プレイヤーとの当たり判定
+	void HitEnemy();//敵への攻撃時の判定
+	void Move();//移動処理
+	void CollisionFild();//地面との当たり判定
+	void CollisionThrow();//武器を投げた時の当たり判定
 
 	//メンバ変数
 	CModelParts* m_Parent;//親モデル
@@ -68,5 +74,11 @@ private:
 	CCollisionVisual* m_visual;//当たり判定の可視化
 	bool m_Garb;//キャラクターが持ってるか判定
 	int m_Durability;//耐久値
+	D3DXVECTOR3 m_RotKeep;//向きの保存
+	D3DXVECTOR3 m_ScaleKeep;//拡大率の保存
+	D3DXVECTOR3 m_ThrowAngle;
+	bool m_Throw;
+	D3DXMATRIX m_rot;
+	D3DXMATRIX m_scale;
 };
 #endif

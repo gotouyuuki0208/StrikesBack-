@@ -62,6 +62,8 @@ private:
 	void Count();//カウントする
 	void MoveAction();//移動時の行動
 	void ReleseWeapon();//武器を離す
+	void MotionUpdate();
+	void SetWeaponMotion(MOTION_TYPE motion);//武器所持時のモーションを設定
 
 	//メンバ変数
 	CWeapon* m_weapon;//武器の情報

@@ -58,12 +58,11 @@ CGame::~CGame()
 HRESULT CGame::Init()
 {
 	CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_INGAME);
-
+	CManager::GetInstance()->GetStageManager()->StageReset();
 	CManager::GetInstance()->GetGameManager()->SetGame(CGameManager::GAME::NONE);
 	//CSky::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(2000.0f, 2000.0f, 2000.0f));
 	//CObjectMesh::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(100.0f, 0.0f, 100.0f), 3, 3);
 	//CBlock::Create(D3DXVECTOR3(0.0f, 0.0f,0.0f), D3DXVECTOR3(3.0f, 1.0f, 3.0f));
-	m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 	//CBoss::Create(D3DXVECTOR3(0.0f, 0.0f, 50.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 	//CHitEnemy::Create(D3DXVECTOR3(-50.0f, 0.0f, 500.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 	//CHitEnemy::Create(D3DXVECTOR3(0.0f, 0.0f, 2100.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
@@ -77,17 +76,12 @@ HRESULT CGame::Init()
 	//CDeliveryPerson::Create(D3DXVECTOR3(0.0f, 0.0f, 100.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 	//CBigWeapon::Create(D3DXVECTOR3(300.0f, 0.0f, 300.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f), "data\\MODEL\\bicycle.x");
 	//CSmallWeapon::Create(D3DXVECTOR3(-100.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data\\MODEL\\iron_pipe.x");
-	m_PlalyerHPGauge = CPlayerHPGauge::Create(D3DXVECTOR3(10.0f, 20.0f, 0.0f), 10, 300, m_player->GetLife());
-
-	//現在のステージを取得
-	int StageNum = static_cast<int>(CManager::GetInstance()->GetStageManager()->GetStage());
+	
 
 	//ステージを生成
-	m_Edit->Load(StageNum);
-
-	////移動の操作説明を表示
-	//CManager::GetInstance()->GetTutorial()->StartTutorial();
-	//CManager::GetInstance()->GetTutorial()->SetAction();
+	m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
+	m_PlalyerHPGauge = CPlayerHPGauge::Create(D3DXVECTOR3(10.0f, 20.0f, 0.0f), 10, 300, m_player->GetLife());
+	CManager::GetInstance()->GetStageManager()->Load();
 
 	DisplayUI();
 
@@ -130,9 +124,7 @@ void CGame::Update()
 		m_PlalyerHPGauge->SetHP(m_player->GetLife());
 	}
 
-	
-
-	
+	UseEdit();
 
 	//ステージの切り替え
 	ChangeStage();
@@ -157,7 +149,6 @@ void CGame::Update()
 	if (CManager::GetInstance()->GetGameManager()->GetGame() != CGameManager::GAME::NONE)
 	{
 		//ゲーム画面に遷移
-		
 		CManager::GetInstance()->GetGameManager()->SetGame(CManager::GetInstance()->GetGameManager()->GetGame());
 		CManager::GetInstance()->GetFade()->SetFade(MODE::RESULT);
 	}
@@ -180,31 +171,25 @@ void CGame::ChangeStage()
 		&& CManager::GetInstance()->GetStageManager()->ChangeObject())
 	{//ステージが切り替わってるとき
 
-		m_playerlife = m_player->GetLife();
-		m_Edit->DeleteAll();
-		CObject::ReleaseAll();
-
 		//現在のステージを取得
 		int StageNum = static_cast<int>(CManager::GetInstance()->GetStageManager()->GetStage());
 
+		//プレイヤーの位置を変更
 		if (StageNum == 2)
 		{
-			m_player = CPlayer::Create(D3DXVECTOR3(-900.0f, 0.0f, 300.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
+			m_player->SetPos(D3DXVECTOR3 (-900.0f, 0.0f, 300.0f));
 		}
 		else
 		{
-			m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 100.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
+			m_player->SetPos(D3DXVECTOR3(0.0f, 0.0f, 100.0f));
 		}
+		m_player->DeleteWeapon();
+		m_player->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));//プレイヤーの向きを変更
 
 		//ステージを生成
-		m_Edit->Load(StageNum);
+		CManager::GetInstance()->GetStageManager()->DeleteAll();//全てのオブジェクトを削除
+		CManager::GetInstance()->GetStageManager()->Load();//オブジェクトを読み込む
 		CManager::GetInstance()->GetCamera()->Init();
-
-		m_player->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
-		m_PlalyerHPGauge = CPlayerHPGauge::Create(D3DXVECTOR3(10.0f, 20.0f, 0.0f), 10, 300, m_player->GetLife());
-		m_player->SetLife(m_playerlife);
-
-		//CStageChangePoint::Create(D3DXVECTOR3(0.0f, 0.0f, 200.0f), D3DXVECTOR3(10.0f, 10.0f, 0.0f));
 
 		CManager::GetInstance()->GetStageManager()->ChangeReset();
 	}
@@ -224,7 +209,7 @@ void CGame::DebugSelect()
 			CManager::GetInstance()->GetDebug()->Reset();
 			CManager::GetInstance()->GetDebug()->StartPlayerTest();//プレイヤーのデバッグをスタート
 			CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
-			CBoss::Create(D3DXVECTOR3(0.0f, 0.0f, 50.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
+			//CBoss::Create(D3DXVECTOR3(0.0f, 0.0f, 50.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 			CBigWeapon::Create(D3DXVECTOR3(100.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f), "data\\MODEL\\cone.x");
 			CSmallWeapon::Create(D3DXVECTOR3(-100.0f,0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data\\MODEL\\iron_pipe.x");
 			CSmallWeapon::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.0f, 1.0f, 1.0f), "data\\MODEL\\syokaki.x");
@@ -267,8 +252,7 @@ void CGame::DebugSelect()
 			CManager::GetInstance()->GetDebug()->StartBattleTest();//ボスのデバッグをスタート
 			m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 50.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 			m_PlalyerHPGauge = CPlayerHPGauge::Create(D3DXVECTOR3(10.0f, 20.0f, 0.0f), 10, 300, m_player->GetLife());
-			m_Boss = CBoss::Create(D3DXVECTOR3(0.0f, 0.0f, 300.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
-			m_BossHPGauge = CBossHPGauge::Create(D3DXVECTOR3(1000.0f, 680.0f, 0.0f), 10, 100, m_Boss->GetLife());
+			CBoss::Create(D3DXVECTOR3(0.0f, 0.0f, 300.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 			CBicycle::Create(D3DXVECTOR3(100.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f), D3DXVECTOR3(0.0f,0.0f,0.0f));
 			CBat::Create(D3DXVECTOR3(-100.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 			CFild::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1000.0f, 0.0f, 1000.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));

@@ -108,5 +108,5 @@ void CTitle::Bg()
 	CBenchPress::Create(D3DXVECTOR3(-80.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 
 	//êl
-	COutGameChara::Create(D3DXVECTOR3(75.0f, 10.0f, -3.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
+	COutGameChara::Create(D3DXVECTOR3(75.0f, 22.0f, -3.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 }

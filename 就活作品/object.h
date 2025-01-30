@@ -48,8 +48,6 @@ public:
 	static void ReleseDeath();//死亡フラグが立ってるオブジェクト削除
 	TYPE GetType();//タイプ取得
 	void SetType(TYPE type);//タイプ設定
-	void SwitchDeath();//死亡フラグの切り替え
-	void DisengageList();//リストから切り離す
 	CObject* GetNextObj();//次のオブジェクトを取得
 	CObject* GetPrevObj();//前のオブジェクトを取得
 protected:
@@ -57,6 +55,11 @@ protected:
 	void Release();//自分自身の解放	
 
 private:
+
+	//メンバ関数
+	void SwitchDeath();//死亡フラグの切り替え
+	void DisengageList();//リストから切り離す
+
 	//メンバ変数
 	static CObject* m_apObject[PRIORITY][MAX_OBJECT];//オブジェクト管理
 

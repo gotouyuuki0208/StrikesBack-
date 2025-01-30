@@ -1,6 +1,6 @@
 //==========================
 // 
-// Pch.h
+//プリコンパイル済みヘッダー[Pch.h]
 // Author Yuki Goto
 //
 //==========================
@@ -41,7 +41,7 @@ using namespace std;
 #define FVF_VERTEX_2D (D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1)
 #define FVF_VERTEX_3D (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_DIFFUSE|D3DFVF_TEX1)
 #define CLASS_NAME "windowClass"//ウィンドウクラスの名前
-#define WINDOW_NAME ""//ウインドウの名前
+#define WINDOW_NAME "Strikes Back"//ウインドウの名前
 
 #ifdef _DEBUG
 #define DBG_NEW new (_NORMAL_BLOCK , __FILE__, __LINE__)

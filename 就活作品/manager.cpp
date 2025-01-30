@@ -75,8 +75,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	//フェード
 	m_pFade = CFade::Create();
-	m_pFade->SetFade(CScene::MODE::TITLE);//最初のシーン設定
-	//m_pFade->SetFade(CScene::MODE::GAME);//最初のシーン設定
+	//m_pFade->SetFade(CScene::MODE::TITLE);//最初のシーン設定
+	m_pFade->SetFade(CScene::MODE::GAME);//最初のシーン設定
 	//m_pFade->SetFade(CScene::MODE::RESULT);//最初のシーン設定
 	
 	//デバッグ
@@ -209,7 +209,8 @@ void CManager::Update(void)
 
 	m_pJoypad->Update();//パッドの更新
 
-	if (m_pFade->GetFade() == CFade::FADE::FADE_NONE)
+	//if (m_pFade->GetFade() == CFade::FADE::FADE_NONE)
+	if (m_pScene != nullptr)
 	{//フェードしてないとき
 		m_pScene->Update();//シーンの更新
 	}
@@ -224,7 +225,8 @@ void CManager::Draw(void)
 {
 	m_pRenderer->Draw();//レンダラーの描画
 
-	if (m_pFade->GetFade() == CFade::FADE::FADE_NONE)
+	//if (m_pFade->GetFade() == CFade::FADE::FADE_NONE)
+	if (m_pScene != nullptr)
 	{//フェードしてないとき
 		m_pScene->Draw();//シーンの描画
 	}

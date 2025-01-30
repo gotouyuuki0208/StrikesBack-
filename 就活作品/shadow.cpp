@@ -11,7 +11,7 @@
 #include "texture.h"
 
 //静的メンバ初期化
-const int CShadow::PRIORITY = 0;//描画順
+const int CShadow::PRIORITY = 3;//描画順
 
 //==========================
 //コンストラクタ
@@ -116,5 +116,5 @@ CShadow* CShadow::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 void CShadow::Move(D3DXVECTOR3 pos)
 {
 	//位置を変更
-	SetPos(D3DXVECTOR3(pos.x, 0.0f, pos.z));
+	SetPos(D3DXVECTOR3(pos.x, 1.0f, pos.z));
 }

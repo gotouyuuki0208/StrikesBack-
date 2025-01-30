@@ -17,16 +17,11 @@ const int CEnemy::PRIORITY = 1;//描画順
 //コンストラクタ
 //==========================
 CEnemy::CEnemy(int nPriority) :
-CMotionModel(nPriority),//基底コンストラクタ
+CCharacter(nPriority),//基底コンストラクタ
 m_AttackState(ATTACK_STATE::USUALLY),//攻撃方法
-m_state(STATE::USUALLY),//現在の状態S
-m_nLife(0),//寿命
-m_Damage(false),//ダメージ判定
 m_EnemyType(ENEMY_TYPE::NONE),//敵の種類
-m_visual(nullptr),//当たり判定の可視化
 m_player(nullptr),//プレイヤーの情報
 m_Movable(false),//行動可能か判定
-m_DamageMove(D3DXVECTOR3(0.0f, 0.0f, 0.0f)),//吹っ飛びの移動値
 m_CurPoint(0)//現在の移動地点
 {
 	for (int i = 0; i < POINT;i++)
@@ -51,14 +46,12 @@ CEnemy::~CEnemy()
 //==========================
 HRESULT CEnemy::Init()
 {
+
 	//初期設定
-	CMotionModel::Init();
+	CCharacter::Init();
 
 	//プレイヤーの情報を取得
 	GetPlayerInfo();
-
-	//移動地点を取得
-	GetMovePoint();
 
 	SetPosOld(GetPos());
 
@@ -71,13 +64,7 @@ HRESULT CEnemy::Init()
 void  CEnemy::Uninit()
 {
 	//終了処理
-	CMotionModel::Uninit();
-
-	if (m_visual != nullptr)
-	{
-		m_visual->Uninit();
-		m_visual = nullptr;
-	}
+	CCharacter::Uninit();
 
 	if (m_player != nullptr)
 	{
@@ -102,10 +89,10 @@ void CEnemy::Update()
 	Move();
 
 	//モーションの更新
-	Motion();
+	//Motion();
 
 	//更新処理
-	CMotionModel::Update();
+	CCharacter::Update();
 
 	//地面との当たり判定
 	CollisionFild();
@@ -113,20 +100,23 @@ void CEnemy::Update()
 	//敵同士の当たり判定
 	ColisionEnemy();
 
-	if (m_Damage)
+	if (GetDamage())
 	{
 		if (m_player->GetInputFrame() >= 54)
 		{
-			m_Damage=false;
+
+			SetDamage(false);
 		}
 	}
 
-	if (m_nLife <= 0)
+	
+	if (GetLife() <= 0)
 	{
+		CManager::GetInstance()->GetStageManager()->DeleteObj(*this);
 		Uninit();
 	}
 
-	if (m_visual != nullptr)
+	//if (m_visual != nullptr)
 	{
 		//m_visual->SetPos(GetPos());
 	}
@@ -153,7 +143,8 @@ void CEnemy::Draw()
 	D3DXMatrixTranslation(&mtxTrans, GetPos().x, GetPos().y, GetPos().z);
 	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxTrans);
 
-	if (m_state == STATE::GRAB)
+	
+	if (GetState() == STATE::GRAB)
 	{
 		D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &m_Mtx);
 	}
@@ -164,7 +155,7 @@ void CEnemy::Draw()
 	//モデルパーツの描画
 	PartsDraw();
 
-	if (m_visual != nullptr)
+	//if (m_visual != nullptr)
 	{
 		//m_visual->Draw();
 	}
@@ -192,7 +183,6 @@ CEnemy* CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 
 	return pEnemy;
 }
-
 //==========================
 //移動処理
 //==========================
@@ -203,11 +193,13 @@ void CEnemy::Move()
 		return;
 	}*/
 
-	SetMove(D3DXVECTOR3(m_DamageMove.x += (0 - m_DamageMove.x) * 0.25f,
-		m_DamageMove.y-1.0f,
-		m_DamageMove.z += (0 - m_DamageMove.z) * 0.25f));
+	SetDamegeBlow(D3DXVECTOR3(GetDamegeBlow().x + (0 - GetDamegeBlow().x) * 0.25f,
+		GetDamegeBlow().y - 1.0f,
+		GetDamegeBlow().z + (0 - GetDamegeBlow().z) * 0.25f));
 
-	SetPos(GetPos() + m_DamageMove);
+	SetMove(GetDamegeBlow());
+
+	SetPos(GetPos() + GetDamegeBlow());
 }
 
 //==========================
@@ -218,21 +210,25 @@ void CEnemy::Damage(int damage)
 	if (!CManager::GetInstance()->GetDebug()->GetPlayerTest())
 	{
 		if (GetState() != STATE::GUARD)
-		{
+		{//ガードしてないとき
+
 			//寿命を減らす
-			m_nLife -= damage;
+			SetLife(GetLife() - damage);
 
 			//ダメージ状態に変更
-			SetDamage();
+			SetDamage(true);
 
+			//ダメージモーションに設定
 			SetMotion(MOTION_TYPE::DAMAGE);
 		}
 		else
-		{
+		{//ガードしてるとき
+
 			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_GUARD);
 
 			if (m_player->GetHaveWeapon())
 			{//プレイヤーが武器をもっている
+
 				//寿命を減らす
 				int Damage = damage / 2;
 
@@ -240,28 +236,13 @@ void CEnemy::Damage(int damage)
 				{//ダメージが1より小さいとき
 					Damage = 1;
 				}
-				m_nLife -= Damage;
+				SetLife(GetLife() - Damage);
 
 				//ダメージ状態に変更
-				SetDamage();
+				SetDamage(true);
 			}
 		}
 	}
-}
-
-//==========================
-//被弾時の吹き飛び処理
-//==========================
-void CEnemy::DamegeBlow(D3DXVECTOR3 pos)
-{
-	if (GetState() != STATE::GUARD)
-	{
-		SetMotion(MOTION_TYPE::DAMAGEBLOW);
-	}
-	float angle = atan2f(GetPos().x - pos.x, GetPos().z - pos.z);
-	m_DamageMove = (D3DXVECTOR3(sinf(angle) * 15.0f, GetMove().y, cosf(angle) * 15.0f));
-	//SetPos(GetPos() + GetMove());
-
 }
 
 //==========================
@@ -269,7 +250,7 @@ void CEnemy::DamegeBlow(D3DXVECTOR3 pos)
 //==========================
 void CEnemy::BeGrabbed(D3DXMATRIX mtx)
 {
-	m_state = STATE::GRAB;//掴まれてる状態に変更
+	SetState(STATE::GRAB);//掴まれてる状態に変更
 
 	m_Mtx = mtx;//マトリックスの保存
 
@@ -282,7 +263,7 @@ void CEnemy::BeGrabbed(D3DXMATRIX mtx)
 //==========================
 void CEnemy::ReleaseGrab(D3DXVECTOR3 rot)
 {
-	m_state = STATE::USUALLY;//通常状態に変更
+	SetState(STATE::NEUTRAL);//通常状態に変更
 
 	SetPos(D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42, GetMtxWorld()._43));
 	SetRot(rot);
@@ -310,22 +291,6 @@ CEnemy::ATTACK_STATE CEnemy::GetAttackState()
 }
 
 //==========================
-//状態の設定
-//==========================
-void CEnemy::SetState(STATE state)
-{
-	m_state = state;
-}
-
-//==========================
-//状態の取得
-//==========================
-CEnemy::STATE CEnemy::GetState()
-{
-	return m_state;
-}
-
-//==========================
 //敵の種類を設定
 //==========================
 void CEnemy::SetEnemyType(ENEMY_TYPE EnemyType)
@@ -339,57 +304,6 @@ void CEnemy::SetEnemyType(ENEMY_TYPE EnemyType)
 CEnemy::ENEMY_TYPE CEnemy::GetEnemyType()
 {
 	return m_EnemyType;
-}
-
-//==========================
-//被弾時の当たり判定の可視化
-//==========================
-void CEnemy::DamageVisual(int PartsNum, float Radius)
-{
-	GetParts(PartsNum)->CreateVisual(D3DXVECTOR3(GetParts(PartsNum)->GetMtxWorld()._41, GetParts(PartsNum)->GetMtxWorld()._42, GetParts(PartsNum)->GetMtxWorld()._43), Radius);
-}
-
-//==========================
-//寿命の設定
-//==========================
-void CEnemy::SetLife(int life)
-{
-	m_nLife = life;
-}
-
-//==========================
-//寿命の取得
-//==========================
-int CEnemy::GetLife()
-{
-	return m_nLife;
-}
-
-//==========================
-//ダメージ判定の取得
-//==========================
-bool CEnemy::GetDamage()
-{
-	return m_Damage;
-}
-
-//==========================
-//ダメージ判定の変更
-//==========================
-void CEnemy::SetDamage()
-{
-	m_Damage = true;
-}
-
-//==========================
-//当たり判定の可視化処理
-//==========================
-void CEnemy::SetVisual()
-{
-	if (m_visual == nullptr)
-	{
-		//m_visual = CCollisionVisual::Create(GetPos(), GetRadius());
-	}
 }
 
 //==========================
@@ -576,6 +490,11 @@ void CEnemy::judgeMovable()
 //==========================
 void CEnemy::GetMovePoint()
 {
+	if (m_Point[0] != nullptr)
+	{
+		return;
+	}
+
 	int Point = 0;
 
 	//オブジェクトを取得
@@ -651,6 +570,9 @@ void CEnemy::GetMovePoint()
 //==========================
 void CEnemy::Patrol()
 {
+	//移動地点を取得
+	GetMovePoint();
+
 	if (m_Point[m_CurPoint] == nullptr)
 	{
 		return;

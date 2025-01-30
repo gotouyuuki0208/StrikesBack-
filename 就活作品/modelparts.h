@@ -31,6 +31,7 @@ public:
 	void SetRot(D3DXVECTOR3 rot);//向きの設定
 	D3DXVECTOR3& GetPos();//位置の取得
 	D3DXVECTOR3& GetRot();//向きの取得
+	D3DXVECTOR3& GetScale();//スケールの取得
 	bool GetExistParent();//親パーツがあるかの取得
 	D3DXMATRIX& GetMtxWorld();//マトリックス取得
 	void SetSize();//サイズの設定

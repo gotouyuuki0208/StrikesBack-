@@ -114,5 +114,5 @@ void CResult::Bg()
 	CBenchPress::Create(D3DXVECTOR3(-80.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 
 	//êl
-	COutGameChara::Create(D3DXVECTOR3(0.0f, 0.0f, -50.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
+	//COutGameChara::Create(D3DXVECTOR3(0.0f, 0.0f, -50.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
 }

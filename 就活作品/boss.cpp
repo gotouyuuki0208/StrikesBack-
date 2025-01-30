@@ -76,7 +76,6 @@ HRESULT CBoss::Init()
 void  CBoss::Uninit()
 {
 	
-
 	if (!CManager::GetInstance()->GetDebug()->GetEdit())
 	{
 		//プレイヤーが持つボスの情報を削除
@@ -142,6 +141,7 @@ void CBoss::Update()
 
 	//更新処理
 	CEnemy::Update();
+	MotionUpdate();
 
 	if (m_BossHPGauge != nullptr)
 	{
@@ -195,6 +195,42 @@ CBoss* CBoss::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 }
 
 //==========================
+//モーションの更新
+//==========================
+void CBoss::MotionUpdate()
+{
+	//パーツの数値の計算
+	CalParts();
+	if (m_weapon != nullptr)
+	{//武器を持ってる
+		if (m_weapon->GetGrab())
+		{
+			m_weapon->SetRot(CalMotionRot(15));
+			m_weapon->SetPos(CalMotionPos(15));
+		}
+	}
+
+	//モーションカウンターを進める
+	MotionCountUpdate();
+
+	if (ExceedMaxFlame())
+	{//モーションのカウンターが再生フレームを超えたとき
+
+		if (m_weapon != nullptr)
+		{//武器を持ってる
+			if (m_weapon->GetGrab())
+			{
+				KeepFirstPos(m_weapon->GetPos(), 15);
+				KeepFirstRot(m_weapon->GetRot(), 15);
+			}
+		}
+	}
+
+	//モーションの情報を更新
+	UpdateMotionInfo();
+}
+
+//==========================
 //攻撃の種類を選択
 //==========================
 void CBoss::ChoiceAttack()
@@ -221,7 +257,7 @@ void CBoss::ChoiceAttack()
 	{//武器が近い
 
 		if (Attack <= WEAPONATTACK_PROBABILITY
-			||GetPartsExistence(15))
+			|| m_weapon != nullptr)
 		{
 			//攻撃方法を設定
 			SetAttackState(ATTACK_STATE::WEAPONATTACK);
@@ -237,7 +273,7 @@ void CBoss::ChoiceAttack()
 	{//プレイヤーが近い
 
 		if (Attack <= HITATTACK_PROBABILITY
-			&& !GetPartsExistence(15))
+			&& m_weapon==nullptr)
 		{
 			//攻撃方法を設定
 			SetAttackState(ATTACK_STATE::ATTACK);
@@ -256,7 +292,7 @@ void CBoss::ChoiceAttack()
 //==========================
 void CBoss::Move()
 {
-	if (GetState() != STATE::USUALLY)
+	if (GetState() != STATE::NEUTRAL)
 	{//攻撃状態の時終了
 		return;
 	}
@@ -280,7 +316,7 @@ void CBoss::Move()
 //==========================
 void CBoss::MoveAction()
 {
-	if ((GetState() != STATE::USUALLY)
+	if ((GetState() != STATE::NEUTRAL)
 		|| m_AttackCoolTime > (ATTACKFINISH_COOLTIME - 60))
 	{//通常状態以外の時または攻撃終了してから1秒たっていない時終了
 		return;
@@ -358,15 +394,15 @@ void CBoss::MoveAction()
 //==========================
 void CBoss::WeaponMove()
 {
-	if ((GetState() != STATE::USUALLY)
+	if ((GetState() != STATE::NEUTRAL)
 		|| m_AttackCoolTime > (ATTACKFINISH_COOLTIME - 60))
 	{//通常状態以外の時または攻撃終了してから1秒たっていない時終了
 		return;
 	}
 
-	if (!GetPartsExistence(15)
-		&& m_weapon!=nullptr)
+	if (m_weapon != nullptr&& !m_weapon->GetGrab())
 	{
+
 		//向きの設定
 		float angle = atan2f(m_weapon->GetPos().x - GetPos().x, m_weapon->GetPos().z - GetPos().z);
 		SetRot(D3DXVECTOR3(GetRot().x, angle + D3DX_PI, GetRot().z));
@@ -420,13 +456,20 @@ void CBoss::Attack()
 		//今のモーションを保存
 		SetOldMotion(GetMotion());
 
-		//攻撃モーションに変更
-		SetMotion(Pop());
+		if (m_weapon != nullptr)
+		{
+			SetWeaponMotion(Pop());
+		}
+		else
+		{
+			//攻撃モーションに変更
+			SetMotion(Pop());
+		}
 	}
 
 	if (m_FlameCount >= 10)
 	{
-		if (GetPartsExistence(15))
+		if (m_weapon!=nullptr)
 		{
 			ColisionWeaponAttack();
 		}
@@ -442,7 +485,15 @@ void CBoss::Attack()
 	if (m_FlameCount >= 26 && Colision&& m_StackIdx > 0)
 	{//フレーム数が24以上かつプレイヤーが近いかつコンボできる
 
-			SetMotion(Pop());//モーションを再生
+		if (m_weapon != nullptr)
+		{
+			SetWeaponMotion(Pop());
+		}
+		else
+		{
+			//攻撃モーションに変更
+			SetMotion(Pop());
+		}
 			m_FlameCount = 0;//カウントしてたフレーム数をリセット
 			m_Attack = false;//攻撃していない状態の戻す
 			ChangeDirection();//向きを変える
@@ -451,17 +502,18 @@ void CBoss::Attack()
 	{//プレイヤーが遠いまたはコンボできない
 		
 		SetOldMotion(GetMotion());//今のモーションを保存
-		SetState(STATE::USUALLY);//通常状態に変更
+		SetState(STATE::NEUTRAL);//通常状態に変更
 		SetAttackState(ATTACK_STATE::ATTACK);
-		if (GetPartsExistence(15))
-		{
-			if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
-			{
-				SetMotion(MOTION_TYPE::WEAPONNEUTRAL);//武器持ち待機状態に変更
+		if (m_weapon != nullptr)
+		{//武器を持ってるとき
+
+			if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::SMALL)
+			{//片手武器のとき
+				SetWeaponMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション
 			}
 			else
-			{
-				SetMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//武器持ち待機状態に変更
+			{//両手武器のとき
+				SetWeaponMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション
 			}
 		}
 
@@ -491,7 +543,7 @@ void CBoss::ColisionHitAttack()
 
 		if (m_StackIdx <= 0)
 		{
-			GetPlayer()->DamageBlow(GetPos());
+			GetPlayer()->DamegeBlow(GetPos());
 		}
 	}
 }
@@ -501,7 +553,7 @@ void CBoss::ColisionHitAttack()
 //==========================
 void CBoss::ColisionWeaponAttack()
 {
-	bool Colision = ColisionSphere(D3DXVECTOR3(GetPartsMtx(15)._41, GetPartsMtx(15)._42, GetPartsMtx(15)._43),
+	bool Colision = ColisionSphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
 		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
 		30.0f,
 		30.0f);
@@ -514,7 +566,7 @@ void CBoss::ColisionWeaponAttack()
 
 		if (m_StackIdx <= 0)
 		{
-			GetPlayer()->DamageBlow(GetPos());
+			GetPlayer()->DamegeBlow(GetPos());
 		}
 
 		if (m_weapon == nullptr)
@@ -526,12 +578,11 @@ void CBoss::ColisionWeaponAttack()
 
 		if (m_weapon->GetDurability() <= 0)
 		{
-			//武器パーツを削除
-			DeleteParts(15);
 			SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
 			SetComboList();
 
 			//武器を削除
+			CManager::GetInstance()->GetStageManager()->DeleteObj(*m_weapon);
 			m_weapon->Uninit();
 			m_weapon = nullptr;
 		}
@@ -566,19 +617,22 @@ void CBoss::ColisionWeapon()
 	if (Colision)
 	{
 		//武器をパーツとして生成
-		
 		if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
 		{
-			SetParts(D3DXVECTOR3(10.0f, -2.0f, -5.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), GetParts(5), m_weapon->GetModelIdx(), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
-			m_weapon->GrabCharacter();
-			SetMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション(武器持ち)
+			m_weapon->SetParent(GetParts(5));
+			m_weapon->SetPos(D3DXVECTOR3(10.0f, -2.0f, -5.0f));
+			m_weapon->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			SetWeaponMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション(武器持ち)
 		}
 		else
 		{
-			SetParts(D3DXVECTOR3(-10.0f, .0f, .0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f), GetParts(8), m_weapon->GetModelIdx(), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
-			m_weapon->GrabCharacter();
-			SetMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション(武器持ち)
+			m_weapon->SetParent(GetParts(8));
+			m_weapon->SetPos(D3DXVECTOR3(-10.0f, 0.0f, 0.0f));
+			m_weapon->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+			SetWeaponMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション(武器持ち)
 		}
+
+		m_weapon->GrabCharacter();//掴まれた状態にする
 
 		SetComboList();
 	}
@@ -664,7 +718,7 @@ bool CBoss::MeasureDistance()
 void CBoss::SetComboList()
 {
 	
-	if (!GetPartsExistence(15))
+	if (m_weapon==nullptr)
 	{
 		m_ComboList[0] = MOTION_TYPE::ATTACK;
 		m_ComboList[1] = MOTION_TYPE::ATTACK2;
@@ -719,15 +773,18 @@ CMotionModel::MOTION_TYPE CBoss::Pop()
 {
 	if (m_StackIdx <= 0)
 	{
-		if (GetPartsExistence(15))
+		if (m_weapon!=nullptr)
 		{
-			if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
+			if (m_weapon->GetGrab())
 			{
-			return MOTION_TYPE::WEAPONNEUTRAL;
-			}
-			else
-			{
-				return MOTION_TYPE::SMALLWEAPONNEUTRAL;
+				if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
+				{
+					return MOTION_TYPE::WEAPONNEUTRAL;
+				}
+				else
+				{
+					return MOTION_TYPE::SMALLWEAPONNEUTRAL;
+				}
 			}
 		}
 		else
@@ -769,9 +826,12 @@ void CBoss::Guard()
 		return;
 	}
 
-	if (GetPartsExistence(15)) 
+	if (m_weapon != nullptr)
 	{
-		SetMotion(MOTION_TYPE::SMALLWEAPONGUARD);
+		if (m_weapon->GetGrab())
+		{
+			SetWeaponMotion(MOTION_TYPE::SMALLWEAPONGUARD);
+		}
 	}
 	else
 	{
@@ -783,7 +843,7 @@ void CBoss::Guard()
 	{
 		m_NearAction = false;
 		m_NearCount = 0;
-		SetState(STATE::USUALLY);
+		SetState(STATE::NEUTRAL);
 	}
 }
 
@@ -824,7 +884,7 @@ void CBoss::Count()
 		{
 			m_NearAction = false;
 			m_NearCount = 0;
-			SetState(STATE::USUALLY);
+			SetState(STATE::NEUTRAL);
 		}
 	}
 
@@ -847,16 +907,15 @@ void CBoss::Count()
 //==========================
 void CBoss::ReleseWeapon()
 {
-	if (GetPartsExistence(15))
-	{//武器を持ってるとき
+	if (m_weapon != nullptr)
+	{
+		if (m_weapon->GetGrab())
+		{//武器を持ってるとき
+			m_weapon->ReleseCharacter(D3DXVECTOR3(GetParts(14)->GetMtxWorld()._41, 0.0f, GetParts(14)->GetMtxWorld()._43));
+			m_weapon = nullptr;
 
-		//武器パーツを削除
-		DeleteParts(15);
-
-		m_weapon->ReleseCharacter(D3DXVECTOR3(GetParts(14)->GetMtxWorld()._41,0.0f, GetParts(14)->GetMtxWorld()._43));
-		m_weapon = nullptr;
-
-		SetComboList();
+			SetComboList();
+		}
 	}
 }
 
@@ -874,4 +933,23 @@ void CBoss::GrabChangeWeapon(CWeapon* weapon)
 	//別の武器を探す
 	m_weapon = nullptr;
 	FindNearbyWeapons();
+}
+
+//==========================
+//武器所持時のモーションを設定
+//==========================
+void CBoss::SetWeaponMotion(CMotionModel::MOTION_TYPE motion)
+{
+	if (GetMotion() == motion)
+	{
+		return;
+	}
+
+	SetMotion(motion);
+
+	if (m_weapon != nullptr)
+	{
+		KeepFirstPos(m_weapon->GetPos(), 15);
+		KeepFirstRot(m_weapon->GetRot(), 15);
+	}
 }

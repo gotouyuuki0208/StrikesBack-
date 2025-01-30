@@ -8,7 +8,7 @@
 #define _ENEMY_H_
 
 //include
-#include "motionmodel.h"
+#include"character.h"
 #include "collisionvisual.h"
 #include "enemymovepoint.h"
 #include "player.h"
@@ -17,7 +17,7 @@
 class CPlayer;
 
 //クラスの定義
-class CEnemy :public CMotionModel
+class CEnemy :public CCharacter
 {
 public:
 	enum class ATTACK_STATE
@@ -26,15 +26,6 @@ public:
 		GRAB,//掴む
 		ATTACK,//攻撃
 		WEAPONATTACK,//武器攻撃
-		MAX,
-	};
-
-	enum class STATE
-	{
-		USUALLY = 0,//通常
-		ATTACK,//攻撃
-		GUARD,//ガード
-		GRAB,//掴まれる
 		MAX,
 	};
 
@@ -61,19 +52,10 @@ public:
 	void Damage(int damage);//ダメージを受けたときの処理
 	void BeGrabbed(D3DXMATRIX mtx);//掴まれる処理
 	void ReleaseGrab(D3DXVECTOR3 rot);//掴まれていない状態に変更
-	void DamegeBlow(D3DXVECTOR3 pos);//被弾時の吹き飛び処理
 	void SetAttackState(ATTACK_STATE state);//攻撃方法の設定
 	ATTACK_STATE GetAttackState();//攻撃方法の取得
-	void SetLife(int life);//寿命の設定
-	int GetLife();//寿命の取得
-	bool GetDamage();//ダメージ判定の取得
-	void SetDamage();//ダメージ判定の変更
-	void SetState(STATE state);//状態の設定
-	STATE GetState();//状態の取得
 	void SetEnemyType(ENEMY_TYPE EnemyType);//敵の種類を設定
 	ENEMY_TYPE GetEnemyType();//敵の種類を取得
-	void DamageVisual(int PartsNum,float Radius);//被弾時の当たり判定の可視化
-	void SetVisual();//当たり判定の可視化処理
 	CFild* GetFild();//乗っている地面の情報
 	CPlayer* GetPlayer();//プレイヤーの情報を取得
 	bool GetMovable();//移動可能か取得
@@ -91,13 +73,8 @@ private:
 
 	//メンバ変数
 	ATTACK_STATE m_AttackState;//攻撃方法
-	STATE m_state;//現在の状態
 	D3DXMATRIX m_Mtx;//ワールドマトリックス
-	int m_nLife;//寿命
-	bool m_Damage;//ダメージ状態判定
-	D3DXVECTOR3 m_DamageMove;//吹き飛び用の移動値
 	ENEMY_TYPE m_EnemyType;//敵の種類
-	CCollisionVisual* m_visual;//当たり判定の可視化
 	CPlayer* m_player;//プレイヤーの情報
 	bool m_Movable;//行動可能判定
 

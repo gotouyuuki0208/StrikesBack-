@@ -135,7 +135,8 @@ void CHitEnemy::Update()
 	}
 
 	//更新処理
-	CEnemy::Update();	
+	CEnemy::Update();
+	Motion();
 }
 
 //==========================
@@ -189,7 +190,7 @@ CHitEnemy* CHitEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 //==========================
 void CHitEnemy::Move()
 {
-	if (GetState() != STATE::USUALLY)
+	if (GetState() != STATE::NEUTRAL)
 	{//攻撃状態の時終了
 		return;
 	}
@@ -221,7 +222,7 @@ void CHitEnemy::Count()
 		{
 			m_NearAction = false;
 			m_NearCount = 0;
-			SetState(STATE::USUALLY);
+			SetState(STATE::NEUTRAL);
 		}
 	}
 
@@ -243,7 +244,7 @@ void CHitEnemy::Count()
 //==========================
 void CHitEnemy::MoveAction()
 {
-	if ((GetState() != STATE::USUALLY)
+	if ((GetState() != STATE::NEUTRAL)
 		|| m_AttackCoolTime > (ATTACKFINISH_COOLTIME - 60))
 	{//通常状態以外の時または攻撃終了してから1秒たっていない時終了
 		return;
@@ -278,6 +279,12 @@ void CHitEnemy::MoveAction()
 			m_NearCount = 0;
 		}
 	}
+	else if (!Attackable
+		&& ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * WALK_DISTANCE))
+	{
+		//モーションを設定
+		SetMotion(MOTION_TYPE::NEUTRAL);
+	}
 	else if (Attackable
 		&& !ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
 	{//攻撃可能かつプレイヤーより遠い
@@ -293,7 +300,6 @@ void CHitEnemy::MoveAction()
 	{
 		SetState(STATE::ATTACK);
 	}
-	
 	//向きの設定
 	ChangeDirection();
 }
@@ -338,7 +344,7 @@ void CHitEnemy::Attack()
 	{//プレイヤーが遠いまたはコンボできない
 
 		SetOldMotion(GetMotion());//今のモーションを保存
-		SetState(STATE::USUALLY);//通常状態に変更
+		SetState(STATE::NEUTRAL);//通常状態に変更
 		SetAttackState(ATTACK_STATE::ATTACK);
 		if (GetPartsExistence(15))
 		{
@@ -372,7 +378,7 @@ void CHitEnemy::ColisionHitAttack()
 
 		if (m_StackIdx <= 0)
 		{
-			GetPlayer()->DamageBlow(GetPos());
+			GetPlayer()->DamegeBlow(GetPos());
 		}
 	}
 }

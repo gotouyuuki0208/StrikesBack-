@@ -285,8 +285,10 @@ void CMotionModel::SetMotion(MOTION_TYPE MotionType)
 	{
 		if (m_PartsList[i] != nullptr)
 		{
-			m_FirstMotion[i].pos = m_PartsList[i]->GetMotionPos();
-			m_FirstMotion[i].rot = m_PartsList[i]->GetRot();
+			KeepFirstPos(m_PartsList[i]->GetMotionPos(), i);
+			KeepFirstRot(m_PartsList[i]->GetRot(), i);
+			//m_FirstMotion[i].pos = m_PartsList[i]->GetMotionPos();
+			//m_FirstMotion[i].rot = m_PartsList[i]->GetRot();
 		}
 	}
 
@@ -299,63 +301,32 @@ void CMotionModel::SetMotion(MOTION_TYPE MotionType)
 //==========================
 void CMotionModel::Motion()
 {
-	for (int nCntModel = 0; nCntModel < MAX_PARTS; nCntModel++)
-	{
-		if (m_PartsList[nCntModel] != nullptr)
-		{
+	//パーツの数値の計算
+	CalParts();
 
-			//相対値を求める
-			float Cur = (float)m_nCntMotion / m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].nFrame;
+	//モーションカウンターを進める
+	MotionCountUpdate();
 
-			//位置と向きの差分を求める
-			//D3DXVECTOR3 diffrot = m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[nCntModel].rot - m_FirstMotion[nCntModel].rot;
-			D3DXVECTOR3 diffpos = m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[nCntModel].pos - m_FirstMotion[nCntModel].pos;
-			D3DXVECTOR3 addrot;
-			
-			addrot.x = RevisionRot(m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[nCntModel].rot.x, m_FirstMotion[nCntModel].rot.x, Cur);
-			addrot.y = RevisionRot(m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[nCntModel].rot.y, m_FirstMotion[nCntModel].rot.y, Cur);
-			addrot.z = RevisionRot(m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[nCntModel].rot.z, m_FirstMotion[nCntModel].rot.z, Cur);
+	//モーションの情報を更新
+	UpdateMotionInfo();
+}
 
-			//現在値を求める
-			D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-			//rot.x = m_FirstMotion[nCntModel].rot.x + (diffrot.x * Cur);
-			//rot.y = m_FirstMotion[nCntModel].rot.y + (diffrot.y * Cur);
-			//rot.z = m_FirstMotion[nCntModel].rot.z + (diffrot.z * Cur);
-
-			rot.x = m_FirstMotion[nCntModel].rot.x + addrot.x;
-			rot.y = m_FirstMotion[nCntModel].rot.y + addrot.y;
-			rot.z = m_FirstMotion[nCntModel].rot.z + addrot.z;
-
-			//向きの設定
-			m_PartsList[nCntModel]->SetRot(D3DXVECTOR3(rot.x, rot.y, rot.z));
-
-			if (!m_PartsList[nCntModel]->GetExistParent())
-			{//親のパーツがないとき
-
-				//現在値を求める
-				pos.x = m_FirstMotion[nCntModel].pos.x + (diffpos.x * Cur);
-				pos.y = m_FirstMotion[nCntModel].pos.y + (diffpos.y * Cur);
-				pos.z = m_FirstMotion[nCntModel].pos.z + (diffpos.z * Cur);
-
-				//位置の設定
-				m_PartsList[nCntModel]->SetMotionPos(D3DXVECTOR3(pos.x, pos.y, pos.z));
-			}
-
-		}
-	}
-
-	m_nCntMotion++;//モーションカウンターを進める
-
-	if (m_nCntMotion == m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].nFrame)
+//==========================
+//モーションの情報を更新
+//==========================
+void CMotionModel::UpdateMotionInfo()
+{
+	if (ExceedMaxFlame())
 	{//モーションカウンターが再生フレーム数に達した
 
 		for (int i = 0; i < MAX_PARTS; i++)
 		{
 			if (m_PartsList[i] != nullptr)
 			{
-				m_FirstMotion[i].pos = m_PartsList[i]->GetMotionPos();
-				m_FirstMotion[i].rot = m_PartsList[i]->GetRot();
+				KeepFirstPos(m_PartsList[i]->GetMotionPos(), i);
+				KeepFirstRot(m_PartsList[i]->GetRot(), i);
+				//m_FirstMotion[i].pos = m_PartsList[i]->GetMotionPos();
+				//m_FirstMotion[i].rot = m_PartsList[i]->GetRot();
 			}
 		}
 
@@ -377,6 +348,119 @@ void CMotionModel::Motion()
 			}
 		}
 	}
+}
+
+//==========================
+//カウンターの更新
+//==========================
+void CMotionModel::MotionCountUpdate()
+{
+	m_nCntMotion++;
+}
+
+//==========================
+//パーツの更新に必要な数値を計算
+//==========================
+void CMotionModel::CalParts()
+{
+	for (int nCntModel = 0; nCntModel < MAX_PARTS; nCntModel++)
+	{
+		if (m_PartsList[nCntModel] != nullptr)
+		{
+			//現在値を求める
+			D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+			//パーツの向きを求める
+			rot = CalMotionRot(nCntModel);
+
+			//向きの設定
+			m_PartsList[nCntModel]->SetRot(rot);
+
+			if (!m_PartsList[nCntModel]->GetExistParent())
+			{//親のパーツがないとき
+
+				//パーツの位置を求める
+				pos = CalMotionPos(nCntModel);
+
+				//位置の設定
+				m_PartsList[nCntModel]->SetMotionPos(pos);
+			}
+		}
+	}
+}
+
+//==========================
+//モーションのカウンターが再生フレームを超えたか判定
+//==========================
+bool CMotionModel::ExceedMaxFlame()
+{
+	if (m_nCntMotion == m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].nFrame)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//==========================
+//モーション中のパーツの位置を求める
+//==========================
+D3DXVECTOR3& CMotionModel::CalMotionPos(int PartsNum)
+{
+	D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	//相対値を求める
+	float Cur = (float)m_nCntMotion / m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].nFrame;
+
+	//位置の差分を求める
+	D3DXVECTOR3 diffpos = m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[PartsNum].pos - m_FirstMotion[PartsNum].pos;
+
+	//現在値を求める
+	pos.x = m_FirstMotion[PartsNum].pos.x + (diffpos.x * Cur);
+	pos.y = m_FirstMotion[PartsNum].pos.y + (diffpos.y * Cur);
+	pos.z = m_FirstMotion[PartsNum].pos.z + (diffpos.z * Cur);
+
+	return pos;
+}
+
+//==========================
+//モーション中のパーツの向きを求める
+//==========================
+D3DXVECTOR3& CMotionModel::CalMotionRot(int PartsNum)
+{
+	D3DXVECTOR3 addrot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	//相対値を求める
+	float Cur = (float)m_nCntMotion / m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].nFrame;
+
+	//向きの差分を求める
+	addrot.x = RevisionRot(m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[PartsNum].rot.x, m_FirstMotion[PartsNum].rot.x, Cur);
+	addrot.y = RevisionRot(m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[PartsNum].rot.y, m_FirstMotion[PartsNum].rot.y, Cur);
+	addrot.z = RevisionRot(m_MotionInfo[(int)m_MotionType].aKeySet[m_nCurKey].aKey[PartsNum].rot.z, m_FirstMotion[PartsNum].rot.z, Cur);
+
+	rot.x = m_FirstMotion[PartsNum].rot.x + addrot.x;
+	rot.y = m_FirstMotion[PartsNum].rot.y + addrot.y;
+	rot.z = m_FirstMotion[PartsNum].rot.z + addrot.z;
+
+	return rot;
+}
+
+//==========================
+//最初の位置を保存
+//==========================
+void CMotionModel::KeepFirstPos(D3DXVECTOR3 pos, int PartsNum)
+{
+	m_FirstMotion[PartsNum].pos = pos;
+}
+
+//==========================
+//最初の向きを保存
+//==========================
+void CMotionModel::KeepFirstRot(D3DXVECTOR3 rot, int PartsNum)
+{
+	m_FirstMotion[PartsNum].rot = rot;
 }
 
 //==========================

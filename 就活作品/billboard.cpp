@@ -147,7 +147,7 @@ void CBillBoard::Draw()
 	LPDIRECT3DDEVICE9 pDevice;//デバイスへのポインタ
 	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();//デバイスの取得
 
-	D3DXMATRIX mtxTrans;//計算用マトリックス
+	D3DXMATRIX mtxTrans,a;//計算用マトリックス
 	D3DXMATRIX mtxView;//ビューマトリックス取得用
 
 	//頂点バッファをデータストリームに設定
@@ -165,6 +165,7 @@ void CBillBoard::Draw()
 	//ビューマトリックスを取得
 	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 
+	
 	//ポリゴンをカメラに対して正面に向ける
 	D3DXMatrixInverse(&GetMtxWorld(), NULL, &mtxView);//逆行列を求める
 	GetMtxWorld()._41 = 0.0f;

@@ -66,10 +66,7 @@ public:
 		DAMAGEBLOW,//吹き飛び
 		SMALLWEAPONGUARD,//片手武器所持時ガード
 		WEAPONMOVE,//武器を持った状態の移動
-		GRABATTACK,//掴み攻撃
-		THROW,//投げ飛ばし
-		GRAB,//掴まれる
-		TEST,//テスト
+		AVOIDANCE_BACK,//後ろに回避
 	};
 
 	//メンバ関数
@@ -95,6 +92,14 @@ public:
 	bool GetPartsExistence(int PartsNum);//パーツが存在するか判定
 	void Motion();//モーション処理
 	void PartsDraw();//パーツの描画
+	D3DXVECTOR3& CalMotionPos(int PartsNum);//モーション中のパーツの位置を求める
+	D3DXVECTOR3& CalMotionRot(int PartsNum);//モーション中のパーツの向きを求める
+	void KeepFirstPos(D3DXVECTOR3 pos, int PartsNum);//最初の位置を保存
+	void KeepFirstRot(D3DXVECTOR3 rot, int PartsNum);//最初の向きを保存
+	bool ExceedMaxFlame();//モーションのカウンターが再生フレームを超えたか判定
+	void CalParts();//パーツの更新に必要な数値を計算
+	void MotionCountUpdate();//カウンターの更新
+	void UpdateMotionInfo();//モーションの情報を更新
 private:
 
 	//メンバ変数

@@ -312,3 +312,64 @@ float CObjectX::GetTransparent()
 {
 	return m_Transparent;
 }
+
+//========================
+//行列の生成
+//========================
+void CObjectX::CreateMtx()
+{
+	D3DXMATRIX mtxRot, mtxTrans, mtxScale;//計算用マトリックス
+
+	//ワールドマトリックスの初期化
+	D3DXMatrixIdentity(&GetMtxWorld());
+
+	//スケール設定
+	D3DXMatrixScaling(&mtxScale, GetScale().x, GetScale().y, GetScale().z);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxScale);
+
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, GetRot().y, GetRot().x, GetRot().z);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxRot);
+
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTrans, GetPos().x, GetPos().y, GetPos().z);
+	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxTrans);
+}
+
+//========================
+//モデルの描画
+//========================
+void CObjectX::DrawModel()
+{
+	LPDIRECT3DDEVICE9 pDevice;//デバイスへのポインタ
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();//デバイスの取得
+
+	D3DMATERIAL9 matDef;//現在のマテリアル保存用
+	D3DXMATERIAL* pMat;//マテリアルデータへのポインタ
+
+	//現在のマトリックスを取得
+	pDevice->GetMaterial(&matDef);
+
+	//法線の長さを1にする
+	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
+
+	//マテリアルデータへのポインタを取得
+	pMat = (D3DXMATERIAL*)m_pBuffMat->GetBufferPointer();
+
+	for (int nCntMat = 0; nCntMat < (int)m_dwNumMat; nCntMat++)
+	{
+		//透明度を設定
+		pMat[nCntMat].MatD3D.Diffuse.a = m_Transparent;
+
+		//マテリアルの設定
+		pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+		pDevice->SetTexture(0, m_pTexture2[nCntMat]);
+
+		//モデルパーツの描画
+		m_pMesh->DrawSubset(nCntMat);
+	}
+
+
+	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
+}

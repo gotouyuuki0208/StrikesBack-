@@ -725,23 +725,22 @@ void CEdit::StageChange()
 //==========================
 void CEdit::DeleteAll()
 {
-	/*m_Objectite = m_Object.begin();
-	int a = 0;
+	m_Objectite = m_Object.begin();
+
 	while (1)
 	{
 		if (m_Objectite == m_Object.end())
-		{*/
+		{
 			m_Object.clear();//—v‘f‚ð‘S‚Äíœ
-			//CObject::ReleaseAll();
-	//		break;
-	//	}
+			CObject::ReleaseAll();
+			break;
+		}
 
-	//	CObject* obj = *m_Objectite;
-	//	
-	//	obj->Uninit();
-	//	m_Objectite++;
-	//	a++;
-	//}
+		CObject* obj = *m_Objectite;
+		
+		obj->Uninit();
+		m_Objectite++;
+	}
 }
 
 //==========================
