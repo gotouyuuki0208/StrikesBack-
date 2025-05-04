@@ -125,6 +125,8 @@ void CItem::SetModelIdx(int Idx)
 //==========================
 void CItem::ColisionPlayer()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CPlayer::PRIORITY);
 
@@ -147,7 +149,7 @@ void CItem::ColisionPlayer()
 
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
 
-		bool Colision = ColisionSphere(GetPos(),
+		bool Colision = pCollision->Sphere(GetPos(),
 			pPlayer->GetPos(),
 			GetRadius(),
 			pPlayer->GetRadius());

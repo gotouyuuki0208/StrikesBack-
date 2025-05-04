@@ -97,7 +97,7 @@ CShadow* CShadow::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	pShadow->SetSize(size);
 
 	//F‚ÌÝ’è
-	pShadow->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+	pShadow->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 
 	//‰Šú‰»ˆ—
 	pShadow->Init();

@@ -8,7 +8,8 @@
 //include
 #include"objectMesh.h"
 #include"manager.h"
-#include"particle.h"
+#include"texture.h"
+
 //静的メンバ初期化
 const int CObjectMesh::PRIORITY = 0;//描画優先度
 
@@ -24,7 +25,8 @@ m_size{},//ポリゴンのサイズ
 m_WidthDiv(0),//横の分割数
 m_VerticalDiv(0),//縦の分割数
 m_NumVtx(0),//頂点数
-m_NumIdx(0)//インデックス数
+m_NumIdx(0),//インデックス数
+m_nTexIdx(0)//テクスチャの番号
 {
 
 }
@@ -79,13 +81,6 @@ HRESULT CObjectMesh::Init(void)
 //========================
 void CObjectMesh::Uninit(void)
 {
-
-	if (m_pTexture != nullptr)
-	{//テクスチャの解放
-		m_pTexture->Release();
-		m_pTexture = nullptr;
-	}
-
 	if (m_pVtxBuff != nullptr)
 	{//頂点バッファの解放
 		m_pVtxBuff->Release();
@@ -98,6 +93,11 @@ void CObjectMesh::Uninit(void)
 		m_pIdxBuff = nullptr;
 	}
 
+	if (m_pTexture != nullptr)
+	{//テクスチャの解放
+		m_pTexture = nullptr;
+	}
+
 	Release();
 }
 
@@ -106,11 +106,7 @@ void CObjectMesh::Uninit(void)
 //========================
 void CObjectMesh::Update()
 {
-	for (int a = 0; a < 30; a++)
-	{
-    
-	CParticle::Create(GetPos(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 10, 10.0f, 10.0f, 10.0f);
-	}
+
 }
 
 //========================
@@ -131,8 +127,16 @@ void CObjectMesh::Draw()
 	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxRot);
 
 	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,0.0f, 0.0f, 0.0f);
+	D3DXMatrixTranslation(&mtxTrans,GetPos().x, GetPos().y, GetPos().z);
 	D3DXMatrixMultiply(&GetMtxWorld(), &GetMtxWorld(), &mtxTrans);
+
+	GetMtxWorld()._41 = 0.0f;
+	GetMtxWorld()._42 = 0.0f;
+	GetMtxWorld()._43 = 0.0f;
+
+	//カリングをオフにする
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &GetMtxWorld());
@@ -149,8 +153,15 @@ void CObjectMesh::Draw()
 	//テクスチャの設定
 	pDevice->SetTexture(0, m_pTexture);
 
+	//ポリゴン数
+	int polygon = ((m_VerticalDiv * m_WidthDiv) * 2) + (4 * (m_VerticalDiv - 1));
+
 	//ポリゴンの描画
-	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, m_NumVtx, 0, ((m_VerticalDiv * m_WidthDiv) * 2) + (4 * (m_VerticalDiv - 1)));
+	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, m_NumVtx, 0, polygon);
+
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+
 }
 
 //========================
@@ -164,16 +175,21 @@ CObjectMesh* CObjectMesh::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, int Width, i
 	pObjectMesh->SetPos(pos);
 
 	//サイズの設定
-	pObjectMesh->m_size = size;
+	pObjectMesh->SetSize(size);
 
 	//横の分割数
-	pObjectMesh->m_WidthDiv = Width;
+	pObjectMesh->SetWidthDiv(Width);
 
 	//縦の分割数
-	pObjectMesh->m_VerticalDiv = Vertical;
+	pObjectMesh->SetVerticalDiv(Vertical);
 
 	//初期設定
 	pObjectMesh->Init();
+
+	//テクスチャ設定
+	CTexture* pTex = CManager::GetInstance()->GetTexture();
+	pObjectMesh->m_nTexIdx = pTex->Regist("data\\TEXTURE\\effect000.png");
+	pObjectMesh->BindTexture(pTex->GetAdress(pObjectMesh->m_nTexIdx));
 
 	return pObjectMesh;
 }
@@ -192,26 +208,29 @@ void CObjectMesh::SetInit()
 	float Width = (m_size.x * 2) / m_WidthDiv;
 
 	//頂点の縦幅を算出
-	float Vertical = (m_size.z * 2) / m_VerticalDiv;
+	float Height = (m_size.y * 2) / m_VerticalDiv;
 
+	//頂点の縦幅を算出
+	float Vertical = (m_size.z * 2) / m_VerticalDiv;
+	
 	//頂点の横の位置
-	int a = 0;
+	int WidthPos = 0;
 
 	//頂点の縦の位置
-	int b = 0;
+	int VerticalPos = 0;
 
 	//頂点座標の設定
 	for (int i = 0; i < m_NumVtx; i++)
 	{
-		pVtx[i].pos = D3DXVECTOR3(-m_size.x + (Width * a), 0.0f, m_size.z - (Vertical * b));
-		if (a == m_WidthDiv)
+		pVtx[i].pos = D3DXVECTOR3(-m_size.x + (Width * WidthPos), m_size.y + (-Height * VerticalPos), m_size.z - (Vertical * VerticalPos));
+		if (WidthPos == m_WidthDiv)
 		{//頂点の横幅が最後になった
-			a = 0;
-			b++;
+			WidthPos = 0;
+			VerticalPos++;
 		}
 		else
 		{
-			a++;
+			WidthPos++;
 		}
 	}
 
@@ -224,13 +243,27 @@ void CObjectMesh::SetInit()
 	//頂点カラーの設定
 	for (int i = 0; i < m_NumVtx; i++)
 	{
-		pVtx[i].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[i].col = D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f);
 	}
 	
+
+	Width = 1.0f / m_WidthDiv;
+	Vertical = 1.0f / m_VerticalDiv;
+	WidthPos = 0;
+	VerticalPos = 0;
 	//テクスチャ座標の設定
 	for (int i = 0; i < m_NumVtx; i++)
 	{
-		pVtx[i].tex = D3DXVECTOR2(0.0f, 0.0f);
+		pVtx[i].tex = D3DXVECTOR2(0.0f + (Width * WidthPos), 0.0f + (-Vertical * VerticalPos));
+		if (WidthPos == m_WidthDiv)
+		{//頂点の横幅が最後になった
+			WidthPos = 0;
+			VerticalPos++;
+		}
+		else
+		{
+			WidthPos++;
+		}
 	}
 	
 	
@@ -248,25 +281,104 @@ void CObjectMesh::SeIdx()
 	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
 
 	//インデックスの設定
-	int a = 0;
+	int IdxNum = 0;
 
 	for (int i = 0; i < m_VerticalDiv; i++)
 	{//縦の分割数
 
-		for (int n = 0; n < m_WidthDiv; n++)
+		for (int n = 0; n < m_WidthDiv+1; n++)
 		{//横の分割数
-			pIdx[a] = (m_WidthDiv + 1) * (i + 1) + n;
-			pIdx[a + 1] = (m_WidthDiv + 1) * i + n;
-			a += 2;
+			pIdx[IdxNum] = (m_WidthDiv + 1) * (i + 1) + n;
+			pIdx[IdxNum + 1] = (m_WidthDiv + 1) * i + n;
+			IdxNum += 2;
 		}
 
 		if (i != m_VerticalDiv - 1)
 		{
-			pIdx[a] = (m_WidthDiv + 1) * (1 + i) - 1;
-			pIdx[a + 1] = (m_WidthDiv + 1) * (2 + i);
+			pIdx[IdxNum] = (m_WidthDiv + 1) * (1 + i) - 1;
+			pIdx[IdxNum + 1] = (m_WidthDiv + 1) * (2 + i);
+			IdxNum += 2;
 		}
-}
+	}
+
+	for (int i = 0; i < m_NumIdx; i++)
+	{
+		int a = pIdx[i];
+		a = 0;
+	}
 
 	//インデックスバッファをアンロックする
 	m_pIdxBuff->Unlock();
+}
+
+//========================
+//縦の分割数を設定
+//========================
+void CObjectMesh::SetVerticalDiv(int vertical)
+{
+	m_VerticalDiv = vertical;
+}
+
+//========================
+//縦の分割数を取得
+//========================
+int CObjectMesh::GetVerticalDiv()
+{
+	return m_VerticalDiv;
+}
+
+//========================
+//横の分割数を設定
+//========================
+void CObjectMesh::SetWidthDiv(int width)
+{
+	m_WidthDiv = width;
+}
+
+//========================
+//横の分割数を設定
+//========================
+int CObjectMesh::GetWidthDiv()
+{
+	return m_WidthDiv;
+}
+
+//========================
+//サイズを設定
+//========================
+void CObjectMesh::SetSize(D3DXVECTOR3 size)
+{
+	m_size = size;
+}
+
+//========================
+//サイズを取得
+//========================
+D3DXVECTOR3& CObjectMesh::GetSize()
+{
+	return m_size;
+}
+
+//========================
+//頂点バッファを取得
+//========================
+LPDIRECT3DVERTEXBUFFER9& CObjectMesh::GetVtxBuff()
+{
+	return m_pVtxBuff;
+}
+
+//========================
+//頂点数の取得
+//========================
+int CObjectMesh::GetNumVtx()
+{
+	return m_NumVtx;
+}
+
+//========================
+//テクスチャ割り当て
+//========================
+void CObjectMesh::BindTexture(LPDIRECT3DTEXTURE9 pTex)
+{
+	m_pTexture = pTex;
 }

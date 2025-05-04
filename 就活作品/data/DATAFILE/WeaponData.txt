@@ -1,4 +1,4 @@
-pos_x:-552
+pos_x:-522
 pos_y:0
 pos_z:1724
 scale_x:2
@@ -11,9 +11,9 @@ weapontype:1
 Type:1
 END_DATA
 
-pos_x:2046
+pos_x:3168
 pos_y:0
-pos_z:3638
+pos_z:3614
 scale_x:2
 scale_y:2
 scale_z:2
@@ -24,9 +24,9 @@ weapontype:2
 Type:2
 END_DATA
 
-pos_x:3627
+pos_x:4068
 pos_y:0
-pos_z:3638
+pos_z:3623
 scale_x:2
 scale_y:2
 scale_z:2

@@ -26,9 +26,12 @@ public:
 	void Move(D3DXVECTOR3 pos);//カメラの移動
 	void VerticalMove(D3DXVECTOR3 pos);//カメラの縦移動
 	D3DXVECTOR3& GetPosR();//注視点の取得
+	D3DXVECTOR3& GetPosV();//視点の取得
 	void OutGame(D3DXVECTOR3 pos);//インゲーム以外のカメラ
 	D3DXVECTOR3& GetRot();//向きの取得
 	void Overhead(D3DXVECTOR3 pos);//頭上から写す
+	void SetTargetPos(D3DXVECTOR3 pos);//カメラの追従変更後の位置を設定
+	void TarGetMove();//ターゲットの位置へ移動
 private:
 	//メンバ関数
 	void Input();//入力処理

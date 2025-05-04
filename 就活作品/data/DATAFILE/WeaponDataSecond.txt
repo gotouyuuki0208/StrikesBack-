@@ -1,6 +1,6 @@
-pos_x:-172
+pos_x:-230
 pos_y:0
-pos_z:3285
+pos_z:2758
 scale_x:1
 scale_y:1
 scale_z:1
@@ -13,7 +13,7 @@ END_DATA
 
 pos_x:602
 pos_y:0
-pos_z:4075
+pos_z:3119
 scale_x:1
 scale_y:1
 scale_z:1

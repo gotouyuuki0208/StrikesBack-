@@ -21,6 +21,7 @@
 #include"stagemanager.h"
 #include"TutorialManager.h"
 #include"GameManager.h"
+#include"collision.h"
 
 //マネージャクラスの定義
 class CManager
@@ -39,7 +40,6 @@ public:
 	CInputKeyboard*GetKeyboard();//キーボード入力取得
 	CInputJoypad* GetJoypad();//パッド情報取得
 	CSound* GetSound();//サウンド情報取得
-	//CBlockManager* GetBlockManager();//ブロック情報取得
 	CCamera* GetCamera();//カメラ情報取得
 	CLight* GetLight();//ライト情報取得
 	CTexture* GetTexture();//テクスチャ情報取得
@@ -49,7 +49,8 @@ public:
 	CStageManager* GetStageManager();//ステージの取得
 	CTutorial* GetTutorial();//チュートリアルの取得
 	CScene* GetScene();//シーンの取得
-	CGameManager* GetGameManager();
+	CGameManager* GetGameManager();//ゲーム管理の取得
+	CCollision* GetCollision();//当たり判定の取得
 	void SetMode(CScene::MODE mode);//画面の設定
 private:
 
@@ -71,6 +72,7 @@ private:
 	CStageManager* m_Stage;//ステージ管理
 	CTutorial* m_Tutorial;//チュートリアル管理
 	CGameManager* m_GameManager;//ゲーム管理
+	CCollision* m_Collision;//当たり判定
 };
 
 #endif 

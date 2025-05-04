@@ -86,7 +86,7 @@ CGymFild* CGymFild::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DXVECTOR3 rot)
 	pFild->SetRot(rot);
 
 	//F‚ÌÝ’è
-	pFild->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pFild->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰Šú‰»ˆ—
 	pFild->Init();

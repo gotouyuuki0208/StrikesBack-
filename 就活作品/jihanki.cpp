@@ -144,6 +144,8 @@ CJihanki* CJihanki::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3 rot)
 //==========================
 void CJihanki::ColisionPlayer()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CPlayer::PRIORITY);
 
@@ -166,7 +168,7 @@ void CJihanki::ColisionPlayer()
 
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
 
-		bool Colision = ColisionSphere(GetPos(),
+		bool Colision = pCollision->Sphere(GetPos(),
 			pPlayer->GetPos(),
 			GetRadius(),
 			pPlayer->GetRadius());

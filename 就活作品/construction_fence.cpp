@@ -87,7 +87,7 @@ CConstruction* CConstruction::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVEC
 
 	//ƒ‚ƒfƒ‹‚Ì¶¬
 	CModel* pModel = CManager::GetInstance()->GetModel();
-	pConveni->SetModelIdx(pModel->Regist("data\\MODEL\\test_building002.x"));
+	pConveni->SetModelIdx(pModel->Regist("data\\MODEL\\construction.x"));
 	pConveni->BindModel(pModel->GetMeshAdress(pConveni->GetModelIdx()),
 		pModel->GetBuffMatAdress(pConveni->GetModelIdx()),
 		pModel->GetNumMatAdress(pConveni->GetModelIdx()),

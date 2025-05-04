@@ -240,6 +240,8 @@ void CWeapon::Move()
 //==========================
 void CWeapon::CollisionEnemy()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
 
@@ -262,7 +264,7 @@ void CWeapon::CollisionEnemy()
 
 		CEnemy* pEnemy = (CEnemy*)pObj;
 
-		bool Colision = ColisionSphere(D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42 + 5.0f, GetMtxWorld()._43),
+		bool Colision = pCollision->Sphere(D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42 + 5.0f, GetMtxWorld()._43),
 			D3DXVECTOR3(pEnemy->GetPartsMtx(0)._41, pEnemy->GetPartsMtx(0)._42, pEnemy->GetPartsMtx(0)._43),
 			10.0f,
 			30.0f);
@@ -356,6 +358,8 @@ void CWeapon::Reset()
 //==========================
 void CWeapon::ColisionPlayer()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CPlayer::PRIORITY);
 
@@ -378,7 +382,7 @@ void CWeapon::ColisionPlayer()
 
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
 
-		bool Colision = ColisionSphere(GetPos(),
+		bool Colision = pCollision->Sphere(GetPos(),
 			pPlayer->GetPos(),
 			GetRadius() - 1.0f,
 			pPlayer->GetRadius() - 1.0f);
@@ -408,7 +412,7 @@ void CWeapon::ColisionPlayer()
 
 		}
 
-		Colision = ColisionSphere(GetPos(),
+		Colision = pCollision->Sphere(GetPos(),
 			pPlayer->GetPos(),
 			GetRadius(),
 			pPlayer->GetRadius());
@@ -430,6 +434,8 @@ void CWeapon::ColisionPlayer()
 //==========================
 void CWeapon::HitEnemy()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
 	
@@ -452,7 +458,7 @@ void CWeapon::HitEnemy()
 
 		CEnemy* pEnemy = dynamic_cast<CEnemy*>(pObj);
 
-		bool Colision = ColisionSphere(D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42, GetMtxWorld()._43),
+		bool Colision = pCollision->Sphere(D3DXVECTOR3(GetMtxWorld()._41, GetMtxWorld()._42, GetMtxWorld()._43),
 			D3DXVECTOR3(pEnemy->GetPartsMtx(1)._41, pEnemy->GetPartsMtx(1)._42, pEnemy->GetPartsMtx(1)._43),
 			30.0f,
 			30.0f);

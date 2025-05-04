@@ -37,7 +37,7 @@ weapontype:1
 Type:2
 END_DATA
 
-pos_x:-1805
+pos_x:-1328
 pos_y:0
 pos_z:504
 scale_x:1
@@ -50,7 +50,7 @@ weapontype:2
 Type:1
 END_DATA
 
-pos_x:-1805
+pos_x:-1326
 pos_y:0
 pos_z:344
 scale_x:1

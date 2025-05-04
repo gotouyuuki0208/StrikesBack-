@@ -41,7 +41,6 @@ public:
 	void SetRadius(float radius);//”¼Œa‚Ìİ’è
 	D3DXVECTOR3& GetScale();//Šg‘å—¦‚Ìİ’è
 	void SetScale(D3DXVECTOR3 scale);//Šg‘å—¦‚Ìİ’è
-	bool ColisionSphere(D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, float myradius, float partnerradius);//‹…‚Ì”»’è
 	float RevisionRot(float objectiverot ,float currentrot,float Cur);//Œü‚«‚Ì•â³
 	float NormalizeAngle(float angle);//Œü‚«‚Ì³‹K‰»
 	float VectorCalculation(float current, float purpose);//ƒxƒNƒgƒ‹‚ÌZo

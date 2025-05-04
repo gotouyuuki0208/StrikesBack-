@@ -50,6 +50,9 @@
 #include"cone.h"
 #include"gymfild.h"
 #include"gymceiling.h"
+#include"corridorExit.h"
+#include"corridorceiling.h"
+#include"illumination.h"
 
 //静的メンバ初期化
 const float CEdit::MOVE = 1.0f;//移動量
@@ -65,7 +68,8 @@ m_EditObjectKeep{},//編集中のオブジェクトを保存
 m_MoveDirection(false),//移動方向
 m_SwitchInput(false),//入力方法
 m_move(false),//移動の編集
-m_Camera(false)//カメラの位置
+m_Camera(false),//カメラの位置
+m_ChangeScale(false)//スケールの変更
 {
 	m_Object.clear();//要素を全て削除
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
@@ -311,6 +315,45 @@ void CEdit::Scale()
 		{
 			m_scale.x -= SCALE;
 			m_scale.y -= SCALE;
+			m_scale.z -= SCALE;
+		}
+	}
+
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_G))
+	{
+		m_ChangeScale = !m_ChangeScale;
+	}
+
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_T))
+	{
+		if (!m_ChangeScale)
+		{
+			m_scale.x += SCALE;
+		}
+		else
+		{
+			m_scale.x -= SCALE;
+		}
+	}
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_Y))
+	{
+		if (!m_ChangeScale)
+		{
+			m_scale.y += SCALE;
+		}
+		else
+		{
+			m_scale.y -= SCALE;
+		}
+	}
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_U))
+	{
+		if (!m_ChangeScale)
+		{
+			m_scale.z += SCALE;
+		}
+		else
+		{
 			m_scale.z -= SCALE;
 		}
 	}
@@ -584,6 +627,18 @@ CObjectgame* CEdit::SetType()
 		object = CGymCeiling::Create(m_pos, m_scale, m_rot);
 		break;
 		
+	case 40:
+		object = CCorridorExit::Create(m_pos, m_scale, m_rot);
+		break;
+
+	case 41:
+		object = CCorridorceiling::Create(m_pos, m_scale, m_rot);
+		break;
+
+	case 42:
+		object = CIllumination::Create(m_pos, m_scale, m_rot);
+		break;
+
 	default:
 		m_ObjectType = 0;
 		object = CBuil::Create(m_pos, m_scale, m_rot);
@@ -732,7 +787,6 @@ void CEdit::DeleteAll()
 		if (m_Objectite == m_Object.end())
 		{
 			m_Object.clear();//要素を全て削除
-			CObject::ReleaseAll();
 			break;
 		}
 
@@ -756,7 +810,7 @@ void CEdit::Load(int Stage)
 }
 
 //==========================
-//配置情報を書き出す5
+//配置情報を書き出す
 //==========================
 void CEdit::Save(int Stage)
 {
@@ -1069,6 +1123,19 @@ void CEdit::BuildingLoad(int Stage)
 				case 26:
 					m_Object.push_back(CGymCeiling::Create(pos, sclse, rot));
 					break;
+
+				case 27:
+					m_Object.push_back(CCorridorExit::Create(pos, sclse, rot));
+					break;
+
+				case 28:
+					m_Object.push_back(CCorridorceiling::Create(pos, sclse, rot));
+					break;
+
+				case 29:
+					m_Object.push_back(CIllumination::Create(pos, sclse, rot));
+					break;
+
 				default:
 					break;
 				}

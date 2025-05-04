@@ -9,21 +9,19 @@
 #include "player.h"
 #include "manager.h"
 #include "fild.h"
-#include "block.h"
 #include "bigweapon.h"
 #include "smallweapon.h"
 #include "boss.h"
 #include "jihanki.h"
-#include "deliveryperson.h"
 #include "effect.h"
 #include "particle.h"
+#include "guardeffect.h"
+#include "weapon.h"
+#include "enemy.h"
 
 //静的メンバ初期化
 const int CPlayer::PRIORITY = 1;//描画順
 const int CPlayer::MAX_LIFE = 25;//寿命の最大値
-const int CPlayer::INPUT_START_FLAME = 24;//入力受付開始フレーム数
-const int CPlayer::INPUT_FINISH_FLAME = 60;//入力受付終了フレーム数
-const int CPlayer::RESET_FLAME = 54;//コンボの情報リセットフレーム数数
 const float CPlayer::MOVE_VALUE = 3.0f;//移動
 const float CPlayer::DASH_VALUE = 7.0f;//ダッシュ
 const float CPlayer::JUMP_VALUE = 10.0f;//ジャンプ
@@ -32,7 +30,7 @@ const float CPlayer::INERTIA_VALUE = 0.5f;//慣性
 const float CPlayer::ROT_VALUE = 1.57f;//向き
 const float CPlayer::CHARA_WIDTH = 10.0f;//キャラクターのXサイズ
 const float CPlayer::CHARA_HEIGHT = 10.0f;//キャラクターのYサイズ
-
+const float CPlayer::AVOIDANCE_VALUE = 10.0f;//回避の移動値
 //==========================
 //コンストラクタ
 //==========================
@@ -40,23 +38,15 @@ CPlayer::CPlayer(int nPriority) :
 CCharacter(nPriority),//基底クラスのコンストラクタ
 m_grab(false),//掴み判定
 m_weapon(nullptr), //所持してる武器
-//m_GrabEnemy(nullptr),//掴んでる敵
 m_boss(nullptr),//ボスの情報を取得
-m_FlameCount(0),//フレーム数のカウント用
-m_ComboStack{},//攻撃コンボのスタック
-m_StackIdx(0),//スタックのTOPの位置
-m_Attack(false),//攻撃判定
-m_CountAttack(0),//コンボ中に攻撃を当てた回数
-m_testdeth(false),
-m_DamageCount(0),
 m_RecoveryItemStock(0),//アイテムのストック数
 m_WeaponType(false),//武器の種類
 m_VisualCor(false),//当たり判定の色の設定
-m_Avoidance(0),//回避フレーム
-LeftStickAngle(0.0f)//左スティックの角度
+LeftStickAngle(0.0f),//左スティックの角度
+m_StateMachine(nullptr),//状態管理
+m_DamageNum(0)//ダメージ回数カウント
 {
 	SetLife(MAX_LIFE);//寿命の設定
-	SetComboList();//コンボリストの生成
 }
 
 //==========================
@@ -74,7 +64,14 @@ HRESULT CPlayer::Init()
 {
 	//初期設定
 	CCharacter::Init();
+	
+	//向きの変更
 	SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
+
+	//状態管理クラスの作成
+	m_StateMachine = DBG_NEW CStateMachine;
+	auto NewState = DBG_NEW CNeutralState;
+	ChangeState(NewState);
 
 	return S_OK;
 }
@@ -88,17 +85,19 @@ void  CPlayer::Uninit()
 	{
 		m_weapon = nullptr;
 	}
-
-	/*if (m_GrabEnemy != nullptr)
-	{
-		m_GrabEnemy = nullptr;
-	}*/
 	
 	if (m_boss != nullptr)
 	{
 		m_boss = nullptr;
 	}
 
+	if (m_StateMachine != nullptr)
+	{
+		delete m_StateMachine;
+		m_StateMachine = nullptr;
+	}
+
+	
 	//終了処理
 	CCharacter::Uninit();
 }
@@ -113,33 +112,14 @@ void CPlayer::Update()
 		return;
 	}
 
-	if (!CManager::GetInstance()->GetDebug()->GetBossTest())
-	{
-		//入力処理
-		Input();
-	}
-
-	//回避処理
-	Avoidance();
-
-	//移動処理
-	Move();
-
-	if (GetState() == STATE::ATTACK)
-	{
-		//攻撃処理
-		Attack();
-	}
+	//ステートの更新
+	m_StateMachine->Update();
 
 	//地面との当たり判定
 	CollisionFild();
 
-	//m_VisualCor = false;
-
 	//敵との当たり判定
 	CollisionEnemy();
-
-	ColisionDelevery();
 
 	//モーションの更新
 	MotionUpdate();
@@ -147,36 +127,8 @@ void CPlayer::Update()
 	//更新処理
 	CCharacter::Update();
 
-	if (GetDamage())
-	{
-		m_DamageCount++;
-		if (m_DamageCount >= 54)
-		{
-			m_DamageCount = 0;
-			SetDamage(false);
-		}
-	}
-
-	//if (m_GrabEnemy != nullptr)
-	//{//敵を掴んでいるとき
-	//	GrabAttack();
-	//}
-
 	//カメラ追従
 	CManager::GetInstance()->GetCamera()->Move(D3DXVECTOR3(GetPos().x, GetPos().y, GetPos().z));
-
-	//可視化した当たり判定の設定
-	//m_Visual->SetPos(GetPos());
-	//m_Visual->Update();
-
-	if (!m_VisualCor)
-	{
-		//m_Visual->SetCorNomal();
-	}
-	else
-	{
-		//m_Visual->SetCorCollision();
-	}
 }
 
 //==========================
@@ -184,13 +136,8 @@ void CPlayer::Update()
 //==========================
 void CPlayer::Draw()
 {
-	if (!m_testdeth)
-	{
-		//描画処理
-		CCharacter::Draw();
-
-		//m_Visual->Draw();
-	}
+	//描画処理
+	CCharacter::Draw();
 }
 
 //==========================
@@ -208,7 +155,6 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 	pPlayer->Init();
 
 	//ファイルを読み込む
-	//pPlayer->LoadFile("data\\MOTION\\motion_enemy_hit.txt", scale);
 	pPlayer->LoadFile("data\\MOTION\\motion_player_15.txt", scale);
 
 	//半径の設定
@@ -216,9 +162,6 @@ CPlayer* CPlayer::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 
 	//タイプ設定
 	pPlayer->SetType(TYPE::PLAYER);
-
-	//当たり判定可視化
-	//pPlayer->m_Visual = CCollisionVisual::Create(pPlayer->GetPos(), pPlayer->GetRadius());
 	
 	return pPlayer;
 }
@@ -256,109 +199,12 @@ void CPlayer::MotionUpdate()
 }
 
 //==========================
-//入力処理
+//状態を変更
 //==========================
-void CPlayer::Input()
+void CPlayer::ChangeState(CPlayerStateBase* NewState)
 {
-	if (GetDamage())
-	{
-		return;
-	}
-
-	//攻撃の入力処理
-	InputAttack();
-
-	if (GetState() == STATE::NEUTRAL
-		|| GetState() == STATE::MOVE)
-	{
-		//移動の入力処理
-		InputMove();
-	}
-}
-
-//==========================
-//攻撃関係の入力処理
-//==========================
-void CPlayer::InputAttack()
-{
-	if (GetState() != STATE::GUARD)
-	{
-		if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J)
-			|| CManager::GetInstance()->GetJoypad()->GetTrigger(CInputJoypad::JOYKEY_Y))
-		{//攻撃
-			SetState(STATE::ATTACK);
-		}
-
-		if (m_weapon == nullptr)
-		{//武器を持っていないとき
-			if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_O)
-				|| CManager::GetInstance()->GetJoypad()->GetTrigger(CInputJoypad::JOYKEY_B))
-			{//武器を拾う
-				PickUpWeapon();
-			}
-		}
-		else if (m_weapon != nullptr)
-		{
-			if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_P)
-				|| CManager::GetInstance()->GetJoypad()->GetTrigger(CInputJoypad::JOYKEY_B))
-			{//武器を手放す
-
-				if (CManager::GetInstance()->GetJoypad()->Connection())
-				{//パッドが接続されている
-					if (CManager::GetInstance()->GetJoypad()->GetLeftStick())
-					{//左スティックが入力されている
-						ThrowWeapon();
-						return;
-					}
-				}
-				ReleaseWeapon();
-			}
-		}
-	}
-	
-	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_B)
-		|| CManager::GetInstance()->GetJoypad()->GetPress(CInputJoypad::JOYKEY_X))
-	{
-		if ((GetMotion() == MOTION_TYPE::MOVE
-			|| GetMotion() == MOTION_TYPE::NEUTRAL
-			|| GetMotion() == MOTION_TYPE::SMALLWEAPONNEUTRAL)
-			&& GetState() != STATE::ATTACK)
-		{
-			Guard();
-		}
-	}
-	if (CManager::GetInstance()->GetKeyboard()->GetRelease(DIK_B)
-		|| CManager::GetInstance()->GetJoypad()->GetRelease(CInputJoypad::JOYKEY_X))
-	{
-		SetState(STATE::NEUTRAL);
-	}
-
-	if (CManager::GetInstance()->GetJoypad()->GetRelease(CInputJoypad::JOYKEY_A))
-	{
-		SetState(STATE::AVOIDANCE);
-	}
-}
-
-//==========================
-//ガード処理
-//==========================
-void CPlayer::Guard()
-{
-	if (m_weapon != nullptr&&!m_WeaponType)
-	{//両手武器を持っているとき
-		return;
-	}
-
-	if (m_WeaponType)
-	{//片手武器を持っているとき
-		SetWeaponMotion(MOTION_TYPE::SMALLWEAPONGUARD);
-	}
-	else
-	{//素手のとき
-		SetMotion(MOTION_TYPE::GUARD);
-	}
-
-	SetState(STATE::GUARD);
+	NewState->SetOwner(this);
+	m_StateMachine->ChangeState(NewState);
 }
 
 //==========================
@@ -369,220 +215,46 @@ void CPlayer::InputMove()
 	float move = MOVE_VALUE;
 	float CameraRot = CManager::GetInstance()->GetCamera()->GetRot().y;
 
-	if (m_weapon == nullptr
-		|| (m_weapon != nullptr && m_WeaponType))
-	{
-		if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_LSHIFT)
-			|| CManager::GetInstance()->GetJoypad()->GetTriggerPedal(CInputJoypad::JOYKEY_LEFT_TRIGGER))
-		{//ダッシュ
-
-			move = DASH_VALUE;
-		}
-	}
-
-	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_W))
-	{//奥に移動
-
-		//移動値の設定
-		SetMove(D3DXVECTOR3(GetMove().x + sinf(CameraRot * D3DX_PI)* move,
-			GetMove().y,
-			GetMove().z + cosf(CameraRot * D3DX_PI) * move));
-		
-		//向きの設定
-		//SetRotMove(D3DXVECTOR3(GetRotMove().x, CameraRot * D3DX_PI-3.14f, GetRotMove().z));
-
-		SetRot(D3DXVECTOR3(GetRot().x, CameraRot * D3DX_PI - 3.14f, GetRot().z));
-
-		if (move == MOVE_VALUE)
-		{
-			if (!m_WeaponType
-				&&m_weapon->GetGrab())
-			{
-				SetWeaponMotion(MOTION_TYPE::WEAPONMOVE);//移動モーション
-			}
-			else
-			{
-				SetMotion(MOTION_TYPE::MOVE);//移動モーション
-			}
-		}
-		else if (move == DASH_VALUE)
-		{
-			SetMotion(MOTION_TYPE::DUSH);//移動モーション
-		}
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_A))
-	{//左に移動
-
-		//移動値の設定
-		SetMove(D3DXVECTOR3(GetMove().x + sinf(CameraRot * D3DX_PI-(D3DX_PI/2)) * move,
-			GetMove().y,
-			GetMove().z + cosf(CameraRot * D3DX_PI - (D3DX_PI / 2)) * move));
-
-		//向きの設定
-		//SetRotMove(D3DXVECTOR3(GetRotMove().x, CameraRot * D3DX_PI + D3DX_PI / 2, GetRotMove().z));
-		SetRot(D3DXVECTOR3(GetRot().x, CameraRot * D3DX_PI + D3DX_PI / 2, GetRot().z));
-		
-		if (move == MOVE_VALUE)
-		{
-			if (!m_WeaponType
-				&& m_weapon->GetGrab())
-			{
-				SetWeaponMotion(MOTION_TYPE::WEAPONMOVE);//移動モーション
-			}
-			else
-			{
-				SetMotion(MOTION_TYPE::MOVE);//移動モーション
-			}
-		}
-		else if (move == DASH_VALUE)
-		{
-			SetMotion(MOTION_TYPE::DUSH);//移動モーション
-		}
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_S))
-	{//手前に移動
-		SetMove(D3DXVECTOR3(GetMove().x - sinf(CameraRot * D3DX_PI) * move,
-			GetMove().y,
-			GetMove().z - cosf(CameraRot * D3DX_PI) * move));
-
-		//向きの設定
-		//SetRotMove(D3DXVECTOR3(GetRotMove().x, CameraRot * 0.0f, GetRotMove().z));
-		SetRot(D3DXVECTOR3(GetRot().x, CameraRot * D3DX_PI, GetRot().z));
-
-		if (move == MOVE_VALUE)
-		{
-			if (!m_WeaponType
-				&& m_weapon->GetGrab())
-			{
-				SetWeaponMotion(MOTION_TYPE::WEAPONMOVE);//移動モーション
-			}
-			else
-			{
-				SetMotion(MOTION_TYPE::MOVE);//移動モーション
-			}
-		}
-		else if (move == DASH_VALUE)
-		{
-			SetMotion(MOTION_TYPE::DUSH);//移動モーション
-		}
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_D))
-	{//右に移動
-		SetMove(D3DXVECTOR3(GetMove().x - sinf(CameraRot * D3DX_PI - (D3DX_PI / 2)) * move,
-			GetMove().y,
-			GetMove().z - cosf(CameraRot * D3DX_PI - (D3DX_PI / 2)) * move));
-
-		//向きの設定
-		//SetRotMove(D3DXVECTOR3(GetRotMove().x, CameraRot * D3DX_PI - D3DX_PI / 2, GetRotMove().z));
-		SetRot(D3DXVECTOR3(GetRot().x, CameraRot * D3DX_PI - D3DX_PI / 2, GetRot().z));
-
-		if (move == MOVE_VALUE)
-		{
-			if (!m_WeaponType
-				&& m_weapon->GetGrab())
-			{
-				SetWeaponMotion(MOTION_TYPE::WEAPONMOVE);//移動モーション
-			}
-			else
-			{
-				SetMotion(MOTION_TYPE::MOVE);//移動モーション
-			}
-		}
-		else if (move == DASH_VALUE)
-		{
-			SetMotion(MOTION_TYPE::DUSH);//移動モーション
-		}
-	}
-	else
-	{//移動していない
-		//if (GetMotion() == MOTION_TYPE::MOVE
-		//	|| GetMotion() == MOTION_TYPE::DUSH)
-		//{
-		//	if (m_weapon!=nullptr)
-		//	{
-		//		if (m_WeaponType)
-		//		{
-		//			SetMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション
-		//		}
-		//		else
-		//		{
-		//			SetMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション
-		//		}
-		//	}
-		//	else
-		//	{
-		//		SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
-		//	}
-		//}
-
-		//SetState(STATE::NEUTRAL);
+	if (CManager::GetInstance()->GetJoypad()->GetTriggerPedal(CInputJoypad::JOYKEY_LEFT_TRIGGER))
+	{//ダッシュ
+		move = DASH_VALUE;
 	}
 
 	if (CManager::GetInstance()->GetJoypad()->Connection())
 	{//パッドが接続されているとき
 
-		if (!CManager::GetInstance()->GetJoypad()->GetLeftStick())
-		{//左スティックを入力していない
+		//左スティックの角度を取得
+		LeftStickAngle = CManager::GetInstance()->GetJoypad()->GetLeftAngle();
 
-			//停止時のモーションに設定
-			if (m_weapon != nullptr)
-			{
-				if (m_WeaponType)
-				{
-					SetWeaponMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション
-				}
-				else
-				{
-					SetWeaponMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション
-				}
-			}
-			else
-			{
-				SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
-			}
-			return;
-		}
+		//移動値の設定
+		SetMove(D3DXVECTOR3(GetMove().x + sinf(CameraRot * D3DX_PI + LeftStickAngle) * move,
+			GetMove().y,
+			GetMove().z + cosf(CameraRot * D3DX_PI + LeftStickAngle) * move));
+
+		//向きの設定
+		D3DXVECTOR3 rot = GetRot();
+
+		SetRot(D3DXVECTOR3(GetRot().x, ((CameraRot * D3DX_PI) + (LeftStickAngle + D3DX_PI)), GetRot().z));
+	}
+
+}
+
+//==========================
+//攻撃時の移動処理
+//==========================
+void CPlayer::AttackMove()
+{
+	if (CManager::GetInstance()->GetJoypad()->Connection())
+	{//パッドが接続されているとき
 
 		//左スティックの角度を取得
 		LeftStickAngle = CManager::GetInstance()->GetJoypad()->GetLeftAngle();
-		
+
 		//移動値の設定
-		SetMove(D3DXVECTOR3(GetMove().x + sinf(CameraRot * D3DX_PI+ LeftStickAngle) * move,
+		SetMove(D3DXVECTOR3(GetMove().x + sinf(GetRot().y + D3DX_PI) * MOVE_VALUE,
 			GetMove().y,
-			GetMove().z + cosf(CameraRot * D3DX_PI + LeftStickAngle) * move));
-		
-		//向きの設定
-		SetRot(D3DXVECTOR3(GetRot().x, ((CameraRot* D3DX_PI) + (LeftStickAngle + D3DX_PI)), GetRot().z));
-
-		//モーションの設定
-		if (move == MOVE_VALUE)
-		{
-			if (m_weapon!=nullptr)
-			{
-				if (!m_WeaponType
-					&& m_weapon->GetGrab())
-				{
-					SetWeaponMotion(MOTION_TYPE::WEAPONMOVE);//移動モーション
-				}
-			}
-			else
-			{
-				SetMotion(MOTION_TYPE::MOVE);//移動モーション
-			}
-		}
-		else if (move == DASH_VALUE)
-		{
-			SetMotion(MOTION_TYPE::DUSH);//移動モーション
-		}
+			GetMove().z + cosf(GetRot().y + D3DX_PI) * MOVE_VALUE));
 	}
-
-	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_N))
-	{
-		Recovery();
-	}
-
-	//今のモーションを保存
-	SetOldMotion(GetMotion());
 }
 
 //==========================
@@ -617,160 +289,24 @@ void CPlayer::Move()
 //==========================
 void CPlayer::Avoidance()
 {
-	if (GetState() != STATE::AVOIDANCE)
-	{
+	if (!CManager::GetInstance()->GetJoypad()->Connection())
+	{//パッドが接続されていないとき
 		return;
 	}
 
-	m_Avoidance++;
+	//カメラの向きを取得
+	float CameraRot = CManager::GetInstance()->GetCamera()->GetRot().y;
 
-	if (CManager::GetInstance()->GetJoypad()->Connection())
-	{//パッドが接続されているとき
+	//移動値の設定
+	SetMove(D3DXVECTOR3(GetMove().x - sinf(CameraRot * D3DX_PI + LeftStickAngle) * AVOIDANCE_VALUE,
+		GetMove().y,
+		GetMove().z - cosf(CameraRot * D3DX_PI + LeftStickAngle) * AVOIDANCE_VALUE));
 
-		//カメラの向きを取得
-		float CameraRot = CManager::GetInstance()->GetCamera()->GetRot().y;
+	//向きの設定
+	SetRot(D3DXVECTOR3(GetRot().x, ((CameraRot * D3DX_PI) + (LeftStickAngle + D3DX_PI)), GetRot().z));
 
-		//移動値の設定
-		SetMove(D3DXVECTOR3(GetMove().x - sinf(CameraRot * D3DX_PI + LeftStickAngle) * 7.0f,
-			GetMove().y,
-			GetMove().z - cosf(CameraRot * D3DX_PI + LeftStickAngle) * 7.0f));
-
-		//向きの設定
-		SetRot(D3DXVECTOR3(GetRot().x, ((CameraRot * D3DX_PI) + (LeftStickAngle + D3DX_PI)), GetRot().z));
-	}
-
-	SetMotion(MOTION_TYPE::AVOIDANCE_BACK);
-
-	if (m_Avoidance == 10)
-	{
-		m_Avoidance = 0;
-		SetState(STATE::NEUTRAL);
-	}
-}
-
-//==========================
-//攻撃処理
-//==========================
-void CPlayer::Attack()
-{
-	
-	if (GetDamage())
-	{//ダメージを受けている
-		return;
-	}
-
-	if (GetOldMotion() == GetMotion())
-	{//前回のモーションと今のモーションが同じ
-
-		//今のモーションを保存
-		SetOldMotion(GetMotion());
-
-		if (m_weapon != nullptr)
-		{
-			SetWeaponMotion(Pop());
-		}
-		else
-		{
-			//攻撃モーションに変更
-			SetMotion(Pop());
-		}
-	}
-
-	if (m_FlameCount > 10 && m_FlameCount < 24)
-	{
-		//自販機への当たり判定
-		CollisionJihankiAttack();
-
-		//配達員への当たり判定
-		ColisionDeleveryAttack();
-		
-		//敵への攻撃判定
-		if (m_weapon==nullptr)
-		{//武器を持っていない
-			CollisionHitEnemy();
-		}
-		else
-		{
-			CollisionWeaponEnemy();
-		}
-
-		CorrectionAngle();
-	}
-	else
-	{
-		for (int i = 0; i < MAX_PARTS; i++)
-		{
-			if (GetPartsExistence(i))
-			{
-				//GetParts(i)->VisualDelete();
-			}
-		}
-	}
-
-	m_FlameCount++;
-
-	if (m_FlameCount > INPUT_START_FLAME && m_FlameCount <= INPUT_FINISH_FLAME && m_StackIdx>0)
-	{
-		if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J)
-			|| CManager::GetInstance()->GetJoypad()->GetTrigger(CInputJoypad::JOYKEY_Y))
-		{
-			//モーションを再生
-			if (m_weapon != nullptr)
-			{
-				SetWeaponMotion(Pop());
-			}
-			else
-			{
-				//攻撃モーションに変更
-				SetMotion(Pop());
-			}
-
-			CorrectionAngle();
-
-			m_FlameCount = 0;
-			m_Attack = false;
-			
-		}
-	}
-	else if (m_FlameCount > INPUT_FINISH_FLAME || (m_FlameCount > RESET_FLAME && m_StackIdx <= 0))
-	{
-		//今のモーションを保存
-		SetOldMotion(GetMotion());
-
-		//通常状態に変更
-		SetState(STATE::NEUTRAL);
-
-		if (m_weapon!=nullptr)
-		{//武器を持ってるとき
-
-			if (m_WeaponType)
-			{//片手武器のとき
-				SetWeaponMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション
-			}
-			else
-			{//両手武器のとき
-				SetWeaponMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション
-			}
-		}
-
-		//コンボのスタックをリセット
-		ResetStak();
-
-		m_FlameCount = 0;
-
-		m_Attack = false;
-
-		m_CountAttack = 0;
-
-		for (int i = 0; i < MAX_PARTS; i++)
-		{
-			if (GetPartsExistence(i))
-			{
-				//GetParts(i)->VisualDelete();
-			}
-		}
-		
-	}
+	//位置の設定
+	SetPos(GetPos() + GetMove());
 }
 
 //==========================
@@ -801,73 +337,22 @@ bool CPlayer::GetHaveWeapon()
 }
 
 //==========================
-//武器所持判定
+//武器を持っていない状態に変更
 //==========================
 void CPlayer::DeleteWeapon()
 {
 	m_weapon = nullptr;
-	SetComboList();
-}
-
-//==========================
-//コンボリストの生成
-//==========================
-void CPlayer::SetComboList()
-{
-	if (m_weapon == nullptr)
-	{//武器を持っていない
-		m_ComboList[0] = MOTION_TYPE::ATTACK;
-		m_ComboList[1] = MOTION_TYPE::ATTACK2;
-		m_ComboList[2] = MOTION_TYPE::ATTACK3;
-	}
-	else
-	{//武器を持っている
-		if (m_WeaponType)
-		{//片手武器
-			m_ComboList[0] = MOTION_TYPE::SMALLWEAPONATTACK;
-			m_ComboList[1] = MOTION_TYPE::SMALLWEAPONATTACK2;
-			m_ComboList[2] = MOTION_TYPE::SMALLWEAPONATTACK3;
-
-		}
-		else
-		{//両手武器
-			m_ComboList[0] = MOTION_TYPE::WEAPONATTACK;
-			m_ComboList[1] = MOTION_TYPE::WEAPONATTACK2;
-			m_ComboList[2] = MOTION_TYPE::WEAPONATTACK3;
-		}
-	}
-
-	ResetStak();//スタックのリセット
 }
 
 //==========================
 //ダメージ処理
 //==========================
-void CPlayer::Damage(int damage)
+void CPlayer::Damage()
 {
-	if (GetState() != STATE::GUARD)
-	{
-		SetLife(GetLife()- damage);
-		SetMotion(MOTION_TYPE::DAMAGE);
-		m_DamageCount = 0;
-		SetDamage(true);
-		
-		//コンボのスタックをリセット
-		ResetStak();
-		m_FlameCount = 0;
-		m_Attack = false;
-		m_CountAttack = 0;
-	}
-	
-	if (GetState() == STATE::GUARD)
-	{
-		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_GUARD);
-
-	}
+	SetDamage(true);
 
 	if (GetLife() <= 0)
 	{
-		m_testdeth = true;
 		if (CManager::GetInstance()->GetGameManager()->GetGame() == CGameManager::GAME::NONE)
 		{
 			CManager::GetInstance()->GetGameManager()->SetGame(CGameManager::GAME::OVER);
@@ -881,32 +366,6 @@ void CPlayer::Damage(int damage)
 void CPlayer::AddItem()
 {
 	m_RecoveryItemStock++;
-}
-
-//==========================
-//入力受付時間を取得
-//==========================
-int CPlayer::GetInputFrame()
-{
-	return m_FlameCount;
-}
-
-//==========================
-//掴み攻撃の処理
-//==========================
-void CPlayer::GrabAttack()
-{
-	/*m_FlameCount++;
-
-	if (m_FlameCount > 3 && m_FlameCount <=31)
-	{
-		m_GrabEnemy->BeGrabbed(GetParts(5)->GetMtxWorld());
-	}
-	else if(m_FlameCount>31)
-	{
-		ReleaseEnemy();
-		m_FlameCount = 0;
-	}*/
 }
 
 //==========================
@@ -956,6 +415,8 @@ void CPlayer::CollisionFild()
 //==========================
 void CPlayer::CollisionEnemy()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CBoss::PRIORITY);
 
@@ -978,14 +439,13 @@ void CPlayer::CollisionEnemy()
 
 		CBoss* pBoss = (CBoss*)pObj;
 
-		bool Colision = ColisionSphere(GetPos(),
+		bool Colision = pCollision->Sphere(GetPos(),
 			pBoss->GetPos(),
 			GetRadius(),
 			pBoss->GetRadius());
 
 		if (Colision)
 		{
-			//m_VisualCor = true;
 
 			D3DXVECTOR3 Vector = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//向きベクトル
 			D3DXVECTOR3 NormalizeVec = D3DXVECTOR3(0.0f, 0.0f, 0.0f);//正規化したベクトル
@@ -1011,16 +471,10 @@ void CPlayer::CollisionEnemy()
 //==========================
 //敵を殴るときの当たり判定
 //==========================
-void CPlayer::CollisionHitEnemy()
+void CPlayer::HitEnemy(int PartsNum)
 {
-	if (m_StackIdx != 1)
-	{
-		//GetParts(8)->CreateVisual(D3DXVECTOR3(GetPartsMtx(8)._41, GetPartsMtx(8)._42, GetPartsMtx(8)._43), 20.0f);
-	}
-	else
-	{
-		//GetParts(5)->CreateVisual(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43), 15.0f);
-	}
+	//当たり判定の情報を取得
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
@@ -1042,65 +496,24 @@ void CPlayer::CollisionHitEnemy()
 			continue;
 		}
 
-		CEnemy* pEnemy = (CEnemy*)pObj;
+		//エネミークラスにキャスト
+		CEnemy* pEnemy = dynamic_cast<CEnemy*>(pObj);
 
-		bool Colision;
+		//判定の中心位置を設定
+		D3DXVECTOR3 mypos = { GetParts(PartsNum)->GetMtxWorld()._41,GetParts(PartsNum)->GetMtxWorld()._42,GetParts(PartsNum)->GetMtxWorld()._43 };
+		D3DXVECTOR3 pos = { pEnemy->GetParts(1)->GetMtxWorld()._41,pEnemy->GetParts(1)->GetMtxWorld()._42,pEnemy->GetParts(1)->GetMtxWorld()._43 };
 
-		if (m_StackIdx != 1)
-		{
-			Colision = ColisionSphere(D3DXVECTOR3(GetPartsMtx(8)._41 + 5.0f, GetPartsMtx(8)._42, GetPartsMtx(8)._43),
-				D3DXVECTOR3(pEnemy->GetPartsMtx(1)._41, pEnemy->GetPartsMtx(1)._42, pEnemy->GetPartsMtx(1)._43),
-				20.0f,
-				15.0f);
-		}
-		else
-		{
-			Colision = ColisionSphere(D3DXVECTOR3(GetPartsMtx(5)._41 + 5.0f, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
-				D3DXVECTOR3(pEnemy->GetPartsMtx(1)._41, pEnemy->GetPartsMtx(1)._42, pEnemy->GetPartsMtx(1)._43),
-				15.0f,
-				15.0f);
-		}
+		bool Colision = pCollision->Sphere(mypos, pos,10.0f, 10.0f);
 
-		//pEnemy->DamageVisual(1, 15.0f);
+		if (Colision)
+		{//攻撃が当たっている
 
-		if (Colision && !m_Attack)
-		{
 			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_ATTACK);
-
-			if (m_StackIdx != 1)
-			{
-				//GetParts(8)->GetVisual()->SetCorCollision();
-
-				for (int i = 0; i < 3; i++)
-				{
-					CEffect::Create(D3DXVECTOR3(GetPartsMtx(8)._41, GetPartsMtx(8)._42, GetPartsMtx(8)._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f),15.0f,15.0f);
-				}
-			}
-			else
-			{
-				//GetParts(5)->GetVisual()->SetCorCollision();
-
-				for (int i = 0; i < 3; i++)
-				{
-					CEffect::Create(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f), 15.0f, 15.0f);
-				}
-			}
-			
 
 			//ダメージ処理
 			pEnemy->Damage(1);
-			m_Attack = true;
 			CManager::GetInstance()->GetCamera()->SetShape(5, 5);
-			m_CountAttack++;
-			if (m_StackIdx <= 0 && m_CountAttack >= 3)
-			{
-				if (!CManager::GetInstance()->GetDebug()->GetPlayerTest())
-				{
-					//吹き飛び
-					pEnemy->DamegeBlow(GetPos());
-
-				}
-			}
+			
 		}
 
 		pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
@@ -1110,9 +523,9 @@ void CPlayer::CollisionHitEnemy()
 //==========================
 //敵を武器で殴るときの当たり判定
 //==========================
-void CPlayer::CollisionWeaponEnemy()
+void CPlayer::WeaponHitEnemy()
 {
-	//GetParts(15)->CreateVisual(D3DXVECTOR3(GetPartsMtx(8)._41, GetPartsMtx(8)._42, GetPartsMtx(8)._43), 30.0f);
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
@@ -1134,21 +547,20 @@ void CPlayer::CollisionWeaponEnemy()
 			continue;
 		}
 
-		CEnemy* pEnemy = (CEnemy*)pObj;
+		CEnemy* pEnemy = dynamic_cast<CEnemy*>(pObj);
 
-		bool Colision = ColisionSphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
+		bool Colision = pCollision->Sphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
 			D3DXVECTOR3(pEnemy->GetPartsMtx(1)._41, pEnemy->GetPartsMtx(1)._42, pEnemy->GetPartsMtx(1)._43),
 			30.0f,
 			30.0f);
 
-		//pEnemy->DamageVisual(1, 30.0f);
+		if (Colision)
+		{//当たっている
 
-		if (Colision && !m_Attack)
-		{
 			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
 
 			for (int i = 0; i < 20; i++)
-			{
+			{//パーティクルの生成
 				CParticle::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
 					D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f),
 					10,
@@ -1159,44 +571,21 @@ void CPlayer::CollisionWeaponEnemy()
 			}
 
 			for (int i = 0; i < 3; i++)
-			{
+			{//エフェクトの表示
 				CEffect::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f), 15.0f, 15.0f);
 			}
 
-			//GetParts(15)->GetVisual()->SetCorCollision();
 			if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::SMALL)
-			{
+			{//片手武器のとき
 				pEnemy->Damage(2);
 			}
 			else
-			{
+			{//両手武器のとき
 				pEnemy->Damage(3);
 			}
-			m_Attack = true;
-			m_weapon->SubDurability();//武器の耐久値を減らす
-			if (m_StackIdx <= 0)
-			{
-				if (!CManager::GetInstance()->GetDebug()->GetPlayerTest())
-				{
-					//吹き飛び
-					pEnemy->DamegeBlow(GetPos());
-				}
-			}
 
-			if (m_weapon->GetDurability() <= 0)
-			{//耐久値がなくなったとき
-				DeleteParts(15);
-				SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
-
-				//武器を削除する
-				CManager::GetInstance()->GetStageManager()->DeleteObj(*m_weapon);
-				m_weapon->Uninit();
-				m_weapon = nullptr;
-				m_WeaponType = false;
-
-				SetComboList();//コンボリストの生成
-				break;
-			}
+			//武器の耐久を減らす
+			WeaponDamage();
 		}
 
 		pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
@@ -1208,6 +597,8 @@ void CPlayer::CollisionWeaponEnemy()
 //==========================
 void CPlayer::CollisionJihankiAttack()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CJihanki::PRIORITY);
 
@@ -1230,163 +621,21 @@ void CPlayer::CollisionJihankiAttack()
 
 		CJihanki* pJihan = (CJihanki*)pObj;
 
-		bool Colision = ColisionSphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
+		bool Colision = pCollision->Sphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
 			D3DXVECTOR3(pJihan->GetPos().x, pJihan->GetPos().y+20.0f, pJihan->GetPos().z),
 			10.0f,
 			30.0f);
 
-		//pJihan->DamageVisual(D3DXVECTOR3(pJihan->GetPos().x, pJihan->GetPos().y + 30.0f, pJihan->GetPos().z),
-			//30.0f);
-
-		if (Colision && !m_Attack)
+		if (Colision )
 		{
 			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_ATTACK);
 
 			//ダメージ処理
 			pJihan->Damage(1);
-			m_Attack = true;
 			CManager::GetInstance()->GetCamera()->SetShape(5, 5);
-			m_CountAttack++;
 		}
 
 		pObj = CObject::GetObj(pObj, CJihanki::PRIORITY);
-	}
-}
-
-//==========================
-//配達員の攻撃当たり判定
-//==========================
-void CPlayer::ColisionDeleveryAttack()
-{
-	//オブジェクトを取得
-	CObject* pObj = CObject::GetObj(nullptr, CDeliveryPerson::PRIORITY);
-
-	while (pObj != nullptr)
-	{
-		if (pObj == nullptr)
-		{//オブジェクトがない
-			pObj = CObject::GetObj(pObj, CDeliveryPerson::PRIORITY);
-			continue;
-		}
-
-		//種類の取得
-		CObject::TYPE type = pObj->GetType();
-
-		if (type != CObject::TYPE::DELIVERY)
-		{//オブジェクトが配達員ではない
-			pObj = CObject::GetObj(pObj, CDeliveryPerson::PRIORITY);
-			continue;
-		}
-
-		CDeliveryPerson* pDelivery = (CDeliveryPerson*)pObj;
-
-		bool Colision = ColisionSphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
-			D3DXVECTOR3(pDelivery->GetPartsMtx(1)._41, pDelivery->GetPartsMtx(1)._42, pDelivery->GetPartsMtx(1)._43),
-			10.0f,
-			30.0f);
-
-		if (Colision && !m_Attack)
-		{
-			//ダメージ処理
-			pDelivery->Damage(1);
-			m_Attack = true;
-			CManager::GetInstance()->GetCamera()->SetShape(5, 5);
-			m_CountAttack++;
-		}
-
-		pObj = CObject::GetObj(pObj, CDeliveryPerson::PRIORITY);
-	}
-}
-
-//==========================
-//配達員の当たり判定
-//==========================
-void CPlayer::ColisionDelevery()
-{
-	//オブジェクトを取得
-	CObject* pObj = CObject::GetObj(nullptr, CDeliveryPerson::PRIORITY);
-
-	while (pObj != nullptr)
-	{
-		if (pObj == nullptr)
-		{//オブジェクトがない
-			pObj = CObject::GetObj(pObj, CDeliveryPerson::PRIORITY);
-			continue;
-		}
-
-		//種類の取得
-		CObject::TYPE type = pObj->GetType();
-
-		if (type != CObject::TYPE::DELIVERY)
-		{//オブジェクトが配達員ではない
-			pObj = CObject::GetObj(pObj, CDeliveryPerson::PRIORITY);
-			continue;
-		}
-
-		CDeliveryPerson* pDelivery = (CDeliveryPerson*)pObj;
-
-		bool Colision = ColisionSphere(GetPos(),
-			pDelivery->GetPos(),
-			GetRadius(),
-			pDelivery->GetRadius());
-
-		pDelivery->Movable();//移動可能にする
-
-		if (Colision)
-		{
-			//m_VisualCor = true;
-
-			pDelivery->Immovable();//移動不可能にする
-		}
-
-		pObj = CObject::GetObj(pObj, CDeliveryPerson::PRIORITY);
-	}
-}
-
-//==========================
-//敵を掴む処理
-//==========================
-void CPlayer::GrabEnemy()
-{
-	/*if (m_GrabEnemy != nullptr)
-	{
-		return;
-	}*/
-
-	//オブジェクトを取得
-	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
-
-	while (pObj != nullptr)
-	{
-		if (pObj == nullptr)
-		{//オブジェクトがない
-			pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
-			continue;
-		}
-
-		//種類の取得
-		CObject::TYPE type = pObj->GetType();
-
-		if (type != CObject::TYPE::ENEMY)
-		{//オブジェクトがエネミーではない
-			pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
-			continue;
-		}
-
-		CEnemy* pEnemy = (CEnemy*)pObj;
-
-		bool colision = ColisionSphere(GetPos(), pEnemy->GetPos(), 10.0f, 30.0f);
-
-		if (colision)
-		{
-			//SetMotion(MOTION_TYPE::GRABATTACK);
-			//pEnemy->SetMotion(MOTION_TYPE::GRAB);
-			//pEnemy->SetMotion(MOTION_TYPE::GRAB);
-			//pEnemy->BeGrabbed(GetParts(5)->GetMtxWorld());
-			//m_GrabEnemy = pEnemy;
-		}
-
-		pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
 	}
 }
 
@@ -1395,6 +644,8 @@ void CPlayer::GrabEnemy()
 //==========================
 void CPlayer::PickUpWeapon()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CWeapon::PRIORITY);
 
@@ -1423,7 +674,7 @@ void CPlayer::PickUpWeapon()
 			continue;
 		}
 
-		bool colision = ColisionSphere(GetPos(), pWeapon->GetPos(), GetRadius(), pWeapon->GetRadius());
+		bool colision = pCollision->Sphere(GetPos(), pWeapon->GetPos(), GetRadius(), pWeapon->GetRadius());
 
 		if (colision)
 		{
@@ -1453,13 +704,19 @@ void CPlayer::PickUpWeapon()
 				CBoss* pBoss = dynamic_cast<CBoss*>(m_boss);
 				pBoss->GrabChangeWeapon(pWeapon);
 			}
-			
-			SetComboList();//コンボリストの生成
 			break;
 		}
 
 		pObj = CObject::GetObj(pObj, CWeapon::PRIORITY);
 	}
+}
+
+//==========================
+//武器の種類を取得
+//==========================
+bool CPlayer::GetWeaponType()
+{
+	return m_WeaponType;
 }
 
 //==========================
@@ -1480,88 +737,8 @@ void CPlayer::ReleaseWeapon()
 	m_weapon = nullptr;//武器の情報を削除
 
 	SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
-	SetComboList();//コンボリストの生成
+	
 }
-
-//==========================
-//敵を放す
-//==========================
-void CPlayer::ReleaseEnemy()
-{
-	/*if (m_GrabEnemy != nullptr)
-	{
-		m_GrabEnemy->ReleaseGrab(D3DXVECTOR3(GetParts(5)->GetRot().x, GetRot().y+D3DX_PI, 0.0f));
-		m_GrabEnemy->Damage(10);
-		m_GrabEnemy = nullptr;
-	}*/
-}
-
-//==========================
-//データの追加
-//==========================
-void CPlayer::Push(MOTION_TYPE motion)
-{
-	if (m_StackIdx < 3)
-	{
-		m_ComboStack[m_StackIdx++] = motion;
-	}
-}
-
-//==========================
-//データの取り出し
-//==========================
-CMotionModel::MOTION_TYPE CPlayer::Pop()
-{
-	if (m_StackIdx <= 0)
-	{
-		if (m_weapon != nullptr)
-		{//武器を持ってるとき
-			if (m_WeaponType)
-			{//片手武器
-				return MOTION_TYPE::SMALLWEAPONNEUTRAL;//待機モーション
-			}
-			else
-			{
-				return MOTION_TYPE::WEAPONNEUTRAL;//待機モーション
-			}
-		}
-		else
-		{//武器を持っていない
-			return MOTION_TYPE::NEUTRAL;
-		}
-	}
-
-	return m_ComboStack[--m_StackIdx];
-
-}
-
-//==========================
-//スタックの情報を戻す
-//==========================
-void CPlayer::ResetStak()
-{
-	m_StackIdx = 0;
-	for (int i = 2; i >= 0; i--)
-	{
-		Push(m_ComboList[i]);
-	}
-}
-
-//==========================
-//回復アイテムを使用
-//==========================
-void CPlayer::Recovery()
-{
-	if (m_RecoveryItemStock <= 0)
-	{
-		return;
-	}
-
-	m_RecoveryItemStock--;//アイテム数を減らす
-
-	SetLife(GetLife() + 2);//回復
-}
-
 //==========================
 //角度の補正
 //==========================
@@ -1569,6 +746,7 @@ void CPlayer::CorrectionAngle()
 {
 	float distance = 0.0f;
 	CEnemy* pNearEnemy = nullptr;
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
@@ -1624,7 +802,7 @@ void CPlayer::CorrectionAngle()
 		return;
 	}
 
-	bool colision = ColisionSphere(GetPos(), pNearEnemy->GetPos(), GetRadius() * 3, pNearEnemy->GetRadius());
+	bool colision = pCollision->Sphere(GetPos(), pNearEnemy->GetPos(), GetRadius() * 3, pNearEnemy->GetRadius());
 
 	if (colision)
 	{
@@ -1699,5 +877,98 @@ void CPlayer::ThrowWeapon()
 	m_weapon = nullptr;//武器の情報を削除
 
 	SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
-	SetComboList();//コンボリストの生成
+}
+
+//==========================
+//被弾回数初期化
+//==========================
+void CPlayer::ResetDamageNum()
+{
+	m_DamageNum = 0;
+}
+
+//==========================
+//被弾回数取得
+//==========================
+int CPlayer::GetDamageNum()
+{
+	return m_DamageNum;
+}
+
+//==========================
+//素手攻撃被弾処理
+//==========================
+void CPlayer::hit(D3DXVECTOR3 pos, int damage)
+{
+	if (m_DamageNum >= 3)
+	{
+		return;
+	}
+
+	//被弾回数を増やす
+	m_DamageNum++;
+
+	//ダメージの数値を取得
+	int DamageNum = damage;
+
+	//現在の状態を取得
+	auto State = m_StateMachine->GetState();
+
+	if (typeid(*State) == typeid(CGuardState))
+	{//ガード状態の時
+
+		//ダメージを減らす
+		DamageNum /= 2;
+	}
+	else if (typeid(*State) == typeid(CSmallWeaponGuardState))
+	{//武器ガード状態の時
+
+		//ダメージを減らす
+		DamageNum /= 2;
+		
+		//武器の耐久を減らす
+		WeaponDamage();
+	}
+
+	//ライフを減らす
+	int Life = GetLife();
+	SetLife(Life -= DamageNum);
+
+	if (typeid(*State) != typeid(CGuardState))
+	{//ガード状態ではない
+		Damage();
+
+		if (m_DamageNum >= 3)
+		{//3回被弾している
+			DamegeBlow(pos);
+		}
+	}
+	else
+	{
+		//エフェクトを表示する位置
+		D3DXVECTOR3 Effectpos = { GetParts(5)->GetMtxWorld()._41,GetParts(5)->GetMtxWorld()._42,GetParts(5)->GetMtxWorld()._43 };
+
+		//ガードエフェクト
+		CGuardEffect::Create(Effectpos, GetRot());
+	}
+}
+
+//==========================
+//武器の耐久を減らす
+//==========================
+void CPlayer::WeaponDamage()
+{
+	//武器の耐久値を減らす
+	m_weapon->SubDurability();
+
+	if (m_weapon->GetDurability() <= 0)
+	{//耐久値がなくなったとき
+		DeleteParts(15);
+
+		//武器を削除する
+		CManager::GetInstance()->GetStageManager()->DeleteObj(*m_weapon);
+		m_weapon->Uninit();
+		m_weapon = nullptr;
+		m_WeaponType = false;
+	}
 }

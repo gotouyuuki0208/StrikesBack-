@@ -192,22 +192,6 @@ D3DXVECTOR3& CObjectgame::GetScale()
 }
 
 //==========================
-//‹…‚Ì”»’è
-//==========================
-bool CObjectgame::ColisionSphere(D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, float myradius, float partnerradius)
-{
-	D3DXVECTOR3 DisPos = D3DXVECTOR3(mypos.x - partnerpos.x, mypos.y - partnerpos.y, mypos.z - partnerpos.z);
-	float Distance = sqrtf((DisPos.x * DisPos.x) + (DisPos.y * DisPos.y) + (DisPos.z * DisPos.z));
-
-	if (Distance < myradius + partnerradius)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-//==========================
 //Œü‚«‚Ì•â³
 //==========================
 float CObjectgame::RevisionRot(float objectiverot, float currentrot, float Cur)

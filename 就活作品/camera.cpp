@@ -42,8 +42,8 @@ CCamera::~CCamera()
 //==========================
 HRESULT CCamera::Init()
 {
-	m_posV = D3DXVECTOR3(-100.0f, 10.0f, -200.0f);//視点
-	m_posR = D3DXVECTOR3(-50.0f, 70.0f, 0.0f);//注視点
+	m_posV = D3DXVECTOR3(-100.0f, Y_DISTANCE, Z_DISTANCE);//視点
+	m_posR = D3DXVECTOR3(-50.0f, Y_DISTANCE, 0.0f);//注視点
 	//m_posV = D3DXVECTOR3(0.0f, Y_DISTANCE, Z_DISTANCE);//視点
 	//m_posR = D3DXVECTOR3(0.0f, Y_DISTANCE, 0.0f);//注視点
 	//m_posR = D3DXVECTOR3(0.0f, 80.0f, 0.0f);//注視点
@@ -64,7 +64,7 @@ HRESULT CCamera::Init()
 //==========================
 void CCamera::Uninit()
 {
-
+	
 }
 
 //==========================
@@ -72,16 +72,8 @@ void CCamera::Uninit()
 //==========================
 void CCamera::Update()
 {
-
 	//入力処理
 	Input();
-
-	/*m_posR.x += (m_targetposR.x - m_posR.x) * 0.75f;
-	m_posV.x += (m_targetposV.x - m_posV.x) * 0.75f;
-
-	m_posR.z += (m_targetposR.z - m_posR.z) * 0.75f;
-	m_posV.z += (m_targetposV.z - m_posV.z) * 0.75f;*/
-
 }
 
 #define PLOJECTION (1)//投影方法切り替え
@@ -193,6 +185,14 @@ D3DXVECTOR3& CCamera::GetPosR()
 }
 
 //==========================
+//視点の取得
+//==========================
+D3DXVECTOR3& CCamera::GetPosV()
+{
+	return m_posV;
+}
+
+//==========================
 //インゲーム以外のカメラ
 //==========================
 void CCamera::OutGame(D3DXVECTOR3 pos)
@@ -214,13 +214,37 @@ D3DXVECTOR3& CCamera::GetRot()
 //==========================
 void CCamera::Overhead(D3DXVECTOR3 pos)
 {
-	m_posR.x = pos.x;
-	m_posR.z = pos.z;
+	m_posV.x = pos.x + (sinf(m_rot.y * D3DX_PI) * Z_DISTANCE);
+	m_posV.z = pos.z + (cosf(m_rot.y * D3DX_PI) * Z_DISTANCE);
 
-	m_posV.x = pos.x;
-	m_posV.z = pos.z + Z_DISTANCE;
+	m_posR.x = m_posV.x - (sinf(m_rot.y * D3DX_PI) * Z_DISTANCE);
+	m_posR.z = m_posV.z - (cosf(m_rot.y * D3DX_PI) * Z_DISTANCE);
 
-	m_posV.y = 1000.0f;
+	m_posV.y = 2000.0f;
+}
+
+//==========================
+//カメラの追従変更後の位置を設定
+//==========================
+void CCamera::SetTargetPos(D3DXVECTOR3 pos)
+{
+	m_targetposR.x = pos.x;
+	m_targetposR.z = pos.z;
+
+	m_targetposV.x = pos.x;
+	m_targetposV.z = pos.z + Z_DISTANCE;
+}
+
+//==========================
+//ターゲットの位置へ移動
+//==========================
+void CCamera::TarGetMove()
+{
+	m_posR.x += (m_targetposR.x - m_posR.x) * 0.05f;
+	m_posV.x += (m_targetposV.x - m_posV.x) * 0.05f;
+												
+	m_posR.z += (m_targetposR.z - m_posR.z) * 0.05f;
+	m_posV.z += (m_targetposV.z - m_posV.z) * 0.05f;
 }
 
 //==========================
@@ -228,92 +252,12 @@ void CCamera::Overhead(D3DXVECTOR3 pos)
 //==========================
 void CCamera::Input(void)
 {
-	if (CManager::GetInstance()->GetTutorial()->GetTutorial())
+	if (CManager::GetInstance()->GetTutorial()->GetTutorial()
+		|| CManager::GetInstance()->GetScene()==nullptr
+		|| CManager::GetInstance()->GetGameManager()->GetDirection())
 	{//操作説明表示中
 		return;
 	}
-	
-	//カメラの平行移動
-	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_H))
-	{
-		if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_T))
-		{
-			m_posV.x += sinf(m_rot.y * D3DX_PI + 2.355f) * 2.0f;
-			m_posV.z += cosf(m_rot.y * D3DX_PI + 2.355f) * 2.0f;
-			m_posR.x += sinf(m_rot.y * D3DX_PI + 2.355f) * 2.0f;
-			m_posR.z += cosf(m_rot.y * D3DX_PI + 2.355f) * 2.0f;
-		}
-		else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_G))
-		{
-			m_posV.x += sinf(m_rot.y * D3DX_PI + 0.785f) * 2.0f;
-			m_posV.z += cosf(m_rot.y * D3DX_PI + 0.785f) * 2.0f;
-			m_posR.x += sinf(m_rot.y * D3DX_PI + 0.785f) * 2.0f;
-			m_posR.z += cosf(m_rot.y * D3DX_PI + 0.785f) * 2.0f;
-		}
-		else
-		{
-			m_posV.x += sinf(m_rot.y * D3DX_PI + 1.57f) * 2.0f;
-			m_posV.z += cosf(m_rot.y * D3DX_PI + 1.57f) * 2.0f;
-			m_posR.x += sinf(m_rot.y * D3DX_PI + 1.57f) * 2.0f;
-			m_posR.z += cosf(m_rot.y * D3DX_PI + 1.57f) * 2.0f;
-		}
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_F))
-	{
-		if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_T))
-		{
-			m_posV.x += sinf(m_rot.y * D3DX_PI - 2.355f) * 2.0f;
-			m_posV.z += cosf(m_rot.y * D3DX_PI - 2.355f) * 2.0f;
-			m_posR.x += sinf(m_rot.y * D3DX_PI - 2.355f) * 2.0f;
-			m_posR.z += cosf(m_rot.y * D3DX_PI - 2.355f) * 2.0f;
-		}
-		else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_G))
-		{
-			m_posV.x += sinf(m_rot.y * D3DX_PI - 0.785f) * 2.0f;
-			m_posV.z += cosf(m_rot.y * D3DX_PI - 0.785f) * 2.0f;
-			m_posR.x += sinf(m_rot.y * D3DX_PI - 0.785f) * 2.0f;
-			m_posR.z += cosf(m_rot.y * D3DX_PI - 0.785f) * 2.0f;
-		}
-		else
-		{
-			m_posV.x += sinf(m_rot.y * D3DX_PI - 1.57f) * 2.0f;
-			m_posV.z += cosf(m_rot.y * D3DX_PI - 1.57f) * 2.0f;
-			m_posR.x += sinf(m_rot.y * D3DX_PI - 1.57f) * 2.0f;
-			m_posR.z += cosf(m_rot.y * D3DX_PI - 1.57f) * 2.0f;
-		}
-	}
-	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_T))
-	{
-		m_PosRY += 1.0f;
-		m_posR.y = 0.0f + m_PosRY;
-
-		m_PosVY += 1.0f;
-		m_posV.y = Y_DISTANCE + m_PosVY;
-	}
-	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_G))
-	{
-		m_PosRY -= 1.0f;
-		m_posR.y = 0.0f + m_PosRY;
-
-		m_PosVY -= 1.0f;
-		
-		m_posV.y = Y_DISTANCE + m_PosVY;
-	}
-
-	/*else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_Q))
-	{
-		m_posV.x += sinf(m_rot.y * D3DX_PI) * -2.0f;
-		m_posV.z += cosf(m_rot.y * D3DX_PI) * -2.0f;
-		m_posR.x += sinf(m_rot.y * D3DX_PI) * -2.0f;
-		m_posR.z += cosf(m_rot.y * D3DX_PI) * -2.0f;
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_E))
-	{
-		m_posV.x += sinf(m_rot.y * D3DX_PI) * 2.0f;
-		m_posV.z += cosf(m_rot.y * D3DX_PI) * 2.0f;
-		m_posR.x += sinf(m_rot.y * D3DX_PI) * 2.0f;
-		m_posR.z += cosf(m_rot.y * D3DX_PI) * 2.0f;
-	}*/
 
 	float angle = CManager::GetInstance()->GetJoypad()->GetRightAngle();
 
@@ -339,43 +283,4 @@ void CCamera::Input(void)
 		}
 
 	}
-	/*else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_Y))
-	{
-		m_PosVY += 1.0f;
-		m_posV.x = m_posR.x + (sinf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-		m_posV.y = Y_DISTANCE + m_PosVY;
-		m_posV.z = m_posR.z + (cosf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_N))
-	{
-		m_PosVY -= 1.0f;
-		m_posV.x = m_posR.x + (sinf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-		m_posV.y = Y_DISTANCE + m_PosVY;
-		m_posV.z = m_posR.z + (cosf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-	}*/
-
-	//注視点操作
-	/*if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_T))
-	{
-		m_PosRY += 2.0f;
-		m_posR.y = 0.0f + m_PosRY;
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_B))
-	{
-		m_PosRY -= 2.0f;
-		m_posR.y = 0.0f + m_PosRY;
-	}*/
-	/*if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_Q))
-	{
-		m_rot.y -= 0.01f;
-		m_posR.x = m_posV.x - (sinf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-		m_posR.z = m_posV.z - (cosf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-	}
-	else if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_E))
-	{
-		m_rot.y += 0.01f;
-		m_posR.x = m_posV.x - (sinf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-		m_posR.z = m_posV.z - (cosf(m_rot.y * D3DX_PI) * Z_DISTANCE);
-	}*/
-
 }

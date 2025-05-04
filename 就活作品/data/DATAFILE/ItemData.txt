@@ -1,6 +1,6 @@
-pos_x:1683
+pos_x:3018
 pos_y:0
-pos_z:3618
+pos_z:3617
 scale_x:1.5
 scale_y:1.5
 scale_z:1.5

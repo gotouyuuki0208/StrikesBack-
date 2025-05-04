@@ -12,7 +12,7 @@
 #include"manager.h"
 
 //静的メンバ初期化
-const int CRenderer::NUM_EXPLANATION = 25;//デバッグ表示の最大数
+const int CRenderer::NUM_EXPLANATION = 29;//デバッグ表示の最大数
 ///========================
 //コンストラクタ
 //========================
@@ -21,6 +21,7 @@ CRenderer::CRenderer()
 	m_pD3D = nullptr;
 	m_pD3DDevice = nullptr;
 	g_pFont = nullptr;
+	pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 }
 
 //========================
@@ -203,7 +204,7 @@ void CRenderer::DrawDebug(void)
 	{
 		rect[nCnt] = { 0,20 * nCnt,SCREEN_WIDTH ,SCREEN_HEIGHT };
 	}
-
+	pos = playerpos();
 	//文字列に代入
 	wsprintf(&aStr[0][0], "FPS:%d\n", GetFps());
 	wsprintf(&aStr[1][0], "視点回転:Z,C\n");
@@ -230,6 +231,10 @@ void CRenderer::DrawDebug(void)
 	wsprintf(&aStr[22][0], "オブジェクトの種類を切り替え:←,→\n");
 	wsprintf(&aStr[23][0], "編集モードを切り替え(新規配置と配置済み):↑\n");
 	wsprintf(&aStr[24][0], "ステージを切り替え:V\n");
+	wsprintf(&aStr[25][0], "モデルのスケール拡縮変更:G\n");
+	wsprintf(&aStr[26][0], "モデルのスケール拡縮X:T\n");
+	wsprintf(&aStr[27][0], "モデルのスケール拡縮Y:Y\n");
+	sprintf(&aStr[28][0], "%.2f,%.2f,%.2f\n",pos.x, pos.y, pos.z);
 
 	//テキストの描画
 	for (int nCnt = 0; nCnt < NUM_EXPLANATION; nCnt++)
@@ -237,4 +242,39 @@ void CRenderer::DrawDebug(void)
 		g_pFont->DrawText(NULL, &aStr[nCnt][0], -1, &rect[nCnt], DT_LEFT, D3DCOLOR_RGBA(255, 0, 0, 255));
 	}
 
+}
+
+D3DXVECTOR3& CRenderer::playerpos()
+{
+	D3DXVECTOR3 pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	//オブジェクトを取得
+	CObject* pObj = CObject::GetObj(nullptr, CPlayer::PRIORITY);
+
+	while (pObj != nullptr)
+	{
+		if (pObj == nullptr)
+		{//オブジェクトがない
+			pObj = CObject::GetObj(pObj, CPlayer::PRIORITY);
+			continue;
+		}
+
+		//種類の取得
+		CObject::TYPE type = pObj->GetType();
+
+		if (type != CObject::TYPE::PLAYER)
+		{//オブジェクトがプレイヤーではない
+			pObj = CObject::GetObj(pObj, CPlayer::PRIORITY);
+			continue;
+		}
+
+		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
+
+		//プレイヤーの情報を取得
+		return pos = pPlayer->GetPos();
+
+		break;
+	}
+
+	return pos;
 }

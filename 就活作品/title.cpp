@@ -11,12 +11,13 @@
 #include"bg.h"
 #include"fild.h"
 #include"outgamecharactar.h"
-#include"gym_wall_top.h"
+#include"OutGameWall.h"
 #include"pullup.h"
 #include"punchingbag.h"
 #include"benchpress.h"
 #include"TitleLogo.h"
 #include"titlestart.h"
+
 //==========================
 // コンストラクタ
 //==========================
@@ -98,9 +99,9 @@ void CTitle::Bg()
 	CFild::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(500.0f, 0.0f, 500.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	//壁
-	CGymwalltop::Create(D3DXVECTOR3(0.0f, 0.0f, 100.0f), D3DXVECTOR3(10.0f, 10.0f, 10.0f), D3DXVECTOR3(0.0f, 1.57f, 0.0f));
-	CGymwalltop::Create(D3DXVECTOR3(150.0f, 0.0f, 0.0f), D3DXVECTOR3(10.0f, 10.0f, 10.0f), D3DXVECTOR3(0.0f, 3.14f, 0.0f));
-	CGymwalltop::Create(D3DXVECTOR3(0.0f, 250.0f, 0.0f), D3DXVECTOR3(10.0f, 10.0f, 10.0f), D3DXVECTOR3(0.0f, 1.57f, 1.57f));
+	COutGameWall::Create(D3DXVECTOR3(0.0f, 0.0f, 100.0f), D3DXVECTOR3(10.0f, 10.0f, 10.0f), D3DXVECTOR3(0.0f, 1.57f, 0.0f));
+	COutGameWall::Create(D3DXVECTOR3(150.0f, 0.0f, 0.0f), D3DXVECTOR3(10.0f, 10.0f, 10.0f), D3DXVECTOR3(0.0f, 3.14f, 0.0f));
+	COutGameWall::Create(D3DXVECTOR3(0.0f, 250.0f, 0.0f), D3DXVECTOR3(10.0f, 10.0f, 10.0f), D3DXVECTOR3(0.0f, 1.57f, 1.57f));
 
 	//器具
 	CPullUp::Create(D3DXVECTOR3(70.0f, 0.0f, 0.0f), D3DXVECTOR3(2.5f, 1.7f, 2.0f));

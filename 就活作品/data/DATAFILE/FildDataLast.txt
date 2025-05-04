@@ -10,3 +10,15 @@ rot_z:0
 type:5
 END_DATA
 
+pos_x:-810
+pos_y:0
+pos_z:1870
+scale_x:1000
+scale_y:0
+scale_z:1000
+rot_x:0
+rot_y:0
+rot_z:0
+type:5
+END_DATA
+

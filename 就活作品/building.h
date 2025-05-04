@@ -43,6 +43,9 @@ public:
 		WALL,//壁
 		GYMDOOR,//体育館ドア
 		GYMCEILING,
+		CEXIT,//廊下出口
+		CORRIDORCEILING,//廊下天井
+		ILLUMINATION,//照明
 		MAX,
 	};
 

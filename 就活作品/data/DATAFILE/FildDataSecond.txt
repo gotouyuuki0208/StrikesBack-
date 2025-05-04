@@ -34,9 +34,9 @@ rot_z:0
 type:1
 END_DATA
 
-pos_x:1462
+pos_x:1008
 pos_y:0
-pos_z:4121
+pos_z:3166
 scale_x:10
 scale_y:0
 scale_z:100
@@ -48,7 +48,7 @@ END_DATA
 
 pos_x:-956
 pos_y:0.5
-pos_z:1152
+pos_z:1096
 scale_x:10
 scale_y:0
 scale_z:10
@@ -60,7 +60,7 @@ END_DATA
 
 pos_x:-299
 pos_y:0.5
-pos_z:1152
+pos_z:1096
 scale_x:10
 scale_y:0
 scale_z:10
@@ -70,9 +70,9 @@ rot_z:0
 type:3
 END_DATA
 
-pos_x:-299
+pos_x:-351
 pos_y:0.5
-pos_z:4189
+pos_z:3224
 scale_x:10
 scale_y:0
 scale_z:10
@@ -82,9 +82,9 @@ rot_z:0
 type:3
 END_DATA
 
-pos_x:1405
+pos_x:887
 pos_y:0.5
-pos_z:4110
+pos_z:3149
 scale_x:10
 scale_y:0
 scale_z:10

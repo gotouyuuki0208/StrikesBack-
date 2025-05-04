@@ -99,7 +99,7 @@ CStageChangePoint* CStageChangePoint::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size)
 	pStageChangePoint->SetSize(size);
 
 	//F‚ÌÝ’è
-	pStageChangePoint->SetCor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	pStageChangePoint->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 	
 	//‰Šú‰»ˆ—
 	pStageChangePoint->Init();
@@ -141,7 +141,9 @@ void CStageChangePoint::ColisionPlayer()
 
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
 
-		bool Colision = ColisionSphere(GetPos(), pPlayer->GetPos(), GetRadius(), pPlayer->GetRadius());
+		CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+		bool Colision = pCollision->Sphere(GetPos(), pPlayer->GetPos(), GetRadius(), pPlayer->GetRadius());
 
 		if (Colision)
 		{

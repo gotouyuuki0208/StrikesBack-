@@ -7,9 +7,14 @@
 #ifndef _STAGEMANAGER_H_
 #define _STAGEMANAGER_H_
 
+//include
 #include"darkbg.h"
 #include<list>
 #include"objectgame.h"
+#include"player.h"
+#include"boss.h"
+#include"playerhpgauge.h"
+#include"bosshpgauge.h"
 
 //クラスの定義
 class CStageManager
@@ -35,6 +40,8 @@ public:
 	void Load();//ステージのオブジェクト生成
 	void DeleteAll();//全てのオブジェクトを削除
 	void DeleteObj(CObjectgame& obj);//オブジェクトを削除
+	void ChangeStage();//ステージの切り替え
+	void HPGaugeUpdate();//プレイヤーのHPゲージの更新
 private:
 
 	//メンバ関数
@@ -47,11 +54,15 @@ private:
 	//メンバ変数
 	STAGE m_Stage;//ステージの番号
 	bool m_Change;//ステージが切り替わったか判定
-	CDarkBg* m_DarkBg;
-	int m_Rast;
+	CDarkBg* m_DarkBg;//暗転のための黒ポリゴン
+	int m_Rast;//最終ステージの番号
 	list<CObjectgame*> m_Obj;//オブジェクトリスト
 	list<CObjectgame*>::iterator m_ObjIte;//オブジェクトリストイテレーター
-	
+
+	CPlayer* m_player;//プレイヤーの情報
+	CPlayerHPGauge* m_PlalyerHPGauge;//プレイヤーのHPゲージの情報
+
+	int m_playerlife;
 };
 
 #endif

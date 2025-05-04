@@ -76,5 +76,6 @@ private:
 	bool m_SwitchInput;//入力方法(false:Press true:Trigger)
 	bool m_move;//移動の編集(false:位置 true:向き)
 	bool m_Camera;//カメラの位置
+	bool m_ChangeScale;//スケール変更
 };
 #endif

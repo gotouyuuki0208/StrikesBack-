@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="attackstate.cpp" />
     <ClCompile Include="basketgoal.cpp" />
     <ClCompile Include="bat.cpp" />
     <ClCompile Include="benchpress.cpp" />
@@ -28,9 +29,13 @@
     <ClCompile Include="bossgaugeframe.cpp" />
     <ClCompile Include="bosshpgauge.cpp" />
     <ClCompile Include="character.cpp" />
+    <ClCompile Include="characterstate.cpp" />
     <ClCompile Include="clear.cpp" />
+    <ClCompile Include="collision.cpp" />
     <ClCompile Include="cone.cpp" />
     <ClCompile Include="construction_fence.cpp" />
+    <ClCompile Include="corridorceiling.cpp" />
+    <ClCompile Include="corridorExit.cpp" />
     <ClCompile Include="corridorfloor.cpp" />
     <ClCompile Include="corridorwall.cpp" />
     <ClCompile Include="curb.cpp" />
@@ -39,12 +44,15 @@
     <ClCompile Include="deliveryperson.cpp" />
     <ClCompile Include="drink.cpp" />
     <ClCompile Include="effect.cpp" />
+    <ClCompile Include="enemyattackstate.cpp" />
     <ClCompile Include="enemymovepoint.cpp" />
+    <ClCompile Include="enemystate.cpp" />
     <ClCompile Include="entrance.cpp" />
     <ClCompile Include="fence.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="garden.cpp" />
+    <ClCompile Include="guardeffect.cpp" />
     <ClCompile Include="gymceiling.cpp" />
     <ClCompile Include="gymdoor.cpp" />
     <ClCompile Include="gymfild.cpp" />
@@ -53,10 +61,12 @@
     <ClCompile Include="gym_wall.cpp" />
     <ClCompile Include="gym_wall_top.cpp" />
     <ClCompile Include="house_white.cpp" />
+    <ClCompile Include="illumination.cpp" />
     <ClCompile Include="knockdown.cpp" />
     <ClCompile Include="objectMesh.cpp" />
     <ClCompile Include="opeUI.cpp" />
     <ClCompile Include="outgamecharactar.cpp" />
+    <ClCompile Include="OutGameWall.cpp" />
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="peoplenum.cpp" />
     <ClCompile Include="pipe.cpp" />
@@ -69,7 +79,6 @@
     <ClCompile Include="bg.cpp" />
     <ClCompile Include="bigweapon.cpp" />
     <ClCompile Include="billboard.cpp" />
-    <ClCompile Include="block.cpp" />
     <ClCompile Include="boss.cpp" />
     <ClCompile Include="buil.cpp" />
     <ClCompile Include="building.cpp" />
@@ -108,6 +117,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="playerstate.cpp" />
     <ClCompile Include="pole.cpp" />
     <ClCompile Include="pullup.cpp" />
     <ClCompile Include="punchingbag.cpp" />
@@ -135,6 +145,7 @@
     <ClCompile Include="collisionvisual.cpp" />
     <ClCompile Include="TitleLogo.cpp" />
     <ClCompile Include="titlestart.cpp" />
+    <ClCompile Include="trajectory.cpp" />
     <ClCompile Include="TutorialManager.cpp" />
     <ClCompile Include="UIbg.cpp" />
     <ClCompile Include="wall.cpp" />
@@ -144,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="apartment.h" />
+    <ClInclude Include="attackstate.h" />
     <ClInclude Include="basketgoal.h" />
     <ClInclude Include="bat.h" />
     <ClInclude Include="benchpress.h" />
@@ -161,10 +173,14 @@
     <ClInclude Include="building.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="character.h" />
+    <ClInclude Include="characterstate.h" />
     <ClInclude Include="clear.h" />
+    <ClInclude Include="collision.h" />
     <ClInclude Include="cone.h" />
     <ClInclude Include="construction_fence.h" />
     <ClInclude Include="conveni.h" />
+    <ClInclude Include="corridorceiling.h" />
+    <ClInclude Include="corridorExit.h" />
     <ClInclude Include="corridorfloor.h" />
     <ClInclude Include="corridorwall.h" />
     <ClInclude Include="curb.h" />
@@ -177,7 +193,9 @@
     <ClInclude Include="edit.h" />
     <ClInclude Include="effect.h" />
     <ClInclude Include="enemy.h" />
+    <ClInclude Include="enemyattackstate.h" />
     <ClInclude Include="enemymovepoint.h" />
+    <ClInclude Include="enemystate.h" />
     <ClInclude Include="entrance.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="fence.h" />
@@ -186,6 +204,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="garden.h" />
+    <ClInclude Include="guardeffect.h" />
     <ClInclude Include="gymceiling.h" />
     <ClInclude Include="gymdoor.h" />
     <ClInclude Include="gymfild.h" />
@@ -194,10 +213,12 @@
     <ClInclude Include="gym_wall.h" />
     <ClInclude Include="gym_wall_top.h" />
     <ClInclude Include="house_white.h" />
+    <ClInclude Include="illumination.h" />
     <ClInclude Include="knockdown.h" />
     <ClInclude Include="objectMesh.h" />
     <ClInclude Include="opeUI.h" />
     <ClInclude Include="outgamecharactar.h" />
+    <ClInclude Include="OutGameWall.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="peoplenum.h" />
     <ClInclude Include="pipe.h" />
@@ -223,6 +244,7 @@
     <ClInclude Include="objectX.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="playerstate.h" />
     <ClInclude Include="pole.h" />
     <ClInclude Include="pullup.h" />
     <ClInclude Include="punchingbag.h" />
@@ -250,6 +272,7 @@
     <ClInclude Include="collisionvisual.h" />
     <ClInclude Include="TitleLogo.h" />
     <ClInclude Include="titlestart.h" />
+    <ClInclude Include="trajectory.h" />
     <ClInclude Include="TutorialManager.h" />
     <ClInclude Include="UIbg.h" />
     <ClInclude Include="wall.h" />

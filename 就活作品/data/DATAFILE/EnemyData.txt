@@ -18,7 +18,7 @@ END_DATA
 
 pos_x:4293
 pos_y:0
-pos_z:3360
+pos_z:3090
 scale_x:1.5
 scale_y:1.5
 scale_z:1.5
@@ -27,7 +27,7 @@ END_DATA
 
 pos_x:2290
 pos_y:0
-pos_z:2926
+pos_z:2981
 scale_x:1.5
 scale_y:1.5
 scale_z:1.5
@@ -36,7 +36,7 @@ END_DATA
 
 pos_x:3110
 pos_y:0
-pos_z:2926
+pos_z:2972
 scale_x:1.5
 scale_y:1.5
 scale_z:1.5

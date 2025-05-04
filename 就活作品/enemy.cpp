@@ -9,20 +9,31 @@
 #include "enemy.h"
 #include "manager.h"
 #include "model.h"
+#include "enemymovepoint.h"
+#include "player.h"
+#include "enemystate.h"
 
 //静的メンバ初期化
 const int CEnemy::PRIORITY = 1;//描画順
+const float CEnemy::DUSH_DISTANCE = 10.0f;//走る距離
+const float CEnemy::DUSH_SPEED = 3.5f;//走る速さ
+const float CEnemy::STOP_DISTANCE = 5.0f;//停止する距離
+const float CEnemy::WALK_SPEED = 2.0f;//歩く速さ
 
 //==========================
 //コンストラクタ
 //==========================
 CEnemy::CEnemy(int nPriority) :
 CCharacter(nPriority),//基底コンストラクタ
-m_AttackState(ATTACK_STATE::USUALLY),//攻撃方法
+//m_AttackState(ATTACK_STATE::USUALLY),//攻撃方法
 m_EnemyType(ENEMY_TYPE::NONE),//敵の種類
 m_player(nullptr),//プレイヤーの情報
 m_Movable(false),//行動可能か判定
-m_CurPoint(0)//現在の移動地点
+m_CurPoint(0),//現在の移動地点
+m_StateMachine(nullptr),//状態管理
+m_Angle(0.0f),//向き
+Attackable(true),//攻撃可能判定
+m_PlayMotion(true)//モーション再生判定
 {
 	for (int i = 0; i < POINT;i++)
 	{
@@ -55,6 +66,11 @@ HRESULT CEnemy::Init()
 
 	SetPosOld(GetPos());
 
+	//状態管理クラスの作成
+	m_StateMachine = DBG_NEW CStateMachine;
+	auto NewState = DBG_NEW CEnemyMovabeState;
+	ChangeState(NewState);
+
 	return S_OK;
 }
 
@@ -78,6 +94,12 @@ void  CEnemy::Uninit()
 			m_Point[i] = nullptr;
 		}
 	}
+
+	if (m_StateMachine != nullptr)
+	{
+		delete m_StateMachine;
+		m_StateMachine = nullptr;
+	}
 }
 
 //==========================
@@ -85,12 +107,19 @@ void  CEnemy::Uninit()
 //==========================
 void CEnemy::Update()
 {
+	//ステートの更新
+	m_StateMachine->Update();
+
 	//移動処理
 	Move();
 
-	//モーションの更新
-	//Motion();
+	if (m_PlayMotion)
+	{//モーションを再生する
 
+		//モーションの更新
+		Motion();
+	}
+	
 	//更新処理
 	CCharacter::Update();
 
@@ -102,7 +131,7 @@ void CEnemy::Update()
 
 	if (GetDamage())
 	{
-		if (m_player->GetInputFrame() >= 54)
+		//if (m_player->GetInputFrame() >= 54)
 		{
 
 			SetDamage(false);
@@ -183,23 +212,51 @@ CEnemy* CEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 
 	return pEnemy;
 }
+
+//==========================
+//状態を変更
+//==========================
+void CEnemy::ChangeState(CEnemyStateBase* NewState)
+{
+	NewState->SetOwner(this);
+	m_StateMachine->ChangeState(NewState);
+}
+
+//==========================
+//攻撃時の移動
+//==========================
+void CEnemy::AttackMove()
+{
+	//向きの変更
+	ChangeDirection();
+
+	//移動値を設定
+	SetMove(D3DXVECTOR3(sinf(m_Angle) * WALK_SPEED, 0.0f, cosf(m_Angle) * WALK_SPEED));
+}
+
 //==========================
 //移動処理
 //==========================
 void CEnemy::Move()
 {
-	/*if (m_state == STATE::GRAB)
-	{
-		return;
-	}*/
+	//前回の位置を保存
+	SetPosOld(GetPos());
 
-	SetDamegeBlow(D3DXVECTOR3(GetDamegeBlow().x + (0 - GetDamegeBlow().x) * 0.25f,
+	//移動値の設定
+	SetMove(D3DXVECTOR3(GetMove().x += (0 - GetMove().x) * 0.25f,
+		GetMove().y,
+		GetMove().z += (0 - GetMove().z) * 0.25f));
+
+	//位置を変更
+	SetPos(GetPos() + GetMove());
+
+	/*SetDamegeBlow(D3DXVECTOR3(GetDamegeBlow().x + (0 - GetDamegeBlow().x) * 0.25f,
 		GetDamegeBlow().y - 1.0f,
 		GetDamegeBlow().z + (0 - GetDamegeBlow().z) * 0.25f));
 
 	SetMove(GetDamegeBlow());
 
-	SetPos(GetPos() + GetDamegeBlow());
+	SetPos(GetPos() + GetDamegeBlow());*/
 }
 
 //==========================
@@ -273,23 +330,6 @@ void CEnemy::ReleaseGrab(D3DXVECTOR3 rot)
 
 }
 
-
-//==========================
-//状態の設定
-//==========================
-void CEnemy::SetAttackState(ATTACK_STATE state)
-{
-	m_AttackState = state;
-}
-
-//==========================
-//状態の取得
-//==========================
-CEnemy::ATTACK_STATE CEnemy::GetAttackState()
-{
-	return m_AttackState;
-}
-
 //==========================
 //敵の種類を設定
 //==========================
@@ -361,6 +401,8 @@ void CEnemy::CollisionFild()
 //==========================
 void CEnemy::ColisionEnemy()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
 
@@ -389,7 +431,7 @@ void CEnemy::ColisionEnemy()
 
 		CEnemy* pEnemy = (CEnemy*)pObj;
 
-		bool Colision = ColisionSphere(GetPos(),
+		bool Colision = pCollision->Sphere(GetPos(),
 			pEnemy->GetPos(),
 			GetRadius(),
 			pEnemy->GetRadius());
@@ -469,7 +511,7 @@ void CEnemy::SetMovable()
 //==========================
 //行動出来るか判定
 //==========================
-void CEnemy::judgeMovable()
+void CEnemy::JudgeMovable()
 {
 	if (m_player == nullptr
 		|| m_Movable)
@@ -477,8 +519,11 @@ void CEnemy::judgeMovable()
 		return;
 	}
 
-	bool Colision = ColisionSphere(GetPos(), m_player->GetPos(), GetRadius() * 30, m_player->GetRadius());
+	//球の当たり判定
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+	bool Colision = pCollision->Sphere(GetPos(), m_player->GetPos(), GetRadius() * 30, m_player->GetRadius());
 	
+	//範囲内に入っている
 	if (Colision)
 	{
 		SetMovable();//行動可能にする
@@ -605,4 +650,132 @@ void CEnemy::Patrol()
 
 	}
 
+}
+
+//==========================
+//ダッシュ判定
+//==========================
+bool CEnemy::JudgeDush()
+{
+	//当たり判定の情報を取得
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
+	{//プレイヤーの半径の10倍の距離より遠い
+		return true;
+	}
+
+	return false;
+}
+
+//==========================
+//ダッシュ移動処理
+//==========================
+void CEnemy::Dush()
+{
+	//向きの変更
+	ChangeDirection();
+
+	//移動値を設定
+	SetMove(D3DXVECTOR3(sinf(m_Angle) * DUSH_SPEED, 0.0f, cosf(m_Angle) * DUSH_SPEED));
+}
+
+//==========================
+//歩き判定
+//==========================
+bool CEnemy::JudgeWalk()
+{
+	//当たり判定の情報を取得
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE)
+		&& !JudgeStop())
+	{//プレイヤーの半径の10倍の距離より近い
+		return true;
+	}
+
+	return false;
+}
+
+//==========================
+//歩き移動処理
+//==========================
+void CEnemy::Walk()
+{
+	//向きの変更
+	ChangeDirection();
+
+	//移動値を設定
+	SetMove(D3DXVECTOR3(sinf(m_Angle) * WALK_SPEED, 0.0f, cosf(m_Angle) * WALK_SPEED));
+}
+
+//==========================
+//停止判定
+//==========================
+bool CEnemy::JudgeStop()
+{
+	//当たり判定の情報を取得
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * STOP_DISTANCE))
+	{//距離が近い
+		return true;
+	}
+
+	return false;
+}
+
+//==========================
+//向きの変更
+//==========================
+float CEnemy::ChangeDirection()
+{
+	//進む角度を計算
+	m_Angle = atan2f(GetPlayer()->GetPos().x - GetPos().x, GetPlayer()->GetPos().z - GetPos().z);
+
+	//向きを設定
+	SetRot(D3DXVECTOR3(GetRot().x, m_Angle + D3DX_PI, GetRot().z));
+
+	return m_Angle;
+}
+
+//==========================
+//攻撃可能か判定
+//==========================
+bool CEnemy::GetAttackable()
+{
+	return Attackable;
+}
+
+//==========================
+//攻撃可能判定を変更
+//==========================
+void CEnemy::ChangeAttackable()
+{
+	Attackable = !Attackable;
+}
+
+//==========================
+//攻撃範囲にプレイヤーがいるか判定
+//==========================
+bool CEnemy::JudgeAttacKRange()
+{
+	//当たり判定の情報を取得
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius()+2.0f, GetPlayer()->GetRadius()+2.0f))
+	{//プレイヤーが攻撃範囲にいない
+
+		return true;
+	}
+
+	return false;
+}
+
+//==========================
+//モーションの再生判定を変更
+//==========================
+void CEnemy::ChangePlayMotion()
+{
+	m_PlayMotion = !m_PlayMotion;
 }

@@ -11,22 +11,24 @@
 //==========================
 // コンストラクタ
 //==========================
-CManager::CManager(void)
+CManager::CManager(void):
+m_pRenderer(nullptr),//レンダラー
+m_pKeyboard(nullptr),//キーボード
+m_pJoypad(nullptr),//キーボード
+m_pSound(nullptr),//サウンド
+m_Camera(nullptr),//カメラ情報取得
+m_Light(nullptr),//ライト情報取得
+m_Debug(nullptr),//デバッグ情報
+m_Texture(nullptr),//テクスチャ
+m_Model(nullptr),//モデル
+m_pFade(nullptr),//フェード
+m_pScene(nullptr),//現在の画面
+m_Stage(nullptr),//ステージ
+m_Tutorial(nullptr),//チュートリアル
+m_GameManager(nullptr),//ゲーム管理
+m_Collision(nullptr)//当たり判定
 {
-	m_pRenderer = nullptr;//レンダラー
-	m_pKeyboard = nullptr;//キーボード
-	m_pJoypad = nullptr;//キーボード
-	m_pSound = nullptr;//サウンド
-	m_Camera = nullptr;//カメラ情報取得
-	m_Light = nullptr;//ライト情報取得
-	m_Debug = nullptr;//デバッグ情報
-	m_Texture = nullptr;//テクスチャ
-	m_Model = nullptr;//モデル
-	m_pFade = nullptr;//フェード
-	m_pScene = nullptr;//現在の画面
-	m_Stage = nullptr;//ステージ
-	m_Tutorial = nullptr;//チュートリアル
-	m_GameManager = nullptr;
+	
 }
 
 //==========================
@@ -57,8 +59,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//サウンド
 	m_pSound = DBG_NEW CSound;
 	m_pSound->Init(hWnd);
-	//m_pSound->PlaySoundA(CSound::SOUND_LABEL_BGM001);
-
+	
 	//カメラ
 	m_Camera = DBG_NEW CCamera;
 	m_Camera->Init();
@@ -77,7 +78,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	m_pFade = CFade::Create();
 	//m_pFade->SetFade(CScene::MODE::TITLE);//最初のシーン設定
 	m_pFade->SetFade(CScene::MODE::GAME);//最初のシーン設定
-	//m_pFade->SetFade(CScene::MODE::RESULT);//最初のシーン設定
 	
 	//デバッグ
 	m_Debug = DBG_NEW CDebug;
@@ -88,7 +88,11 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//チュートリアル
 	m_Tutorial = DBG_NEW CTutorial;
 
+	//ゲーム管理
 	m_GameManager = DBG_NEW CGameManager;
+
+	//当たり判定
+	m_Collision = DBG_NEW CCollision;
 
 	return S_OK;
 }
@@ -192,9 +196,15 @@ void CManager::Uninit(void)
 	}
 
 	if (m_GameManager != nullptr)
-	{
+	{//ゲーム管理
 		delete m_GameManager;
 		m_GameManager = nullptr;
+	}
+
+	if (m_Collision != nullptr)
+	{//当たり判定
+		delete m_Collision;
+		m_Collision = nullptr;
 	}
 }
 
@@ -346,11 +356,19 @@ CScene* CManager::GetScene()
 }
 
 //=====================
-//シーンの取得
+//ゲーム管理の取得
 //=====================
 CGameManager* CManager::GetGameManager()
 {
 	return m_GameManager;
+}
+
+//=====================
+//当たり判定の取得
+//=====================
+CCollision* CManager::GetCollision()
+{
+	return m_Collision;
 }
 
 //=====================

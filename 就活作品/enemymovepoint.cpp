@@ -91,7 +91,7 @@ CEnemyMovePoint* CEnemyMovePoint::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, D3DX
 	pEnemyMovePoint->SetRot(rot);
 
 	//F‚ÌÝ’è
-	pEnemyMovePoint->SetCor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	pEnemyMovePoint->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 
 	//‰Šú‰»ˆ—
 	pEnemyMovePoint->Init();

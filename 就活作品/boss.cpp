@@ -60,7 +60,7 @@ HRESULT CBoss::Init()
 	CEnemy::Init();
 
 	//攻撃方法を設定
-	SetAttackState(ATTACK_STATE::ATTACK);
+	//SetAttackState(ATTACK_STATE::ATTACK);
 
 	if (GetPlayer() != nullptr)
 	{
@@ -107,7 +107,11 @@ void  CBoss::Uninit()
 //==========================
 void CBoss::Update()
 {
-	if (CManager::GetInstance()->GetDebug()->GetEdit())
+	//更新処理
+	CEnemy::Update();
+	MotionUpdate();
+
+	if (CManager::GetInstance()->GetGameManager()->GetDirection())
 	{
 		return;
 	}
@@ -120,11 +124,11 @@ void CBoss::Update()
 		{//ダメージ状態じゃない時
 
 			
-			if(GetAttackState() == ATTACK_STATE::WEAPONATTACK)
+			//if(GetAttackState() == ATTACK_STATE::WEAPONATTACK)
 			{
 				WeaponMove();//武器攻撃時の行動を設定
 			}
-			else
+			//else
 			{
 				MoveAction();//移動時の行動を設定
 			}
@@ -138,10 +142,6 @@ void CBoss::Update()
 	{
 		ChangeDirection();
 	}
-
-	//更新処理
-	CEnemy::Update();
-	MotionUpdate();
 
 	if (m_BossHPGauge != nullptr)
 	{
@@ -242,7 +242,7 @@ void CBoss::ChoiceAttack()
 	{//武器が存在していない
 
 		//攻撃方法を設定
-		SetAttackState(ATTACK_STATE::ATTACK);
+		//SetAttackState(ATTACK_STATE::ATTACK);
 
 		return;
 	}
@@ -260,12 +260,12 @@ void CBoss::ChoiceAttack()
 			|| m_weapon != nullptr)
 		{
 			//攻撃方法を設定
-			SetAttackState(ATTACK_STATE::WEAPONATTACK);
+		//	SetAttackState(ATTACK_STATE::WEAPONATTACK);
 		}
 		else
 		{
 			//攻撃方法を設定
-			SetAttackState(ATTACK_STATE::ATTACK);
+		//	SetAttackState(ATTACK_STATE::ATTACK);
 			ReleseWeapon();
 		}
 	}
@@ -276,13 +276,13 @@ void CBoss::ChoiceAttack()
 			&& m_weapon==nullptr)
 		{
 			//攻撃方法を設定
-			SetAttackState(ATTACK_STATE::ATTACK);
+		//	SetAttackState(ATTACK_STATE::ATTACK);
 			ReleseWeapon();
 		}
 		else
 		{
 			//攻撃方法を設定
-			SetAttackState(ATTACK_STATE::WEAPONATTACK);
+		//	SetAttackState(ATTACK_STATE::WEAPONATTACK);
 		}
 	}
 }
@@ -316,13 +316,15 @@ void CBoss::Move()
 //==========================
 void CBoss::MoveAction()
 {
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	if ((GetState() != STATE::NEUTRAL)
 		|| m_AttackCoolTime > (ATTACKFINISH_COOLTIME - 60))
 	{//通常状態以外の時または攻撃終了してから1秒たっていない時終了
 		return;
 	}
 	
-	if (!ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
+	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
 	{//プレイヤーの半径の10倍の距離より遠い
 
 		//移動値を設定
@@ -337,7 +339,7 @@ void CBoss::MoveAction()
 			m_NearCount = 0;
 		}
 	}
-	else if (!ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * WALK_DISTANCE))
+	else if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * WALK_DISTANCE))
 	{//プレイヤーの半径の5倍の距離より遠い
 
 		//移動値を設定
@@ -352,7 +354,7 @@ void CBoss::MoveAction()
 		}
 	}
 	else if (Attackable
-		&& !ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
+		&& !pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
 	{//攻撃可能かつプレイヤーより遠い
 
 		//移動値を設定
@@ -362,13 +364,13 @@ void CBoss::MoveAction()
 		SetMotion(MOTION_TYPE::MOVE);
 	}
 	else if (Attackable
-		&& ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
+		&& pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
 	{
 		SetState(STATE::ATTACK);
 	}
 	else
 	{
-		if (ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * GUARD_DISTANCE))
+		if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * GUARD_DISTANCE))
 		{//プレイヤーの半径の3倍の距離にいる
 			if (!m_NearAction)
 			{
@@ -450,6 +452,8 @@ void CBoss::Attack()
 		return;
 	}
 
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	if (GetOldMotion() == GetMotion())
 	{//前回のモーションと今のモーションが同じ
 
@@ -481,7 +485,7 @@ void CBoss::Attack()
 
 	m_FlameCount++;
 
-	bool Colision = ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), 17.0f);
+	bool Colision = pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), 17.0f);
 	if (m_FlameCount >= 26 && Colision&& m_StackIdx > 0)
 	{//フレーム数が24以上かつプレイヤーが近いかつコンボできる
 
@@ -503,7 +507,7 @@ void CBoss::Attack()
 		
 		SetOldMotion(GetMotion());//今のモーションを保存
 		SetState(STATE::NEUTRAL);//通常状態に変更
-		SetAttackState(ATTACK_STATE::ATTACK);
+		//SetAttackState(ATTACK_STATE::ATTACK);
 		if (m_weapon != nullptr)
 		{//武器を持ってるとき
 
@@ -530,7 +534,9 @@ void CBoss::Attack()
 //==========================
 void CBoss::ColisionHitAttack()
 {
-	bool Colision = ColisionSphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	bool Colision = pCollision->Sphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
 		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
 		GetRadius(),
 		GetPlayer()->GetRadius());
@@ -538,7 +544,7 @@ void CBoss::ColisionHitAttack()
 	if (Colision && !m_Attack)
 	{
 		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_ATTACK);
-		GetPlayer()->Damage(1);
+		//GetPlayer()->Damage();
 		m_Attack = true;
 
 		if (m_StackIdx <= 0)
@@ -553,7 +559,9 @@ void CBoss::ColisionHitAttack()
 //==========================
 void CBoss::ColisionWeaponAttack()
 {
-	bool Colision = ColisionSphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	bool Colision = pCollision->Sphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
 		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
 		30.0f,
 		30.0f);
@@ -561,7 +569,7 @@ void CBoss::ColisionWeaponAttack()
 	if (Colision && !m_Attack)
 	{
 		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
-		GetPlayer()->Damage(1);
+		//GetPlayer()->Damage();
 		m_Attack = true;
 
 		if (m_StackIdx <= 0)
@@ -609,7 +617,9 @@ bool CBoss::JudgeAttackable()
 //==========================
 void CBoss::ColisionWeapon()
 {
-	bool Colision = ColisionSphere(GetPos(),
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	bool Colision = pCollision->Sphere(GetPos(),
 		m_weapon->GetPos(),
 		GetRadius(),
 		m_weapon->GetRadius());
@@ -826,6 +836,8 @@ void CBoss::Guard()
 		return;
 	}
 
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
 	if (m_weapon != nullptr)
 	{
 		if (m_weapon->GetGrab())
@@ -839,7 +851,7 @@ void CBoss::Guard()
 
 	}
 
-	if (!ColisionSphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * GUARD_DISTANCE))
+	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * GUARD_DISTANCE))
 	{
 		m_NearAction = false;
 		m_NearCount = 0;

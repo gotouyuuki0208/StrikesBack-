@@ -9,6 +9,7 @@
 
 //include
 #include "weapon.h"
+#include"trajectory.h"
 
 //ƒNƒ‰ƒX‚Ì’è‹`
 class CSmallWeapon :public CWeapon

@@ -56,7 +56,7 @@ void  CGymwalltop::Uninit()
 void CGymwalltop::Update()
 {
 	//XVˆ—
-	//CBuilding::Update();
+	CBuilding::Update();
 }
 
 //==========================

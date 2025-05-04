@@ -50,15 +50,22 @@
 #include"cone.h"
 #include"gymfild.h"
 #include"gymceiling.h"
+#include"corridorExit.h"
+#include"corridorceiling.h"
+#include"illumination.h"
+#include"sky.h"
 
 //==========================
 //コンストラクタ
 //==========================
 CStageManager::CStageManager():
 m_Stage(STAGE::STAGE_FIRST),
-m_Change(false),
-m_DarkBg(nullptr),
-m_Rast(0)
+m_Change(false),//ステージ切り替わり判定
+m_DarkBg(nullptr),//暗転するための頃ポリゴン
+m_Rast(0),//最終ステージの番号
+m_player(nullptr),//プレイヤーの情報
+m_PlalyerHPGauge(nullptr),//プレイヤーのHPゲージの情報
+m_playerlife(0)
 {
 	m_Rast = static_cast<int>(STAGE::STAGE_BOSS);
 	m_DarkBg = CDarkBg::Create();
@@ -85,6 +92,9 @@ void CStageManager::Uninit()
 		delete m_DarkBg;
 		m_DarkBg = nullptr;
 	}
+
+	m_player = nullptr;
+	m_PlalyerHPGauge = nullptr;
 
 	m_Obj.clear();
 }
@@ -153,6 +163,53 @@ void CStageManager::StageReset()
 }
 
 //==========================
+//プレイヤーのHPゲージの更新
+//==========================
+void CStageManager::HPGaugeUpdate()
+{
+	m_PlalyerHPGauge->SetHP(m_player->GetLife());
+}
+
+//==========================
+//ステージの切り替え
+//==========================
+void CStageManager::ChangeStage()
+{
+	CGameManager* pGemeManeger = CManager::GetInstance()->GetGameManager();
+
+	if (GetChange()&&ChangeObject())
+	{//ステージが切り替わってるとき
+
+		//ステージを生成
+		DeleteAll();//全てのオブジェクトを削除
+		Load();//オブジェクトを読み込む
+		CManager::GetInstance()->GetCamera()->Init();//カメラの情報を初期化
+
+		//現在のステージを取得
+		int StageNum = static_cast<int>(GetStage());
+
+		if (StageNum == 2)
+		{
+			//pGemeManeger->SetDirection();//演出を開始
+			pGemeManeger->SetChange();
+			pGemeManeger->GetBossInfo();//ボスの情報を取得
+			m_player->SetPos(D3DXVECTOR3(-736.0f, 0.0f, 600.0f));//プレイヤーの位置を変更
+			m_player->SetPosOld(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//プレイヤーの前回の位置を変更
+		}
+		else
+		{
+			m_player->SetPos(D3DXVECTOR3(0.0f, 0.0f, 100.0f));//プレイヤーの位置を変更
+			m_player->SetPosOld(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//プレイヤーの前回の位置を変更
+		}
+
+		m_player->DeleteWeapon();//持っている武器を消す
+		m_player->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));//プレイヤーの向きを変更
+
+		ChangeReset();
+	}
+}
+
+//==========================
 //全てのオブジェクトを削除
 //==========================
 void CStageManager::DeleteAll()
@@ -213,8 +270,15 @@ void CStageManager::DeleteObj(CObjectgame& obj)
 //==========================
 void CStageManager::Load()
 {
+	if (m_Stage == STAGE::STAGE_FIRST)
+	{
+		CSky::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(2000.0f, 2000.0f, 2000.0f));
+		m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
+		m_PlalyerHPGauge = CPlayerHPGauge::Create(D3DXVECTOR3(10.0f, 20.0f, 0.0f), 10, 300, m_player->GetLife());
+	}
+
 	FildLoad();//フィールドの情報を読み込む
-	EnemyLoad();//敵の情報を読み込む
+	//EnemyLoad();//敵の情報を読み込む
 	WeaponLoad();//武器の情報を読み込む
 	BuildingLoad();//建物の情報を読み込む
 	ItemLoad();//アイテムの情報を読み込む
@@ -567,6 +631,19 @@ void CStageManager::BuildingLoad()
 				case 26:
 					m_Obj.push_back(CGymCeiling::Create(pos, sclse, rot));
 					break;
+				
+				case 27:
+					m_Obj.push_back(CCorridorExit::Create(pos, sclse, rot));
+					break;
+				
+				case 28:
+					m_Obj.push_back(CCorridorceiling::Create(pos, sclse, rot));
+					break;
+
+				case 29:
+					m_Obj.push_back(CIllumination::Create(pos, sclse, rot));
+					break;
+
 				default:
 					break;
 				}

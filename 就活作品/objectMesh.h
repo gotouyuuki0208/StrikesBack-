@@ -25,7 +25,15 @@ public:
 	void Update() override;//更新処理
 	void Draw() override;//描画処理
 	static CObjectMesh* Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, int Width, int Vertical);//モデル生成
-
+	void BindTexture(LPDIRECT3DTEXTURE9 pTex);//テクスチャ割り当て
+	void SetVerticalDiv(int vertical);//縦の分割数を設定
+	int GetVerticalDiv();//縦の分割数を取得
+	void SetWidthDiv(int width);//横の分割数を設定
+	int GetWidthDiv();//横の分割数を取得
+	void SetSize(D3DXVECTOR3 size);//サイズを設定
+	D3DXVECTOR3& GetSize();//サイズを取得
+	LPDIRECT3DVERTEXBUFFER9& GetVtxBuff();//頂点バッファを取得
+	int GetNumVtx();//頂点数の取得
 private:
 
 	//メンバ関数
@@ -41,5 +49,6 @@ private:
 	int m_VerticalDiv;//縦の分割数
 	int m_NumVtx;//頂点数
 	int m_NumIdx;//インデックス数
+	int m_nTexIdx;
 };
 #endif 

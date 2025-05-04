@@ -87,7 +87,7 @@ CGymCeiling* CGymCeiling::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3
 
 	//ƒ‚ƒfƒ‹‚Ì¶¬
 	CModel* pModel = CManager::GetInstance()->GetModel();
-	pConveni->SetModelIdx(pModel->Regist("data\\MODEL\\gymceiling.x"));
+	pConveni->SetModelIdx(pModel->Regist("data\\MODEL\\gym_ceiling.x"));
 	pConveni->BindModel(pModel->GetMeshAdress(pConveni->GetModelIdx()),
 		pModel->GetBuffMatAdress(pConveni->GetModelIdx()),
 		pModel->GetNumMatAdress(pConveni->GetModelIdx()),
