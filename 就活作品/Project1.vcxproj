@@ -149,6 +149,7 @@
     <ClCompile Include="TutorialManager.cpp" />
     <ClCompile Include="UIbg.cpp" />
     <ClCompile Include="wall.cpp" />
+    <ClCompile Include="weakenemy.cpp" />
     <ClCompile Include="weapon.cpp" />
     <ClCompile Include="weaponenemy.cpp" />
     <ClCompile Include="weaponpoint.cpp" />
@@ -276,6 +277,7 @@
     <ClInclude Include="TutorialManager.h" />
     <ClInclude Include="UIbg.h" />
     <ClInclude Include="wall.h" />
+    <ClInclude Include="weakenemy.h" />
     <ClInclude Include="weapon.h" />
     <ClInclude Include="weaponenemy.h" />
     <ClInclude Include="weaponpoint.h" />

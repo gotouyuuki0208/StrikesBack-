@@ -82,7 +82,8 @@ private:
 	bool m_WeaponType;//武器の種類(false:両手 true:片手)
 	bool m_VisualCor;//当たり判定の色の設定
 	float LeftStickAngle;//左スティックの角度
-	int m_DamageNum;////ダメージ回数カウント
+	int m_DamageNum;//ダメージ回数カウント
+	
 };
 
 #endif

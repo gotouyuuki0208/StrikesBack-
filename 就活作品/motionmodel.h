@@ -67,6 +67,7 @@ public:
 		SMALLWEAPONGUARD,//片手武器所持時ガード
 		WEAPONMOVE,//武器を持った状態の移動
 		AVOIDANCE_BACK,//後ろに回避
+		MAX
 	};
 
 	//メンバ関数
@@ -100,6 +101,7 @@ public:
 	void CalParts();//パーツの更新に必要な数値を計算
 	void MotionCountUpdate();//カウンターの更新
 	void UpdateMotionInfo();//モーションの情報を更新
+	void SubTransparency(float col);//透明度を減らす
 private:
 
 	//メンバ変数

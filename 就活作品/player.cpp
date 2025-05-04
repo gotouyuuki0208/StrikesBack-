@@ -18,6 +18,7 @@
 #include "guardeffect.h"
 #include "weapon.h"
 #include "enemy.h"
+#include "weakenemy.h"
 
 //静的メンバ初期化
 const int CPlayer::PRIORITY = 1;//描画順
@@ -271,11 +272,11 @@ void CPlayer::Move()
 		GetMove().z += (0 - GetMove().z) * INERTIA_VALUE));
 
 	
+	//吹き飛び時の移動
 	SetDamegeBlow(D3DXVECTOR3(GetDamegeBlow().x += (0 - GetDamegeBlow().x) * 0.25f,
 		GetDamegeBlow().y,
 		GetDamegeBlow().z += (0 - GetDamegeBlow().z) * 0.25f));
 	
-	//吹き飛び時の移動
 	SetMove(D3DXVECTOR3(GetMove().x + GetDamegeBlow().x,
 		GetMove().y+ GetDamegeBlow().y,
 		GetMove().z + GetDamegeBlow().z));
@@ -511,9 +512,21 @@ void CPlayer::HitEnemy(int PartsNum)
 			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_ATTACK);
 
 			//ダメージ処理
-			pEnemy->Damage(1);
-			CManager::GetInstance()->GetCamera()->SetShape(5, 5);
+			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
+			{//敵がボス
+
+			}
+			else
+			{//雑魚敵
+
+				CWeakEnemy* pWeakEnemy = dynamic_cast<CWeakEnemy*>(pObj);
+
+				//ダメージ処理
+				pWeakEnemy->Hit(GetPos(), 1, GetMotion());
+			}
 			
+			//カメラ揺れ
+			CManager::GetInstance()->GetCamera()->SetShape(5, 5);
 		}
 
 		pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
@@ -554,39 +567,67 @@ void CPlayer::WeaponHitEnemy()
 			30.0f,
 			30.0f);
 
-		if (Colision)
-		{//当たっている
+		if (!Colision)
+		{//当たっていない
+			pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
+			continue;
+		}
 
-			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
+		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
 
-			for (int i = 0; i < 20; i++)
-			{//パーティクルの生成
-				CParticle::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
-					D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f),
-					10,
-					1.0f,
-					1.0f,
-					10.0f);
+		for (int i = 0; i < 20; i++)
+		{//パーティクルの生成
+			CParticle::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
+				D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f),
+				10,
+				1.0f,
+				1.0f,
+				10.0f);
 
-			}
+		}
 
-			for (int i = 0; i < 3; i++)
-			{//エフェクトの表示
-				CEffect::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f), 15.0f, 15.0f);
-			}
+		for (int i = 0; i < 3; i++)
+		{//エフェクトの表示
+			CEffect::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f), 15.0f, 15.0f);
+		}
 
-			if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::SMALL)
-			{//片手武器のとき
-				pEnemy->Damage(2);
+		if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::SMALL)
+		{//片手武器のとき
+
+			//ダメージ処理
+			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
+			{//敵がボス
+
 			}
 			else
-			{//両手武器のとき
-				pEnemy->Damage(3);
-			}
+			{//雑魚敵
 
-			//武器の耐久を減らす
-			WeaponDamage();
+				CWeakEnemy* pWeakEnemy = dynamic_cast<CWeakEnemy*>(pObj);
+
+				//ダメージ処理
+				pWeakEnemy->Hit(GetPos(), 1, GetMotion());
+			}
 		}
+		else
+		{//両手武器のとき
+
+			//ダメージ処理
+			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
+			{//敵がボス
+
+			}
+			else
+			{//雑魚敵
+
+				CWeakEnemy* pWeakEnemy = dynamic_cast<CWeakEnemy*>(pObj);
+
+				//ダメージ処理
+				pWeakEnemy->Hit(GetPos(), 1, GetMotion());
+			}
+		}
+
+		//武器の耐久を減らす
+		WeaponDamage();
 
 		pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
 	}

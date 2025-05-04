@@ -43,6 +43,7 @@ public:
 	void CreateMtx();//行列の生成
 	void VisualDelete();//当たり判定の見た目を削除
 	CCollisionVisual* GetVisual();//可視化した当たり判定の情報
+	void SubCol(float m_col);//透明度を減らす
 private:
 
 	//メンバ変数
@@ -64,5 +65,7 @@ private:
 	int m_modelIdx;//モデルの番号
 	D3DXVECTOR3 m_scale;//スケール
 	CCollisionVisual* m_Visual;//当たり判定の可視化
+	float m_Color;//モデルの透明度
+
 };
 #endif

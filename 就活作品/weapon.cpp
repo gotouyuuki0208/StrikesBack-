@@ -12,6 +12,8 @@
 #include "enemy.h"
 #include "player.h"
 #include "fild.h"
+#include"weakenemy.h"
+#include"boss.h"
 
 //静的メンバ初期化
 const int CWeapon::PRIORITY = 2;//描画順
@@ -463,20 +465,48 @@ void CWeapon::HitEnemy()
 			30.0f,
 			30.0f);
 
-		if (Colision)
+		if (!Colision)
+		{//当たっていない
+			pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
+			continue;
+		}
+
+		if (m_weapontype == WEAPONTYPE::SMALL)
 		{
-			if (m_weapontype == WEAPONTYPE::SMALL)
-			{
-				pEnemy->Damage(2);
+			//ダメージ処理
+			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
+			{//敵がボス
+
 			}
 			else
-			{
-				pEnemy->Damage(3);
-			}
+			{//雑魚敵
 
-			//武器の耐久値を減らす
-			SubDurability();
+				CWeakEnemy* pWeakEnemy = dynamic_cast<CWeakEnemy*>(pObj);
+
+				//ダメージ処理
+				pWeakEnemy->Hit(GetPos(), 1, CMotionModel::MOTION_TYPE::MAX);
+			}
 		}
+		else
+		{
+			//ダメージ処理
+			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
+			{//敵がボス
+
+			}
+			else
+			{//雑魚敵
+
+				CWeakEnemy* pWeakEnemy = dynamic_cast<CWeakEnemy*>(pObj);
+
+				//ダメージ処理
+				pWeakEnemy->Hit(GetPos(), 1, CMotionModel::MOTION_TYPE::MAX);
+			}
+		}
+
+		//武器の耐久値を減らす
+		SubDurability();
+
 
 		break;
 	}

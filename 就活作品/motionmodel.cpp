@@ -238,6 +238,21 @@ void CMotionModel::SetDamageCor()
 }
 
 //==========================
+//“§–¾“x‚ğŒ¸‚ç‚·
+//==========================
+void CMotionModel::SubTransparency(float col)
+{
+	for (int i = 0; i < MAX_PARTS; i++)
+	{
+		if (m_PartsList[i] != nullptr)
+		{
+			m_PartsList[i]->SetCor();
+			m_PartsList[i]->SubCol(col);
+		}
+	}
+}
+
+//==========================
 //Œ»İ‚Ìƒ‚[ƒVƒ‡ƒ“‚ğæ“¾
 //==========================
 CMotionModel::MOTION_TYPE CMotionModel::GetMotion()

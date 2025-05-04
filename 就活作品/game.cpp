@@ -48,7 +48,7 @@ HRESULT CGame::Init()
 	CManager::GetInstance()->GetGameManager()->Init();
 
 	CHitEnemy::Create({ 0.0f,0.0f ,500.0f }, { 1.5f,1.5f ,1.5f });
-
+	CHitEnemy::Create({ 0.0f,0.0f ,1000.0f }, { 1.5f,1.5f ,1.5f });
 	//UI•\Ž¦
 	DisplayUI();
 

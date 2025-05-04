@@ -20,8 +20,9 @@ class CEenemyAttackStateBase
 {
 public:
 	//’è”
-	//static const int LEFT_HAND;//¶è‚Ì”Ô†
-	//static const int RIGHT_HAND;//‰Eè‚Ì”Ô†
+	static const int LEFT_HAND;//¶è‚Ì”Ô†
+	static const int RIGHT_HAND;//‰Eè‚Ì”Ô†
+	static const int HITFLAME;//‘fèUŒ‚‚Ì“–‚½‚è”»’è‚ÌƒtƒŒ[ƒ€”
 	//static const int WIDTH;//‹OÕ‚Ì‰¡‚Ì•ªŠ„”
 	//static const int VERTICAL;//‹OÕ‚Ìc‚Ì•ªŠ„”
 	//static const D3DXVECTOR3 TRAJECTORY_SIZE;//‹OÕ‚Ì‘å‚«‚³

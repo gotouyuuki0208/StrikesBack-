@@ -7,9 +7,12 @@
 
 //include
 #include "enemystate.h"
-#include "enemy.h"
 #include"enemyattackstate.h"
+#include "weakenemy.h"
 
+//静的メンバ初期化
+const int CEnemyDamageState::DAMEGE_FLAME = 54;//ダメージ状態を終了するまでのフレーム数
+const int CEnemyDamageBrrowState::BRROW_FLAME = 50;//ダメージ状態を終了するまでのフレーム数
 //==============================================================================
 //敵の状態クラス
 //==============================================================================
@@ -34,7 +37,7 @@ CEnemyStateBase::~CEnemyStateBase()
 //==========================
 //ステートの所持者を設定
 //==========================
-void CEnemyStateBase::SetOwner(CEnemy* enemy)
+void CEnemyStateBase::SetOwner(CWeakEnemy* enemy)
 {
 	m_pEnemy = enemy;
 }
@@ -42,7 +45,7 @@ void CEnemyStateBase::SetOwner(CEnemy* enemy)
 //==========================
 //ステートの所有者を取得
 //==========================
-CEnemy* CEnemyStateBase::GetOwner()
+CWeakEnemy* CEnemyStateBase::GetOwner()
 {
 	return m_pEnemy;
 }
@@ -138,22 +141,35 @@ void CEnemyNeutralState::Update()
 	//モーションを設定
 	m_pEnemy->SetMotion(CMotionModel::MOTION_TYPE::NEUTRAL);
 
+	if (m_pEnemy->GetDamage())
+	{//ダメージを受けた
+
+		m_pEnemy->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CEnemyDamageState;
+		m_pEnemy->ChangeState(NewState);
+		return;
+	}
+
 	if (m_pEnemy->JudgeDush())
-	{//走って近づく状態
+	{//走って近づく範囲にいる
 
 		//待機状態に変更
 		auto NewState = DBG_NEW CEnemyDushState;
 		m_pEnemy->ChangeState(NewState);
 		return;
 	}
-	else if (m_pEnemy->JudgeWalk())
-	{//歩いて近づく状態
+	else if (m_pEnemy->JudgeWalk()
+		||m_pEnemy->GetAttackable())
+	{//歩いて近づく範囲にいるか攻撃可能のとき
 
 		//待機状態に変更
 		auto NewState = DBG_NEW CEnemyMoveState;
 		m_pEnemy->ChangeState(NewState);
 		return;
 	}
+
 }
 
 //==========================
@@ -205,6 +221,17 @@ void CEnemyMoveState::Update()
 	m_pEnemy->Walk();
 	m_pEnemy->Move();
 
+	if (m_pEnemy->GetDamage())
+	{//ダメージを受けた
+
+		m_pEnemy->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CEnemyDamageState;
+		m_pEnemy->ChangeState(NewState);
+		return;
+	}
+
 	if (m_pEnemy->JudgeDush())
 	{//走って近づく状態
 
@@ -214,7 +241,7 @@ void CEnemyMoveState::Update()
 		return;
 	}
 	else if (m_pEnemy->GetAttackable()
-		&& !m_pEnemy->JudgeAttacKRange())
+		&& !m_pEnemy->JudgeAttackRange())
 	{//攻撃可能かつ攻撃範囲にいる
 
 		//攻撃状態に変更
@@ -276,7 +303,46 @@ void CEnemyDamageState::Start()
 //==========================
 void CEnemyDamageState::Update()
 {
+	//モーションを設定
+	m_pEnemy->SetMotion(CMotionModel::MOTION_TYPE::DAMAGE);
 
+	//ダメージを受けてからのフレーム数を数える
+	m_DmageCount++;
+
+	if (m_DmageCount >= DAMEGE_FLAME)
+	{
+		m_DmageCount = 0;
+		m_pEnemy->ResetDamageNum();//被弾回数を初期化
+		m_pEnemy->SetDamage(false);
+
+		//移動状態に変更
+		auto NewState = DBG_NEW CEnemyNeutralState;
+		m_pEnemy->ChangeState(NewState);
+
+		return;
+	}
+
+	if (m_pEnemy->GetDamageNum() >= 3)
+	{//連続で3回被弾した
+
+		m_pEnemy->SetDamage(false);
+
+		//吹き飛び状態に変更
+		auto NewState = DBG_NEW CEnemyDamageBrrowState;
+		m_pEnemy->ChangeState(NewState);
+		return;
+	}
+
+	if (m_pEnemy->GetDamage())
+	{//ダメージを受けた
+
+		m_pEnemy->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CEnemyDamageState;
+		m_pEnemy->ChangeState(NewState);
+		return;
+	}
 }
 
 //==========================
@@ -328,6 +394,16 @@ void CEnemyDushState::Update()
 	m_pEnemy->Dush();
 	m_pEnemy->Move();
 
+	if (m_pEnemy->GetDamage())
+	{//ダメージを受けた
+
+		m_pEnemy->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CEnemyDamageState;
+		m_pEnemy->ChangeState(NewState);
+		return;
+	}
 
 	if (m_pEnemy->JudgeWalk())
 	{//歩いて近づく状態
@@ -390,7 +466,32 @@ void CEnemyDamageBrrowState::Start()
 //==========================
 void CEnemyDamageBrrowState::Update()
 {
-	
+	//移動処理
+	m_pEnemy->Move();
+
+	m_DmageCount++;
+
+	if (m_pEnemy->GetLife() <= 0)
+	{//ライフが0
+
+		if (m_DmageCount >= 30)
+		{
+			m_pEnemy->ChangePlayMotion(false);//モーションを停止
+			m_pEnemy->SubPartsCol();//色を薄くする
+		}
+	}
+	else if (m_DmageCount >= BRROW_FLAME)
+	{
+		m_DmageCount = 0;
+		m_pEnemy->ResetDamageNum();//被弾回数を初期化
+		m_pEnemy->SetDamage(false);
+
+		//待機状態に変更
+		auto NewState = DBG_NEW CEnemyNeutralState;
+		m_pEnemy->ChangeState(NewState);
+
+		return;
+	}
 }
 
 //==========================
@@ -450,6 +551,23 @@ void CEnemyAttackState::Start()
 //==========================
 void CEnemyAttackState::Update()
 {
+	if (m_pEnemy->GetDamage())
+	{//ダメージを受けた
+
+		//攻撃出来ない状態に変更
+		m_pEnemy->ChangeAttackable();
+
+		//攻撃のクールタイムを設定
+		m_pEnemy->SetCoolTime(300);
+
+		m_pEnemy->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CEnemyDamageState;
+		m_pEnemy->ChangeState(NewState);
+		return;
+	}
+
 	m_FlameCount++;
 	m_EenemyAttackStateMachine->Update();	
 

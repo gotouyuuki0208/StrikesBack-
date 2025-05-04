@@ -29,6 +29,7 @@ CModelParts::CModelParts(void)
 	m_scale = D3DXVECTOR3(1.0f, 1.0f, 1.0f);
 	m_corDamage = false;
 	D3DXMatrixIdentity(&m_mtxWorld);
+	m_Color = 1.0f;
 
 	for (int i = 0; i < 100; i++)
 	{
@@ -75,7 +76,7 @@ void CModelParts::Uninit(void)
 //==========================
 void CModelParts::Update(void)
 {
-	
+
 }
 
 //==========================
@@ -126,12 +127,13 @@ void CModelParts::Draw(void)
 	{
 		if (m_corDamage)
 		{
-			pMat[nCntMat].MatD3D.Diffuse = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+			pMat[nCntMat].MatD3D.Diffuse.a = m_Color;
 		}
 		else if (!m_corDamage)
 		{
 			pMat[nCntMat].MatD3D.Diffuse = m_Diffuse[nCntMat];
 		}
+
 		//マテリアルの設定
 		pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
 
@@ -398,7 +400,7 @@ D3DXVECTOR3& CModelParts::GetVtxMax()
 //==========================
 void CModelParts::SetCor()
 {
-	m_corDamage = !m_corDamage;
+	m_corDamage = true;
 }
 
 //==========================
@@ -450,4 +452,12 @@ CCollisionVisual* CModelParts::GetVisual()
 	}
 
 	return nullptr;
+}
+
+//==========================
+//透明度を減らす
+//==========================
+void CModelParts::SubCol(float m_col)
+{
+		m_Color = m_col;
 }

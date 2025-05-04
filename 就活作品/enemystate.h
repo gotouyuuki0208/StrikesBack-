@@ -11,7 +11,7 @@
 #include"characterstate.h"
 
 //前方宣言
-class CEnemy;
+class CWeakEnemy;
 class CEenemyAttackStateMachine;
 class CAttackEenemyState;
 
@@ -24,12 +24,12 @@ public:
 	//メンバ関数
 	CEnemyStateBase();//コンストラクタ
 	~CEnemyStateBase();//デストラクタ
-	void SetOwner(CEnemy* enemy);//ステートの所持者を設定
-	CEnemy* GetOwner();//ステートの所有者を取得
+	void SetOwner(CWeakEnemy* enemy);//ステートの所持者を設定
+	CWeakEnemy* GetOwner();//ステートの所有者を取得
 protected:
 
 	//メンバ変数
-	CEnemy* m_pEnemy;//敵の情報
+	CWeakEnemy* m_pEnemy;//敵の情報
 };
 
 //==============================================================================
@@ -81,6 +81,9 @@ public:
 class CEnemyDamageState :public CEnemyStateBase
 {
 public:
+	//定数
+	static const int DAMEGE_FLAME;//ダメージ状態を終了するまでのフレーム数
+
 	//メンバ関数
 	CEnemyDamageState();//コンストラクタ
 	~CEnemyDamageState();//デストラクタ

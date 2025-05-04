@@ -495,6 +495,9 @@
     <ClCompile Include="enemyattackstate.cpp">
       <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
     </ClCompile>
+    <ClCompile Include="weakenemy.cpp">
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="billboard.h">
@@ -870,6 +873,9 @@
       <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
     </ClInclude>
     <ClInclude Include="enemyattackstate.h">
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="weakenemy.h">
       <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
     </ClInclude>
   </ItemGroup>

@@ -17,6 +17,7 @@ const int CAttackStateBase::RIGHT_HAND = 8;//‰EŽè‚Ì”Ô†
 const int CAttackStateBase::WIDTH = 20;//‹OÕ‚Ì‰¡‚Ì•ªŠ„”
 const int CAttackStateBase::VERTICAL = 20;//‹OÕ‚Ìc‚Ì•ªŠ„”
 const D3DXVECTOR3 CAttackStateBase::TRAJECTORY_SIZE = { 5.0f,5.0f ,0.0f };//‹OÕ‚Ì‘å‚«‚³
+const int CAttackStateBase::HITFLAME = 18;//‘fŽèUŒ‚‚Ì“–‚½‚è”»’è‚ÌƒtƒŒ[ƒ€”
 //========================================================================================================
 //ó‘ÔŠÇ—ƒNƒ‰ƒX
 //========================================================================================================
@@ -232,7 +233,7 @@ void CFirstAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame()<=20)
+	if (m_OwnerState->GetFrame()<= HITFLAME)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
@@ -310,7 +311,7 @@ void CSecondAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame() <= 20)
+	if (m_OwnerState->GetFrame() <= HITFLAME)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
@@ -388,7 +389,7 @@ void CRastAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame() <= 20)
+	if (m_OwnerState->GetFrame() <= HITFLAME)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
 		//UŒ‚‚Ì“–‚½‚è”»’è

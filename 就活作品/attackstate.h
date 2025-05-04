@@ -22,6 +22,8 @@ public:
 	static const int WIDTH;//軌跡の横の分割数
 	static const int VERTICAL;//軌跡の縦の分割数
 	static const D3DXVECTOR3 TRAJECTORY_SIZE;//軌跡の大きさ
+	static const int HITFLAME;//素手攻撃の当たり判定のフレーム数
+
 	//メンバ関数
 	CAttackStateBase();//コンストラクタ
 	~CAttackStateBase();//デストラクタ

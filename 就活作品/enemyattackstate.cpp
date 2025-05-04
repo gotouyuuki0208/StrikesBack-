@@ -9,13 +9,15 @@
 #include"manager.h"
 #include"enemyattackstate.h"
 #include"trajectory.h"
+#include"weakenemy.h"
 
 //Ã“Iƒƒ“ƒo•Ï”‰Šú‰»
-//const int CAttackStateBase::LEFT_HAND = 5;//¶Žè‚Ì”Ô†
-//const int CAttackStateBase::RIGHT_HAND = 8;//‰EŽè‚Ì”Ô†
+const int CEenemyAttackStateBase::LEFT_HAND = 5;//¶Žè‚Ì”Ô†
+const int CEenemyAttackStateBase::RIGHT_HAND = 8;//‰EŽè‚Ì”Ô†
 //const int CAttackStateBase::WIDTH = 20;//‹OÕ‚Ì‰¡‚Ì•ªŠ„”
 //const int CAttackStateBase::VERTICAL = 20;//‹OÕ‚Ìc‚Ì•ªŠ„”
 //const D3DXVECTOR3 CAttackStateBase::TRAJECTORY_SIZE = { 5.0f,5.0f ,0.0f };//‹OÕ‚Ì‘å‚«‚³
+const int CEenemyAttackStateBase::HITFLAME = 18;//‘fŽèUŒ‚‚Ì“–‚½‚è”»’è‚ÌƒtƒŒ[ƒ€”
 //========================================================================================================
 //ó‘ÔŠÇ—ƒNƒ‰ƒX
 //========================================================================================================
@@ -203,7 +205,8 @@ CFirstEenemyAttackState::~CFirstEenemyAttackState()
 //==========================
 void CFirstEenemyAttackState::Start()
 {
-
+	//UŒ‚”»’è‚ð‰Šú‰»
+	m_OwnerState->GetOwner()->ResetAttack();
 }
 
 //==========================
@@ -222,16 +225,17 @@ void CFirstEenemyAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame() < 20)
+	if (m_OwnerState->GetFrame() < HITFLAME)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 		
 		//UŒ‚‚Ì“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->HitPlayer(RIGHT_HAND);
 	}
-	else if (!m_OwnerState->GetOwner()->JudgeAttacKRange())
+	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
 	{//UŒ‚”ÍˆÍ‚ÉƒvƒŒƒCƒ„[‚ª‚¢‚é
 
 		m_OwnerState->ResetInfo();//UŒ‚‚Ìî•ñ‚ð‰Šú‰»
-		m_OwnerState->GetOwner()->ChangePlayMotion();//ƒ‚[ƒVƒ‡ƒ“‚ð’âŽ~
+		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ƒ‚[ƒVƒ‡ƒ“‚ð’âŽ~
 
 		auto NewState = DBG_NEW CSecondEenemyAttackState;
 		m_OwnerState->ChangeAttack(NewState);
@@ -242,6 +246,9 @@ void CFirstEenemyAttackState::Update()
 	{
 		//UŒ‚I—¹
 		m_OwnerState->ChangeCombo();
+
+		//UŒ‚‚ÌƒN[ƒ‹ƒ^ƒCƒ€‚ðÝ’è
+		m_OwnerState->GetOwner()->SetCoolTime(300);
 	}
 }
 
@@ -276,11 +283,14 @@ CSecondEenemyAttackState::~CSecondEenemyAttackState()
 //==========================
 void CSecondEenemyAttackState::Start()
 {
+	//UŒ‚”»’è‚ð‰Šú‰»
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	//Œü‚«‚ð•ÏX
 	m_OwnerState->GetOwner()->ChangeDirection();
 
 	//ƒ‚[ƒVƒ‡ƒ“‚ðÄ¶
-	m_OwnerState->GetOwner()->ChangePlayMotion();
+	m_OwnerState->GetOwner()->ChangePlayMotion(true);
 }
 
 //==========================
@@ -299,16 +309,17 @@ void CSecondEenemyAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame() < 20)
+	if (m_OwnerState->GetFrame() < HITFLAME)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->HitPlayer(LEFT_HAND);
 	}
-	else if (!m_OwnerState->GetOwner()->JudgeAttacKRange())
+	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
 	{//UŒ‚”ÍˆÍ‚ÉƒvƒŒƒCƒ„[‚ª‚¢‚é
 
 		m_OwnerState->ResetInfo();//UŒ‚‚Ìî•ñ‚ð‰Šú‰»
-		m_OwnerState->GetOwner()->ChangePlayMotion();//ƒ‚[ƒVƒ‡ƒ“‚ð’âŽ~
+		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ƒ‚[ƒVƒ‡ƒ“‚ð’âŽ~
 
 		auto NewState = DBG_NEW CRastEenemyAttackState;
 		m_OwnerState->ChangeAttack(NewState);
@@ -319,6 +330,9 @@ void CSecondEenemyAttackState::Update()
 	{
 		//UŒ‚I—¹
 		m_OwnerState->ChangeCombo();
+
+		//UŒ‚‚ÌƒN[ƒ‹ƒ^ƒCƒ€‚ðÝ’è
+		m_OwnerState->GetOwner()->SetCoolTime(300);
 	}
 }
 
@@ -353,11 +367,14 @@ CRastEenemyAttackState::~CRastEenemyAttackState()
 //==========================
 void CRastEenemyAttackState::Start()
 {
+	//UŒ‚”»’è‚ð‰Šú‰»
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	//Œü‚«‚ð•ÏX
 	m_OwnerState->GetOwner()->ChangeDirection();
 
 	//ƒ‚[ƒVƒ‡ƒ“‚ðÄ¶
-	m_OwnerState->GetOwner()->ChangePlayMotion();
+	m_OwnerState->GetOwner()->ChangePlayMotion(true);
 }
 
 //==========================
@@ -376,16 +393,19 @@ void CRastEenemyAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame() <= 20)
+	if (m_OwnerState->GetFrame() <= HITFLAME)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
-		//m_OwnerState->GetOwner()->HitEnemy(RIGHT_HAND);
+		m_OwnerState->GetOwner()->HitPlayer(RIGHT_HAND);
 	}
 	else
 	{
 		//UŒ‚I—¹
 		m_OwnerState->ChangeCombo();
+
+		//UŒ‚‚ÌƒN[ƒ‹ƒ^ƒCƒ€‚ðÝ’è
+		m_OwnerState->GetOwner()->SetCoolTime(300);
 	}
 }
 
