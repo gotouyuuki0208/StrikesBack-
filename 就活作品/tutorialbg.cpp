@@ -1,28 +1,28 @@
 //==========================
 // 
-// 背景処理[bg.cpp]
+// チュートリアルの背景処理[tutorialbg.cpp]
 // Author Yuki Goto
 //
 //==========================
 
 //include
-#include"dark.h"
+#include"tutorialbg.h"
 #include"manager.h"
 
 //静的メンバの初期化
-const int CDark::PRIORITY = 4;//描画優先度
+const int CTutorialBg::PRIORITY = 3;//描画優先度
 //========================
 //コンストラクタ
 //========================
-CDark::CDark(int nPriority) :CObject2D(nPriority)
+CTutorialBg::CTutorialBg(int nPriority):CObject2D(nPriority)
 {
-
+	
 }
 
 //========================
 //デストラクタ
 //========================
-CDark::~CDark()
+CTutorialBg::~CTutorialBg()
 {
 
 }
@@ -30,7 +30,7 @@ CDark::~CDark()
 //========================
 //初期設定
 //========================
-HRESULT CDark::Init(void)
+HRESULT CTutorialBg::Init(void)
 {
 	CObject2D::Init();
 
@@ -40,7 +40,7 @@ HRESULT CDark::Init(void)
 //========================
 //終了処理
 //========================
-void CDark::Uninit(void)
+void CTutorialBg::Uninit(void)
 {
 	CObject2D::Uninit();
 }
@@ -48,7 +48,7 @@ void CDark::Uninit(void)
 //========================
 //更新処理
 //========================
-void CDark::Update()
+void CTutorialBg::Update()
 {
 	CObject2D::Update();
 }
@@ -56,7 +56,7 @@ void CDark::Update()
 //========================
 //描画処理
 //========================
-void CDark::Draw()
+void CTutorialBg::Draw()
 {
 	CObject2D::Draw();
 }
@@ -64,27 +64,22 @@ void CDark::Draw()
 //========================
 //オブジェクト2D生成
 //========================
-CDark* CDark::Create()
+CTutorialBg* CTutorialBg::Create()
 {
 	//インスタンス生成
-	CDark* pDark = DBG_NEW CDark;
-
-	//テクスチャ設定
-	/*CTexture* pTex = CManager::GetInstance()->GetTexture();
-	pDark->m_nTexIdx = pTex->Regist(texname);
-	pDark->BindTexture(pTex->GetAdress(pDark->m_nTexIdx));*/
+	CTutorialBg* pTutorialBg = DBG_NEW CTutorialBg;
 
 	//位置の設定
-	pDark->SetPos(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f));
+	pTutorialBg->SetPos(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f));
 
 	//サイズ設定
-	pDark->SetSize(SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2);
+	pTutorialBg->SetSize(SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2);
 
 	//色を設定
-	pDark->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.7f));
+	pTutorialBg->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.7f));
 
 	//初期設定
-	pDark->Init();
+	pTutorialBg->Init();
 
-	return pDark;
+	return pTutorialBg;
 }

@@ -66,6 +66,9 @@ HRESULT CPlayer::Init()
 	//‰ŠúÝ’è
 	CCharacter::Init();
 	
+	//HPƒQ[ƒW‚Ì¶¬
+	CManager::GetInstance()->GetHudManager()->CreatePlayerHPGauge();
+
 	//Œü‚«‚Ì•ÏX
 	SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 
@@ -109,7 +112,12 @@ void  CPlayer::Uninit()
 void CPlayer::Update()
 {
 	if (CManager::GetInstance()->GetStageManager()->GetChange())
-	{//ƒXƒe[ƒW‘JˆÚ’†
+	{//ƒQ[ƒ€‚ª—V‚×‚È‚¢ó‘Ô
+		return;
+	}
+
+	if (!CManager::GetInstance()->GetGameManager()->GetPlayGame())
+	{//ƒQ[ƒ€‚ª—V‚×‚È‚¢ó‘Ô
 		return;
 	}
 
@@ -128,8 +136,8 @@ void CPlayer::Update()
 	//XVˆ—
 	CCharacter::Update();
 
-	//ƒJƒƒ‰’Ç]
-	CManager::GetInstance()->GetCamera()->Move(D3DXVECTOR3(GetPos().x, GetPos().y, GetPos().z));
+	//HPƒQ[ƒW‚ÌXV
+	CManager::GetInstance()->GetHudManager()->ChangePlayerHP(GetLife());
 }
 
 //==========================
@@ -515,6 +523,9 @@ void CPlayer::HitEnemy(int PartsNum)
 			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
 			{//“G‚ªƒ{ƒX
 
+				CBoss* pBoss = dynamic_cast<CBoss*>(pObj);
+
+				pBoss->hit(GetPos(), 1,GetMotion());
 			}
 			else
 			{//ŽG‹›“G

@@ -1,23 +1,20 @@
 //==========================
 // 
-// ìGÇÃçUåÇÇÃèÛë‘ä«óù[enemyattackstate.h]
+// çUåÇÇÃèÛë‘ä«óù[attackstate.h]
 // Author Yuki Goto
 //
 //==========================
 
 //include
 #include"manager.h"
-#include"enemyattackstate.h"
-#include"trajectory.h"
-#include"weakenemy.h"
+#include"bossattackstate.h"
+#include"bossState.h"
+#include"boss.h"
 
 //ê√ìIÉÅÉìÉoïœêîèâä˙âª
-const int CEnemyAttackStateBase::LEFT_HAND = 5;//ç∂éËÇÃî‘çÜ
-const int CEnemyAttackStateBase::RIGHT_HAND = 8;//âEéËÇÃî‘çÜ
-//const int CAttackStateBase::WIDTH = 20;//ãOê’ÇÃâ°ÇÃï™äÑêî
-//const int CAttackStateBase::VERTICAL = 20;//ãOê’ÇÃècÇÃï™äÑêî
-//const D3DXVECTOR3 CAttackStateBase::TRAJECTORY_SIZE = { 5.0f,5.0f ,0.0f };//ãOê’ÇÃëÂÇ´Ç≥
-const int CEnemyAttackStateBase::HITFLAME = 18;//ëféËçUåÇÇÃìñÇΩÇËîªíËÇÃÉtÉåÅ[ÉÄêî
+const int CBossAttackStateBase::LEFT_HAND = 5;//ç∂éËÇÃî‘çÜ
+const int CBossAttackStateBase::RIGHT_HAND = 8;//âEéËÇÃî‘çÜ
+const int CBossAttackStateBase::HITFLAME = 18;//ëféËçUåÇÇÃìñÇΩÇËîªíËÇÃÉtÉåÅ[ÉÄêî
 //========================================================================================================
 //èÛë‘ä«óùÉNÉâÉX
 //========================================================================================================
@@ -25,8 +22,8 @@ const int CEnemyAttackStateBase::HITFLAME = 18;//ëféËçUåÇÇÃìñÇΩÇËîªíËÇÃÉtÉåÅ[ÉÄê
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CEnemyAttackStateMachine::CEnemyAttackStateMachine() :
-	m_State(nullptr)//ÉvÉåÉCÉÑÅ[ÇÃèÛë‘
+CBossAttackStateMachine::CBossAttackStateMachine() :
+	m_State(nullptr)
 {
 
 }
@@ -34,7 +31,7 @@ CEnemyAttackStateMachine::CEnemyAttackStateMachine() :
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CEnemyAttackStateMachine::~CEnemyAttackStateMachine()
+CBossAttackStateMachine::~CBossAttackStateMachine()
 {
 	if (m_State != nullptr)
 	{
@@ -46,7 +43,7 @@ CEnemyAttackStateMachine::~CEnemyAttackStateMachine()
 //==========================
 //èÛë‘ÇÃïœçX
 //==========================
-void CEnemyAttackStateMachine::ChangeState(CEnemyAttackStateBase* NewState)
+void CBossAttackStateMachine::ChangeState(CAttackBossStateBase* NewState)
 {
 	if (m_State != nullptr)
 	{
@@ -62,7 +59,7 @@ void CEnemyAttackStateMachine::ChangeState(CEnemyAttackStateBase* NewState)
 //==========================
 //çXêV
 //==========================
-void CEnemyAttackStateMachine::Update()
+void CBossAttackStateMachine::Update()
 {
 	if (m_State != nullptr)
 	{
@@ -77,8 +74,7 @@ void CEnemyAttackStateMachine::Update()
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CEnemyAttackStateBase::CEnemyAttackStateBase()
-	//m_Trajectory(nullptr)//ãOê’ÇÃèÓïÒ
+CBossAttackStateBase::CBossAttackStateBase()
 {
 
 }
@@ -86,7 +82,7 @@ CEnemyAttackStateBase::CEnemyAttackStateBase()
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CEnemyAttackStateBase::~CEnemyAttackStateBase()
+CBossAttackStateBase::~CBossAttackStateBase()
 {
 
 }
@@ -94,7 +90,7 @@ CEnemyAttackStateBase::~CEnemyAttackStateBase()
 //==========================
 //äJén
 //==========================
-void CEnemyAttackStateBase::Start()
+void CBossAttackStateBase::Start()
 {
 
 }
@@ -102,7 +98,7 @@ void CEnemyAttackStateBase::Start()
 //==========================
 //çXêV
 //==========================
-void CEnemyAttackStateBase::Update()
+void CBossAttackStateBase::Update()
 {
 
 }
@@ -110,53 +106,19 @@ void CEnemyAttackStateBase::Update()
 //==========================
 //èIóπ
 //==========================
-void CEnemyAttackStateBase::Uninit()
+void CBossAttackStateBase::Uninit()
 {
-	/*if (m_Trajectory != nullptr)
-	{
-		m_Trajectory->Uninit();
-		m_Trajectory = nullptr;
-	}*/
-
 	delete this;
 }
 
-////==========================
-////ãOê’ÇÃê∂ê¨
-////==========================
-//void CAttackStateBase::CreateTrajectory(D3DXVECTOR3 pos)
-//{
-//	if (m_Trajectory != nullptr)
-//	{//ãOê’Ç™ê∂ê¨Ç≥ÇÍÇƒÇ¢ÇÈ
-//		return;
-//	}
-//
-//	//ãOê’Çê∂ê¨
-//	m_Trajectory = CTrajectory::Create(pos, TRAJECTORY_SIZE, WIDTH, VERTICAL);
-//}
-//
-////==========================
-////ãOê’ÇÃà íuÇê›íË
-////==========================
-//void CAttackStateBase::TrajectoryPos(D3DXVECTOR3 pos)
-//{
-//	if (m_Trajectory == nullptr)
-//	{//ãOê’Ç™ê∂ê¨Ç≥ÇÍÇƒÇ¢Ç»Ç¢
-//		return;
-//	}
-//
-//	//êVÇµÇ¢à íuÇê›íË
-//	m_Trajectory->SetNewPos(pos);
-//}
-
 //========================================================================================================
-//ÉvÉåÉCÉÑÅ[ÇÃçUåÇèÛë‘ÉNÉâÉX
+//É{ÉXÇÃçUåÇèÛë‘ÉNÉâÉX
 //========================================================================================================
 
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CAttackEnemyState::CAttackEnemyState() :
+CAttackBossStateBase::CAttackBossStateBase() :
 	m_OwnerState(nullptr)//ÉXÉeÅ[ÉgÇÃèäóLé“
 {
 
@@ -165,7 +127,7 @@ CAttackEnemyState::CAttackEnemyState() :
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CAttackEnemyState::~CAttackEnemyState()
+CAttackBossStateBase::~CAttackBossStateBase()
 {
 
 }
@@ -173,7 +135,7 @@ CAttackEnemyState::~CAttackEnemyState()
 //==========================
 //ÉXÉeÅ[ÉgÇÃèäéùé“Çê›íË
 //==========================
-void CAttackEnemyState::SetOwner(CEnemyAttackState* State)
+void CAttackBossStateBase::SetOwner(CBossAttackState* State)
 {
 	m_OwnerState = State;
 }
@@ -187,7 +149,7 @@ void CAttackEnemyState::SetOwner(CEnemyAttackState* State)
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CFirstEnemyAttackState::CFirstEnemyAttackState()
+CBossFirstAttackState::CBossFirstAttackState()
 {
 
 }
@@ -195,7 +157,7 @@ CFirstEnemyAttackState::CFirstEnemyAttackState()
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CFirstEnemyAttackState::~CFirstEnemyAttackState()
+CBossFirstAttackState::~CBossFirstAttackState()
 {
 
 }
@@ -203,20 +165,19 @@ CFirstEnemyAttackState::~CFirstEnemyAttackState()
 //==========================
 //äJén
 //==========================
-void CFirstEnemyAttackState::Start()
+void CBossFirstAttackState::Start()
 {
-	//çUåÇîªíËÇèâä˙âª
+	//çUåÇÉqÉbÉgîªíËÇâèú
 	m_OwnerState->GetOwner()->ResetAttack();
+
+	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::ATTACK);
 }
 
 //==========================
 //çXêV
 //==========================
-void CFirstEnemyAttackState::Update()
+void CBossFirstAttackState::Update()
 {
-	//ÉÇÅ[ÉVÉáÉìÇÃê›íË
-	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::ATTACK);
-
 	if (m_OwnerState->GetFrame() <= 10)
 	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
 
@@ -225,9 +186,9 @@ void CFirstEnemyAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame() < HITFLAME)
+	if (m_OwnerState->GetFrame() <= HITFLAME)
 	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
-		
+
 		//çUåÇÇÃìñÇΩÇËîªíË
 		m_OwnerState->GetOwner()->HitPlayer(RIGHT_HAND);
 	}
@@ -237,7 +198,7 @@ void CFirstEnemyAttackState::Update()
 		m_OwnerState->ResetInfo();//çUåÇÇÃèÓïÒÇèâä˙âª
 		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ÉÇÅ[ÉVÉáÉìÇí‚é~
 
-		auto NewState = DBG_NEW CSecondEnemyAttackState;
+		auto NewState = DBG_NEW CBossSecondAttackState;
 		m_OwnerState->ChangeAttack(NewState);
 
 		return;
@@ -255,9 +216,9 @@ void CFirstEnemyAttackState::Update()
 //==========================
 //èIóπ
 //==========================
-void CFirstEnemyAttackState::Uninit()
+void CBossFirstAttackState::Uninit()
 {
-	CEnemyAttackStateBase::Uninit();
+	CBossAttackStateBase::Uninit();
 }
 
 //=============================2âÒñ⁄ÇÃçUåÇ======================================
@@ -265,7 +226,7 @@ void CFirstEnemyAttackState::Uninit()
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CSecondEnemyAttackState::CSecondEnemyAttackState()
+CBossSecondAttackState::CBossSecondAttackState()
 {
 
 }
@@ -273,7 +234,7 @@ CSecondEnemyAttackState::CSecondEnemyAttackState()
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CSecondEnemyAttackState::~CSecondEnemyAttackState()
+CBossSecondAttackState::~CBossSecondAttackState()
 {
 
 }
@@ -281,26 +242,19 @@ CSecondEnemyAttackState::~CSecondEnemyAttackState()
 //==========================
 //äJén
 //==========================
-void CSecondEnemyAttackState::Start()
+void CBossSecondAttackState::Start()
 {
-	//çUåÇîªíËÇèâä˙âª
+	//çUåÇÉqÉbÉgîªíËÇâèú
 	m_OwnerState->GetOwner()->ResetAttack();
 
-	//å¸Ç´ÇïœçX
-	m_OwnerState->GetOwner()->ChangeDirection();
-
-	//ÉÇÅ[ÉVÉáÉìÇçƒê∂
-	m_OwnerState->GetOwner()->ChangePlayMotion(true);
+	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::ATTACK2);
 }
 
 //==========================
 //çXêV
 //==========================
-void CSecondEnemyAttackState::Update()
+void CBossSecondAttackState::Update()
 {
-	//ÉÇÅ[ÉVÉáÉìïœçX
-	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::ATTACK2);
-
 	if (m_OwnerState->GetFrame() <= 10)
 	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
 
@@ -309,7 +263,7 @@ void CSecondEnemyAttackState::Update()
 		m_OwnerState->GetOwner()->Move();
 	}
 
-	if (m_OwnerState->GetFrame() < HITFLAME)
+	if (m_OwnerState->GetFrame() <= HITFLAME)
 	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
 
 		//çUåÇÇÃìñÇΩÇËîªíË
@@ -321,7 +275,7 @@ void CSecondEnemyAttackState::Update()
 		m_OwnerState->ResetInfo();//çUåÇÇÃèÓïÒÇèâä˙âª
 		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ÉÇÅ[ÉVÉáÉìÇí‚é~
 
-		auto NewState = DBG_NEW CRastEnemyAttackState;
+		auto NewState = DBG_NEW CBossRastAttackState;
 		m_OwnerState->ChangeAttack(NewState);
 
 		return;
@@ -339,9 +293,9 @@ void CSecondEnemyAttackState::Update()
 //==========================
 //èIóπ
 //==========================
-void CSecondEnemyAttackState::Uninit()
+void CBossSecondAttackState::Uninit()
 {
-	CEnemyAttackStateBase::Uninit();
+	CBossAttackStateBase::Uninit();
 }
 
 //=============================3âÒñ⁄ÇÃçUåÇ======================================
@@ -349,7 +303,7 @@ void CSecondEnemyAttackState::Uninit()
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CRastEnemyAttackState::CRastEnemyAttackState()
+CBossRastAttackState::CBossRastAttackState()
 {
 
 }
@@ -357,7 +311,7 @@ CRastEnemyAttackState::CRastEnemyAttackState()
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CRastEnemyAttackState::~CRastEnemyAttackState()
+CBossRastAttackState::~CBossRastAttackState()
 {
 
 }
@@ -365,26 +319,19 @@ CRastEnemyAttackState::~CRastEnemyAttackState()
 //==========================
 //äJén
 //==========================
-void CRastEnemyAttackState::Start()
+void CBossRastAttackState::Start()
 {
-	//çUåÇîªíËÇèâä˙âª
+	//çUåÇÉqÉbÉgîªíËÇâèú
 	m_OwnerState->GetOwner()->ResetAttack();
 
-	//å¸Ç´ÇïœçX
-	m_OwnerState->GetOwner()->ChangeDirection();
-
-	//ÉÇÅ[ÉVÉáÉìÇçƒê∂
-	m_OwnerState->GetOwner()->ChangePlayMotion(true);
+	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::ATTACK3);
 }
 
 //==========================
 //çXêV
 //==========================
-void CRastEnemyAttackState::Update()
+void CBossRastAttackState::Update()
 {
-	//ÉÇÅ[ÉVÉáÉìÇÃïœçX
-	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::ATTACK3);
-
 	if (m_OwnerState->GetFrame() <= 10)
 	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
 
@@ -401,6 +348,7 @@ void CRastEnemyAttackState::Update()
 	}
 	else
 	{
+
 		//çUåÇèIóπ
 		m_OwnerState->ChangeCombo();
 
@@ -412,9 +360,206 @@ void CRastEnemyAttackState::Update()
 //==========================
 //èIóπ
 //==========================
-void CRastEnemyAttackState::Uninit()
+void CBossRastAttackState::Uninit()
 {
-	CEnemyAttackStateBase::Uninit();
+	CBossAttackStateBase::Uninit();
+}
+
+//==============================================================================
+//óºéËïêäÌçUåÇÉNÉâÉX
+//==============================================================================
+
+//=============================1âÒñ⁄ÇÃçUåÇ======================================
+
+//==========================
+//ÉRÉìÉXÉgÉâÉNÉ^
+//==========================
+CBossFirstBigWeaponAttack::CBossFirstBigWeaponAttack()
+{
+
+}
+
+//==========================
+//ÉfÉXÉgÉâÉNÉ^
+//==========================
+CBossFirstBigWeaponAttack::~CBossFirstBigWeaponAttack()
+{
+
+}
+
+//==========================
+//äJén
+//==========================
+void CBossFirstBigWeaponAttack::Start()
+{
+	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::WEAPONATTACK);
+}
+
+//==========================
+//çXêV
+//==========================
+void CBossFirstBigWeaponAttack::Update()
+{
+	if (m_OwnerState->GetFrame() <= 10)
+	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
+
+		//çUåÇéûÇÃà⁄ìÆ
+		m_OwnerState->GetOwner()->AttackMove();
+		m_OwnerState->GetOwner()->Move();
+	}
+
+	if (m_OwnerState->GetFrame() <= 20)
+	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
+
+	}
+	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
+	{//çUåÇîÕàÕÇ…ÉvÉåÉCÉÑÅ[Ç™Ç¢ÇÈ
+
+		m_OwnerState->ResetInfo();//çUåÇÇÃèÓïÒÇèâä˙âª
+		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ÉÇÅ[ÉVÉáÉìÇí‚é~
+
+		auto NewState = DBG_NEW CBossSecondBigWeaponAttack;
+		m_OwnerState->ChangeAttack(NewState);
+
+		return;
+	}
+}
+
+//==========================
+//èIóπ
+//==========================
+void CBossFirstBigWeaponAttack::Uninit()
+{
+	CBossAttackStateBase::Uninit();
+}
+
+//=============================2âÒñ⁄ÇÃçUåÇ======================================
+
+//==========================
+//ÉRÉìÉXÉgÉâÉNÉ^
+//==========================
+CBossSecondBigWeaponAttack::CBossSecondBigWeaponAttack()
+{
+
+}
+
+//==========================
+//ÉfÉXÉgÉâÉNÉ^
+//==========================
+CBossSecondBigWeaponAttack::~CBossSecondBigWeaponAttack()
+{
+
+}
+
+//==========================
+//äJén
+//==========================
+void CBossSecondBigWeaponAttack::Start()
+{
+	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::WEAPONATTACK2);
+}
+
+//==========================
+//çXêV
+//==========================
+void CBossSecondBigWeaponAttack::Update()
+{
+	if (m_OwnerState->GetFrame() <= 10)
+	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
+
+		//çUåÇéûÇÃà⁄ìÆ
+		m_OwnerState->GetOwner()->AttackMove();
+		m_OwnerState->GetOwner()->Move();
+	}
+
+	if (m_OwnerState->GetFrame() <= 20)
+	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
+
+		//çUåÇÇÃìñÇΩÇËîªíË
+		
+	}
+	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
+	{//çUåÇîÕàÕÇ…ÉvÉåÉCÉÑÅ[Ç™Ç¢ÇÈ
+
+		m_OwnerState->ResetInfo();//çUåÇÇÃèÓïÒÇèâä˙âª
+		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ÉÇÅ[ÉVÉáÉìÇí‚é~
+
+		auto NewState = DBG_NEW CBossRastBigWeaponAttack;
+		m_OwnerState->ChangeAttack(NewState);
+
+		return;
+	}
+}
+
+//==========================
+//èIóπ
+//==========================
+void CBossSecondBigWeaponAttack::Uninit()
+{
+	CBossAttackStateBase::Uninit();
+}
+
+//=============================3âÒñ⁄ÇÃçUåÇ======================================
+
+//==========================
+//ÉRÉìÉXÉgÉâÉNÉ^
+//==========================
+CBossRastBigWeaponAttack::CBossRastBigWeaponAttack()
+{
+
+}
+
+//==========================
+//ÉfÉXÉgÉâÉNÉ^
+//==========================
+CBossRastBigWeaponAttack::~CBossRastBigWeaponAttack()
+{
+
+}
+
+//==========================
+//äJén
+//==========================
+void CBossRastBigWeaponAttack::Start()
+{
+	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::WEAPONATTACK3);
+}
+
+//==========================
+//çXêV
+//==========================
+void CBossRastBigWeaponAttack::Update()
+{
+	if (m_OwnerState->GetFrame() <= 10)
+	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
+
+		//çUåÇéûÇÃà⁄ìÆ
+		m_OwnerState->GetOwner()->AttackMove();
+		m_OwnerState->GetOwner()->Move();
+	}
+
+	if (m_OwnerState->GetFrame() <= 20)
+	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
+
+		//çUåÇÇÃìñÇΩÇËîªíË
+		
+	}
+	else
+	{
+		//çUåÇèIóπ
+		m_OwnerState->ChangeCombo();
+
+		//çUåÇÇÃÉNÅ[ÉãÉ^ÉCÉÄÇê›íË
+		m_OwnerState->GetOwner()->SetCoolTime(300);
+	}
+}
+
+//==========================
+//èIóπ
+//==========================
+void CBossRastBigWeaponAttack::Uninit()
+{
+	CBossAttackStateBase::Uninit();
 }
 
 //==============================================================================
@@ -426,7 +571,7 @@ void CRastEnemyAttackState::Uninit()
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CFirstSmallWeaponEnemyAttack::CFirstSmallWeaponEnemyAttack()
+CBossFirstSmallWeaponAttack::CBossFirstSmallWeaponAttack()
 {
 
 }
@@ -434,7 +579,7 @@ CFirstSmallWeaponEnemyAttack::CFirstSmallWeaponEnemyAttack()
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CFirstSmallWeaponEnemyAttack::~CFirstSmallWeaponEnemyAttack()
+CBossFirstSmallWeaponAttack::~CBossFirstSmallWeaponAttack()
 {
 
 }
@@ -442,7 +587,7 @@ CFirstSmallWeaponEnemyAttack::~CFirstSmallWeaponEnemyAttack()
 //==========================
 //äJén
 //==========================
-void CFirstSmallWeaponEnemyAttack::Start()
+void CBossFirstSmallWeaponAttack::Start()
 {
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONATTACK);
 }
@@ -450,13 +595,13 @@ void CFirstSmallWeaponEnemyAttack::Start()
 //==========================
 //çXêV
 //==========================
-void CFirstSmallWeaponEnemyAttack::Update()
+void CBossFirstSmallWeaponAttack::Update()
 {
 	if (m_OwnerState->GetFrame() <= 10)
 	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
 
 		//çUåÇéûÇÃà⁄ìÆ
-		//m_OwnerState->GetOwner()->AttackMove();
+		m_OwnerState->GetOwner()->AttackMove();
 		m_OwnerState->GetOwner()->Move();
 	}
 
@@ -464,16 +609,27 @@ void CFirstSmallWeaponEnemyAttack::Update()
 	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
 
 		//çUåÇÇÃìñÇΩÇËîªíË
-		//m_OwnerState->GetOwner()->WeaponHitEnemy();
+		
+	}
+	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
+	{//çUåÇîÕàÕÇ…ÉvÉåÉCÉÑÅ[Ç™Ç¢ÇÈ
+
+		m_OwnerState->ResetInfo();//çUåÇÇÃèÓïÒÇèâä˙âª
+		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ÉÇÅ[ÉVÉáÉìÇí‚é~
+
+		auto NewState = DBG_NEW CBossSecondSmallWeaponAttack;
+		m_OwnerState->ChangeAttack(NewState);
+
+		return;
 	}
 }
 
 //==========================
 //èIóπ
 //==========================
-void CFirstSmallWeaponEnemyAttack::Uninit()
+void CBossFirstSmallWeaponAttack::Uninit()
 {
-	CEnemyAttackStateBase::Uninit();
+	CBossAttackStateBase::Uninit();
 }
 
 //=============================2âÒñ⁄ÇÃçUåÇ======================================
@@ -481,7 +637,7 @@ void CFirstSmallWeaponEnemyAttack::Uninit()
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CSecondSmallWeaponEnemyAttack::CSecondSmallWeaponEnemyAttack()
+CBossSecondSmallWeaponAttack::CBossSecondSmallWeaponAttack()
 {
 
 }
@@ -489,7 +645,7 @@ CSecondSmallWeaponEnemyAttack::CSecondSmallWeaponEnemyAttack()
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CSecondSmallWeaponEnemyAttack::~CSecondSmallWeaponEnemyAttack()
+CBossSecondSmallWeaponAttack::~CBossSecondSmallWeaponAttack()
 {
 
 }
@@ -497,7 +653,7 @@ CSecondSmallWeaponEnemyAttack::~CSecondSmallWeaponEnemyAttack()
 //==========================
 //äJén
 //==========================
-void CSecondSmallWeaponEnemyAttack::Start()
+void CBossSecondSmallWeaponAttack::Start()
 {
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONATTACK2);
 }
@@ -505,13 +661,13 @@ void CSecondSmallWeaponEnemyAttack::Start()
 //==========================
 //çXêV
 //==========================
-void CSecondSmallWeaponEnemyAttack::Update()
+void CBossSecondSmallWeaponAttack::Update()
 {
 	if (m_OwnerState->GetFrame() <= 10)
 	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
 
 		//çUåÇéûÇÃà⁄ìÆ
-		//m_OwnerState->GetOwner()->AttackMove();
+		m_OwnerState->GetOwner()->AttackMove();
 		m_OwnerState->GetOwner()->Move();
 	}
 
@@ -519,16 +675,27 @@ void CSecondSmallWeaponEnemyAttack::Update()
 	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
 
 		//çUåÇÇÃìñÇΩÇËîªíË
-		//m_OwnerState->GetOwner()->WeaponHitEnemy();
+		
+	}
+	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
+	{//çUåÇîÕàÕÇ…ÉvÉåÉCÉÑÅ[Ç™Ç¢ÇÈ
+
+		m_OwnerState->ResetInfo();//çUåÇÇÃèÓïÒÇèâä˙âª
+		m_OwnerState->GetOwner()->ChangePlayMotion(false);//ÉÇÅ[ÉVÉáÉìÇí‚é~
+
+		auto NewState = DBG_NEW CBossRastSmallWeaponAttack;
+		m_OwnerState->ChangeAttack(NewState);
+
+		return;
 	}
 }
 
 //==========================
 //èIóπ
 //==========================
-void CSecondSmallWeaponEnemyAttack::Uninit()
+void CBossSecondSmallWeaponAttack::Uninit()
 {
-	CEnemyAttackStateBase::Uninit();
+	CBossAttackStateBase::Uninit();
 }
 
 //=============================3âÒñ⁄ÇÃçUåÇ======================================
@@ -536,7 +703,7 @@ void CSecondSmallWeaponEnemyAttack::Uninit()
 //==========================
 //ÉRÉìÉXÉgÉâÉNÉ^
 //==========================
-CRastSmallWeaponEnemyAttack::CRastSmallWeaponEnemyAttack()
+CBossRastSmallWeaponAttack::CBossRastSmallWeaponAttack()
 {
 
 }
@@ -544,7 +711,7 @@ CRastSmallWeaponEnemyAttack::CRastSmallWeaponEnemyAttack()
 //==========================
 //ÉfÉXÉgÉâÉNÉ^
 //==========================
-CRastSmallWeaponEnemyAttack::~CRastSmallWeaponEnemyAttack()
+CBossRastSmallWeaponAttack::~CBossRastSmallWeaponAttack()
 {
 
 }
@@ -552,7 +719,7 @@ CRastSmallWeaponEnemyAttack::~CRastSmallWeaponEnemyAttack()
 //==========================
 //äJén
 //==========================
-void CRastSmallWeaponEnemyAttack::Start()
+void CBossRastSmallWeaponAttack::Start()
 {
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONATTACK3);
 }
@@ -560,13 +727,13 @@ void CRastSmallWeaponEnemyAttack::Start()
 //==========================
 //çXêV
 //==========================
-void CRastSmallWeaponEnemyAttack::Update()
+void CBossRastSmallWeaponAttack::Update()
 {
 	if (m_OwnerState->GetFrame() <= 10)
 	{//çUåÇäJénÇ©ÇÁ10ÉtÉåÅ[ÉÄà»â∫
 
 		//çUåÇéûÇÃà⁄ìÆ
-		//m_OwnerState->GetOwner()->AttackMove();
+		m_OwnerState->GetOwner()->AttackMove();
 		m_OwnerState->GetOwner()->Move();
 	}
 
@@ -574,14 +741,21 @@ void CRastSmallWeaponEnemyAttack::Update()
 	{//çUåÇäJénÇ©ÇÁ20ÉtÉåÅ[ÉÄà»â∫
 
 		//çUåÇÇÃìñÇΩÇËîªíË
-		//m_OwnerState->GetOwner()->WeaponHitEnemy();
+	}
+	else
+	{
+		//çUåÇèIóπ
+		m_OwnerState->ChangeCombo();
+
+		//çUåÇÇÃÉNÅ[ÉãÉ^ÉCÉÄÇê›íË
+		m_OwnerState->GetOwner()->SetCoolTime(300);
 	}
 }
 
 //==========================
 //èIóπ
 //==========================
-void CRastSmallWeaponEnemyAttack::Uninit()
+void CBossRastSmallWeaponAttack::Uninit()
 {
-	CEnemyAttackStateBase::Uninit();
+	CBossAttackStateBase::Uninit();
 }

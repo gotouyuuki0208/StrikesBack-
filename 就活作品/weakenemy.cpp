@@ -84,6 +84,27 @@ void CWeakEnemy::Update()
 
 	//更新処理
 	CEnemy::Update();
+	
+	if (!GetAttackable())
+	{//攻撃できないとき
+
+		//クールタイムを減らす
+		SubCoolTime();
+
+		if (GetCoolTime() <= 0)
+		{//クールタイムがなくなった
+
+			//攻撃可能にする
+			ChangeAttackable();
+		}
+	}
+
+	if (GetPlayMotion())
+	{//モーションを再生する
+
+		//モーションの更新
+		Motion();
+	}
 
 	//敵同士の当たり判定
 	ColisionEnemy();
@@ -324,7 +345,8 @@ void CWeakEnemy::Patrol()
 //==========================
 void CWeakEnemy::Hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE HitMotion)
 {
-	if (GetDamageNum() >= 3 || m_HitMotion == HitMotion)
+	
+	if (GetDamageNum() >= 3 || GetHitMotion() == HitMotion)
 	{//ダメージ回数が3回以上か前回と同じ攻撃
 		return;
 	}
@@ -333,7 +355,7 @@ void CWeakEnemy::Hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE HitMotion)
 	AddDamegeNum();
 
 	//攻撃を受けたモーションを保存
-	m_HitMotion = HitMotion;
+	SetHitMotion(HitMotion);
 
 	//ダメージの数値を取得
 	int DamageNum = damage;

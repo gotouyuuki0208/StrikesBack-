@@ -77,7 +77,7 @@ CUIBg* CUIBg::Create(D3DXVECTOR3 pos)
 	pUIBg->SetSize(20.0f,150.0f);
 
 	//F‚ðÝ’è
-	pUIBg->SetCor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f));
+	pUIBg->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.5f));
 
 	//‰ŠúÝ’è
 	pUIBg->Init();

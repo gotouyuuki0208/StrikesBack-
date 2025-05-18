@@ -82,7 +82,7 @@ CTitleLogo* CTitleLogo::Create(D3DXVECTOR3 pos)
 	pTitleLogo->SetSize(150.0f,250.0f);
 
 	//F‚ðÝ’è
-	pTitleLogo->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pTitleLogo->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰ŠúÝ’è
 	pTitleLogo->Init();

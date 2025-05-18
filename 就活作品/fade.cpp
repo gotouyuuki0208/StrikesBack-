@@ -14,12 +14,14 @@ const int CFade::PRIORITY = 5;
 //==========================
 // コンストラクタ
 //==========================
-CFade::CFade(int priority):CObject2D(priority)
+CFade::CFade(int priority):
+CObject2D(priority),			//基底コンストラクタ
+m_Transparency(0.0f),					//色
+m_fade(FADE::FADE_NONE),		//フェードの状態
+g_modenext(CScene::MODE::TITLE),//次のシーン
+m_InGame(false)					//ゲーム中か判定
 {
-	m_cor = 0.0f;
-	m_fade = FADE::FADE_NONE;
-	g_modenext = CScene::MODE::TITLE;
-	m_InGame = false;
+	
 }
 
 //==========================
@@ -35,8 +37,13 @@ CFade::~CFade()
 //==========================
 HRESULT CFade::Init()
 {
+	//位置の設定
 	SetPos(D3DXVECTOR3(640.0f, 360.0f, 0.0f));
+	
+	//大きさの設定
 	SetSize(360.0f, 640.0f);
+	
+	//初期設定
 	CObject2D::Init();
 
 	return S_OK;
@@ -59,21 +66,21 @@ void CFade::Update()
 	{
 		if (m_fade == FADE::FADE_IN)
 		{//フェードイン状態
-			m_cor -= 0.05f;
+			m_Transparency -= 0.05f;
 
-			if (m_cor <= 0.0f)
+			if (m_Transparency <= 0.0f)
 			{
-				m_cor = 0.0f;
+				m_Transparency = 0.0f;
 				m_fade = FADE::FADE_NONE;
 			}
 		}
 		else if (m_fade == FADE::FADE_OUT)
 		{//フェードアウト状態
-			m_cor += 0.05f;
+			m_Transparency += 0.05f;
 
-			if (m_cor >= 1.0f)
+			if (m_Transparency >= 1.0f)
 			{
-				m_cor = 1.0f;
+				m_Transparency = 1.0f;
 				m_fade = FADE::FADE_IN;
 
 				if (!m_InGame)
@@ -86,7 +93,7 @@ void CFade::Update()
 		}
 	}
 
-	SetCor(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_cor));//色の設定
+	SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_Transparency));//色の設定
 	CObject2D::Update();//更新処理
 
 }
@@ -142,7 +149,7 @@ void CFade::InGameFade()
 //==========================
 //透明度の取得
 //==========================
-float CFade::GetCor()
+float CFade::GetTransparency()
 {
-	return m_cor;
+	return m_Transparency;
 }

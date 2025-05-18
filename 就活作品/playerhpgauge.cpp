@@ -86,7 +86,7 @@ void CPlayerHPGauge::Draw()
 //==========================
 //オブジェクト2D生成
 //==========================
-CPlayerHPGauge* CPlayerHPGauge::Create(D3DXVECTOR3 pos, float vertical, float width, int hp)
+CPlayerHPGauge* CPlayerHPGauge::Create(D3DXVECTOR3 pos, float vertical, float width)
 {
 	//ゲージの枠を生成
 	CPlayerHPGaugeFrame::Create(pos, vertical+1.0f, width);
@@ -101,11 +101,7 @@ CPlayerHPGauge* CPlayerHPGauge::Create(D3DXVECTOR3 pos, float vertical, float wi
 	pPlayerHPGauge->SetSize(vertical, width);
 
 	//色の設定
-	pPlayerHPGauge->SetCor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-
-	//HPの設定
-	pPlayerHPGauge->SetHP(hp);//現在のHPを設定
-	pPlayerHPGauge->m_MaxHP = hp;//最大HPを保存
+	pPlayerHPGauge->SetCol(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
 	//初期化処理
 	pPlayerHPGauge->Init();
@@ -119,6 +115,11 @@ CPlayerHPGauge* CPlayerHPGauge::Create(D3DXVECTOR3 pos, float vertical, float wi
 void CPlayerHPGauge::SetHP(int hp)
 {
 	m_HP = hp;
+
+	if (m_MaxHP == 0)
+	{
+		m_MaxHP = hp;
+	}
 }
 
 //==========================
@@ -162,15 +163,15 @@ void CPlayerHPGauge::SwitchCor()
 {
 	if (m_Ratio <= 0.2f)
 	{
-		SetCor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 	else if (m_Ratio <= 0.5f)
 	{
-		SetCor(D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f));
+		SetCol(D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f));
 	}
 	else
 	{
-		SetCor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+		SetCol(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 	}
 }
 
@@ -193,10 +194,10 @@ void CPlayerHPGauge::SetVtx()
 	pVtx[3].pos = D3DXVECTOR3(GetPos().x + m_length, GetPos().y + GetVertical(), 0.0f);
 
 	//頂点カラーの設定
-	pVtx[0].col = GetCor();
-	pVtx[1].col = GetCor();
-	pVtx[2].col = GetCor();
-	pVtx[3].col = GetCor();
+	pVtx[0].col = GetCol();
+	pVtx[1].col = GetCol();
+	pVtx[2].col = GetCol();
+	pVtx[3].col = GetCol();
 
 	//頂点バッファをアンロックする
 	pVtxBuff->Unlock();

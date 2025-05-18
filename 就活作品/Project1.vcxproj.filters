@@ -121,6 +121,18 @@
     <Filter Include="ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\boss">
       <UniqueIdentifier>{7e533ad7-a891-4ff4-b2ba-64832afdfca0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\weakenemy">
+      <UniqueIdentifier>{b8b1a724-8b50-4896-9bff-56e3231e8fbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy">
+      <UniqueIdentifier>{222f38d5-94f6-4346-91d3-cd5d8e68a590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\system\manager">
+      <UniqueIdentifier>{367444c6-ca84-4439-bdef-04d06208861b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\system\manager">
+      <UniqueIdentifier>{c1335b62-38c3-410f-a64e-e571dfed1ae0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="title.cpp">
@@ -195,7 +207,7 @@
     <ClCompile Include="sample_objectX.cpp">
       <Filter>ソース ファイル\sample</Filter>
     </ClCompile>
-    <ClCompile Include="bg.cpp">
+    <ClCompile Include="tutorialbg.cpp">
       <Filter>ソース ファイル\gameobject\object2D</Filter>
     </ClCompile>
     <ClCompile Include="sample_billboard.cpp">
@@ -223,9 +235,6 @@
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
     <ClCompile Include="drawdebug.cpp">
-      <Filter>ソース ファイル\system</Filter>
-    </ClCompile>
-    <ClCompile Include="stagemanager.cpp">
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
     <ClCompile Include="apartment.cpp">
@@ -372,12 +381,6 @@
     <ClCompile Include="enemymovepoint.cpp">
       <Filter>ソース ファイル\gameobject\object3D</Filter>
     </ClCompile>
-    <ClCompile Include="TutorialManager.cpp">
-      <Filter>ソース ファイル\system</Filter>
-    </ClCompile>
-    <ClCompile Include="GameManager.cpp">
-      <Filter>ソース ファイル\system</Filter>
-    </ClCompile>
     <ClCompile Include="darkbg.cpp">
       <Filter>ソース ファイル\gameobject\object2D</Filter>
     </ClCompile>
@@ -483,20 +486,47 @@
     <ClCompile Include="boss.cpp">
       <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\boss</Filter>
     </ClCompile>
-    <ClCompile Include="hitenemy.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="weaponenemy.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="enemystate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
+    <ClCompile Include="bossState.cpp">
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\boss</Filter>
     </ClCompile>
     <ClCompile Include="enemyattackstate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+    </ClCompile>
+    <ClCompile Include="enemystate.cpp">
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+    </ClCompile>
+    <ClCompile Include="hitenemy.cpp">
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
     </ClCompile>
     <ClCompile Include="weakenemy.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+    </ClCompile>
+    <ClCompile Include="weaponenemy.cpp">
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+    </ClCompile>
+    <ClCompile Include="bossattackstate.cpp">
+      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>ソース ファイル\system\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="stagemanager.cpp">
+      <Filter>ソース ファイル\system\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TutorialManager.cpp">
+      <Filter>ソース ファイル\system\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="hudmanager.cpp">
+      <Filter>ソース ファイル\system\manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TutorialPopup.cpp">
+      <Filter>ソース ファイル\gameobject\object2D</Filter>
+    </ClCompile>
+    <ClCompile Include="direction.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="directionbg.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -572,7 +602,7 @@
     <ClInclude Include="sample_objectX.h">
       <Filter>ヘッダー ファイル\sample</Filter>
     </ClInclude>
-    <ClInclude Include="bg.h">
+    <ClInclude Include="tutorialbg.h">
       <Filter>ヘッダー ファイル\gameobject\object2D</Filter>
     </ClInclude>
     <ClInclude Include="sample_billboard.h">
@@ -603,9 +633,6 @@
       <Filter>ヘッダー ファイル\system</Filter>
     </ClInclude>
     <ClInclude Include="drawdebug.h">
-      <Filter>ヘッダー ファイル\system</Filter>
-    </ClInclude>
-    <ClInclude Include="stagemanager.h">
       <Filter>ヘッダー ファイル\system</Filter>
     </ClInclude>
     <ClInclude Include="stagechangepoint.h">
@@ -755,12 +782,6 @@
     <ClInclude Include="enemymovepoint.h">
       <Filter>ヘッダー ファイル\gameobject\object3D</Filter>
     </ClInclude>
-    <ClInclude Include="TutorialManager.h">
-      <Filter>ヘッダー ファイル\system</Filter>
-    </ClInclude>
-    <ClInclude Include="GameManager.h">
-      <Filter>ヘッダー ファイル\system</Filter>
-    </ClInclude>
     <ClInclude Include="UIbg.h">
       <Filter>ヘッダー ファイル\gameobject\object2D</Filter>
     </ClInclude>
@@ -863,20 +884,47 @@
     <ClInclude Include="enemy.h">
       <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
     </ClInclude>
-    <ClInclude Include="hitenemy.h">
-      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="weaponenemy.h">
-      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="enemystate.h">
-      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
+    <ClInclude Include="bossState.h">
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\boss</Filter>
     </ClInclude>
     <ClInclude Include="enemyattackstate.h">
-      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\weakenemy</Filter>
+    </ClInclude>
+    <ClInclude Include="enemystate.h">
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\weakenemy</Filter>
+    </ClInclude>
+    <ClInclude Include="hitenemy.h">
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\weakenemy</Filter>
     </ClInclude>
     <ClInclude Include="weakenemy.h">
-      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy</Filter>
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\weakenemy</Filter>
+    </ClInclude>
+    <ClInclude Include="weaponenemy.h">
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\weakenemy</Filter>
+    </ClInclude>
+    <ClInclude Include="bossattackstate.h">
+      <Filter>ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>ヘッダー ファイル\system\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="stagemanager.h">
+      <Filter>ヘッダー ファイル\system\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="TutorialManager.h">
+      <Filter>ヘッダー ファイル\system\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="hudmanager.h">
+      <Filter>ヘッダー ファイル\system\manager</Filter>
+    </ClInclude>
+    <ClInclude Include="TutorialPopup.h">
+      <Filter>ヘッダー ファイル\gameobject\object2D</Filter>
+    </ClInclude>
+    <ClInclude Include="direction.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="directionbg.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

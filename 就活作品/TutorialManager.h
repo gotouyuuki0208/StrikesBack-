@@ -7,29 +7,31 @@
 #ifndef _TUTORIALMANAGER_H_
 #define _TUTORIALMANAGER_H_
 
+//前方宣言
+class CTutorialPopup;
+class CTutorialBg;
+
 //クラスの定義
-class CTutorial
+class CTutorialManager
 {
 public:
 	
 	//メンバ関数
-	CTutorial();//コンストラクタ
-	~CTutorial();//デストラクタ
-	bool GetTutorial();//説明を表示しているかを取得
-	void StartTutorial();//説明を開始
-	void FinishTutorial();//説明を終了
-	void SetAction();//行動説明を表示した状態に変更
-	void SetWeapon();//武器説明を表示した状態に変更
-	void SetRecovery();//回復説明を表示した状態に変更
-	bool GetAction();//行動説明を表示した状態に取得
-	bool GetWeapon();//武器説明を表示した状態に取得
-	bool GetRecovery();//回復説明を表示した状態に取得
+	CTutorialManager();//コンストラクタ
+	~CTutorialManager();//デストラクタ
+	void ActionTutorialDisplay();//行動の説明を表示
+	void WeaponTutorialDisplay();//武器の説明を表示
+	void RecoveryTutorialDisplay();//回復の説明を表示
+	void TutorialDelete();//武器の説明を消す
+
 private:
 	//メンバ変数
-	bool m_Tutorial;//説明表示判定
 	bool m_Action;//行動説明
 	bool m_Weapon;//武器説明
 	bool m_Recovery;//回復説明
+
+	CTutorialPopup* m_pTutorialPopup;//ポップアップ表示するチュートリアルの情報
+	CTutorialBg* m_pTutorialBg;//背景の情報
 };
 
 #endif

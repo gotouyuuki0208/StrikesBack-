@@ -86,7 +86,7 @@ void CBossHPGauge::Draw()
 //==========================
 //オブジェクト2D生成
 //==========================
-CBossHPGauge* CBossHPGauge::Create(D3DXVECTOR3 pos, float vertical, float width, int hp)
+CBossHPGauge* CBossHPGauge::Create(D3DXVECTOR3 pos, float vertical, float width)
 {
 	CBossGaugeFrame::Create(pos, vertical + 1.0f, width);
 
@@ -100,11 +100,7 @@ CBossHPGauge* CBossHPGauge::Create(D3DXVECTOR3 pos, float vertical, float width,
 	pBossHPGauge->SetSize(vertical, width);
 
 	//色の設定
-	pBossHPGauge->SetCor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-
-	//HPの設定
-	pBossHPGauge->SetHP(hp);//現在のHPを設定
-	pBossHPGauge->m_MaxHP = hp;//最大HPを保存
+	pBossHPGauge->SetCol(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
 	//初期化処理
 	pBossHPGauge->Init();
@@ -118,6 +114,12 @@ CBossHPGauge* CBossHPGauge::Create(D3DXVECTOR3 pos, float vertical, float width,
 void CBossHPGauge::SetHP(int hp)
 {
 	m_HP = hp;
+
+	if (m_MaxHP == 0)
+	{//最大HPが設定されていない
+
+		m_MaxHP = hp;
+	}
 }
 
 //==========================
@@ -151,15 +153,15 @@ void CBossHPGauge::SwitchCor()
 {
 	if (m_Ratio <= 0.2f)
 	{
-		SetCor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		SetCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 	else if (m_Ratio <= 0.5f)
 	{
-		SetCor(D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f));
+		SetCol(D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f));
 	}
 	else
 	{
-		SetCor(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+		SetCol(D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 	}
 }
 
@@ -182,10 +184,10 @@ void CBossHPGauge::SetVtx()
 	pVtx[3].pos = D3DXVECTOR3(GetPos().x, GetPos().y + GetVertical(), 0.0f);
 
 	//頂点カラーの設定
-	pVtx[0].col = GetCor();
-	pVtx[1].col = GetCor();
-	pVtx[2].col = GetCor();
-	pVtx[3].col = GetCor();
+	pVtx[0].col = GetCol();
+	pVtx[1].col = GetCol();
+	pVtx[2].col = GetCol();
+	pVtx[3].col = GetCol();
 
 	//頂点バッファをアンロックする
 	pVtxBuff->Unlock();

@@ -27,6 +27,8 @@ CCamera::CCamera()
 	m_PosRY = 0.0f;
 	m_nFlame = 0;
 	m_fShapeScale = 0;
+	m_DrectionFlame = 0;
+	m_NowFlame = 0;
 }
 
 //==========================
@@ -226,13 +228,32 @@ void CCamera::Overhead(D3DXVECTOR3 pos)
 //==========================
 //カメラの追従変更後の位置を設定
 //==========================
-void CCamera::SetTargetPos(D3DXVECTOR3 pos)
+void CCamera::SetTargetPos(D3DXVECTOR3 pos,int flame)
 {
+	//演出終了のフレーム数
+	m_DrectionFlame = flame;
+
+	//移動後の注視点の位置
 	m_targetposR.x = pos.x;
 	m_targetposR.z = pos.z;
 
+	//移動後の視点の位置
 	m_targetposV.x = pos.x;
 	m_targetposV.z = pos.z + Z_DISTANCE;
+}
+
+//==========================
+//カメラの位置を設定
+//==========================
+void CCamera::SetPos(D3DXVECTOR3 pos)
+{
+	//注視点の位置
+	m_posR.x = pos.x;
+	m_posR.z = pos.z;
+
+	//視点の位置
+	m_posV.x = pos.x;
+	m_posV.z = pos.z + Z_DISTANCE;
 }
 
 //==========================
@@ -240,11 +261,47 @@ void CCamera::SetTargetPos(D3DXVECTOR3 pos)
 //==========================
 void CCamera::TarGetMove()
 {
-	m_posR.x += (m_targetposR.x - m_posR.x) * 0.05f;
-	m_posV.x += (m_targetposV.x - m_posV.x) * 0.05f;
-												
-	m_posR.z += (m_targetposR.z - m_posR.z) * 0.05f;
-	m_posV.z += (m_targetposV.z - m_posV.z) * 0.05f;
+	//フレーム数をカウント
+	m_NowFlame++;
+
+	//現在値を求める
+	D3DXVECTOR3 posV = D3DXVECTOR3(0.0f, m_posV.y, 0.0f);
+	D3DXVECTOR3 posR = D3DXVECTOR3(0.0f, m_posR.y, 0.0f);
+
+	//相対値を求める
+	float Cur = (float)m_NowFlame / (float)m_DrectionFlame;
+
+	//位置の差分を求める
+	D3DXVECTOR3 diffposV = m_targetposV - m_posV;
+	D3DXVECTOR3 diffposR = m_targetposR - m_posR;
+
+	//現在値を求める
+	posV.x = m_posV.x + (diffposV.x * Cur);
+	posV.z = m_posV.z + (diffposV.z * Cur);
+
+	posR.x = m_posR.x + (diffposR.x * Cur);
+	posR.z = m_posR.z + (diffposR.z * Cur);
+
+	//位置の設定
+	m_posV = posV;
+	m_posR = posR;
+}
+
+//==========================
+//演出が終了したか取得
+//==========================
+bool CCamera::FinishDirection()
+{
+	if ((int)m_targetposR.z == (int)m_posR.z)
+	{
+		//フレーム数を初期化
+		m_DrectionFlame = 0;
+		m_NowFlame = 0;
+
+		return true;
+	}
+
+	return false;
 }
 
 //==========================
@@ -252,9 +309,9 @@ void CCamera::TarGetMove()
 //==========================
 void CCamera::Input(void)
 {
-	if (CManager::GetInstance()->GetTutorial()->GetTutorial()
+	if (!CManager::GetInstance()->GetGameManager()->GetPlayGame()
 		|| CManager::GetInstance()->GetScene()==nullptr
-		|| CManager::GetInstance()->GetGameManager()->GetDirection())
+		/*|| CManager::GetInstance()->GetGameManager()->GetDirection()*/)
 	{//操作説明表示中
 		return;
 	}

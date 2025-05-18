@@ -22,6 +22,7 @@ public:
 
 	//定数
 	static const int PRIORITY;//描画順
+	static const int POINT = 10;//移動地点の数
 
 	//メンバ関数
 	CWeakEnemy(int nPriority = PRIORITY);//コンストラクタ
@@ -46,7 +47,6 @@ private:
 	CStateMachine* m_StateMachine;//状態管理
 	CEnemyMovePoint* m_Point[POINT];//移動地点の情報
 	int m_CurPoint;//現在の移動地点
-	MOTION_TYPE m_HitMotion;//前回攻撃を受けたモーション
 	float m_Color;
 };
 #endif

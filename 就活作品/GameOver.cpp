@@ -82,7 +82,7 @@ COver* COver::Create(D3DXVECTOR3 pos)
 	pOver->SetSize(100.0f, 350.0f);
 
 	//F‚ðÝ’è
-	pOver->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pOver->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰ŠúÝ’è
 	pOver->Init();

@@ -512,7 +512,7 @@ void CEnemyDamageBrrowState::Uninit()
 CEnemyAttackState::CEnemyAttackState():
 m_FlameCount(0),//UŒ‚‚ÌƒtƒŒ[ƒ€”
 m_Combo(true),//ƒRƒ“ƒ{”»’è
-m_EenemyAttackStateMachine(nullptr)//UŒ‚‚Ìó‘ÔŠÇ—
+m_EnemyAttackStateMachine(nullptr)//UŒ‚‚Ìó‘ÔŠÇ—
 {
 
 }
@@ -530,18 +530,18 @@ CEnemyAttackState::~CEnemyAttackState()
 //==========================
 void CEnemyAttackState::Start()
 {
-	m_EenemyAttackStateMachine = DBG_NEW CEenemyAttackStateMachine;
+	m_EnemyAttackStateMachine = DBG_NEW CEnemyAttackStateMachine;
 
 	
 	if (m_pEnemy->GetEnemyType()==CEnemy::ENEMY_TYPE::HitEnemy)
 	{//‘fŽè‚Ì“G
 
-		auto NewState = DBG_NEW CFirstEenemyAttackState;
+		auto NewState = DBG_NEW CFirstEnemyAttackState;
 		ChangeAttack(NewState);
 	}
 	else
 	{//•ÐŽè•Ší
-		auto NewState = DBG_NEW CFirstSmallWeaponEenemyAttack;
+		auto NewState = DBG_NEW CFirstSmallWeaponEnemyAttack;
 		ChangeAttack(NewState);
 	}
 }
@@ -569,7 +569,7 @@ void CEnemyAttackState::Update()
 	}
 
 	m_FlameCount++;
-	m_EenemyAttackStateMachine->Update();	
+	m_EnemyAttackStateMachine->Update();	
 
 	if (m_Combo)
 	{//UŒ‚’†‚ÍI—¹
@@ -594,10 +594,10 @@ void CEnemyAttackState::Update()
 //==========================
 void CEnemyAttackState::Uninit()
 {
-	if (m_EenemyAttackStateMachine != nullptr)
+	if (m_EnemyAttackStateMachine != nullptr)
 	{
-		delete m_EenemyAttackStateMachine;
-		m_EenemyAttackStateMachine = nullptr;
+		delete m_EnemyAttackStateMachine;
+		m_EnemyAttackStateMachine = nullptr;
 	}
 
 	CEnemyStateBase::Uninit();
@@ -622,10 +622,10 @@ void CEnemyAttackState::ResetInfo()
 //==========================
 //UŒ‚‚ð•ÏX
 //==========================
-void CEnemyAttackState::ChangeAttack(CAttackEenemyState* State)
+void CEnemyAttackState::ChangeAttack(CAttackEnemyState* State)
 {
 	State->SetOwner(this);
-	m_EenemyAttackStateMachine->ChangeState(State);
+	m_EnemyAttackStateMachine->ChangeState(State);
 }
 
 //==========================

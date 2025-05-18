@@ -16,7 +16,7 @@ class CEnemyAttackState;
 //==============================================================================
 //基底クラス
 //==============================================================================
-class CEenemyAttackStateBase
+class CEnemyAttackStateBase
 {
 public:
 	//定数
@@ -28,8 +28,8 @@ public:
 	//static const D3DXVECTOR3 TRAJECTORY_SIZE;//軌跡の大きさ
 
 	//メンバ関数
-	CEenemyAttackStateBase();//コンストラクタ
-	~CEenemyAttackStateBase();//デストラクタ
+	CEnemyAttackStateBase();//コンストラクタ
+	~CEnemyAttackStateBase();//デストラクタ
 	virtual void Start();//開始
 	virtual void Update();//更新
 	virtual void Uninit();//終了
@@ -44,13 +44,13 @@ private:
 //==============================================================================
 //攻撃の状態クラス
 //==============================================================================
-class CAttackEenemyState :public CEenemyAttackStateBase
+class CAttackEnemyState :public CEnemyAttackStateBase
 {
 public:
 
 	//メンバ関数
-	CAttackEenemyState();//コンストラクタ
-	~CAttackEenemyState();//デストラクタ
+	CAttackEnemyState();//コンストラクタ
+	~CAttackEnemyState();//デストラクタ
 	void SetOwner(CEnemyAttackState* State);//ステートの所持者を設定
 
 protected:
@@ -62,20 +62,20 @@ protected:
 //==============================================================================
 //状態管理クラス
 //==============================================================================
-class CEenemyAttackStateMachine
+class CEnemyAttackStateMachine
 {
 public:
 
 	//メンバ関数
-	CEenemyAttackStateMachine();//コンストラクタ
-	~CEenemyAttackStateMachine();//デストラクタ
-	void ChangeState(CEenemyAttackStateBase* NewState);//状態の変更
+	CEnemyAttackStateMachine();//コンストラクタ
+	~CEnemyAttackStateMachine();//デストラクタ
+	void ChangeState(CEnemyAttackStateBase* NewState);//状態の変更
 	void Update();//更新
 
 private:
 
 	//メンバ変数
-	CEenemyAttackStateBase* m_State;//プレイヤーの状態
+	CEnemyAttackStateBase* m_State;//プレイヤーの状態
 
 };
 
@@ -84,36 +84,36 @@ private:
 //==============================================================================
 
 //1回目の攻撃
-class CFirstEenemyAttackState :public CAttackEenemyState
+class CFirstEnemyAttackState :public CAttackEnemyState
 {
 public:
 	//メンバ関数
-	CFirstEenemyAttackState();//コンストラクタ
-	~CFirstEenemyAttackState();//デストラクタ
+	CFirstEnemyAttackState();//コンストラクタ
+	~CFirstEnemyAttackState();//デストラクタ
 	void Start()override;//開始
 	void Update()override;//更新
 	void Uninit()override;//終了
 };
 
 //2回目の攻撃
-class CSecondEenemyAttackState :public CAttackEenemyState
+class CSecondEnemyAttackState :public CAttackEnemyState
 {
 public:
 	//メンバ関数
-	CSecondEenemyAttackState();//コンストラクタ
-	~CSecondEenemyAttackState();//デストラクタ
+	CSecondEnemyAttackState();//コンストラクタ
+	~CSecondEnemyAttackState();//デストラクタ
 	void Start()override;//開始
 	void Update()override;//更新
 	void Uninit()override;//終了
 };
 
 //3回目の攻撃
-class CRastEenemyAttackState :public CAttackEenemyState
+class CRastEnemyAttackState :public CAttackEnemyState
 {
 public:
 	//メンバ関数
-	CRastEenemyAttackState();//コンストラクタ
-	~CRastEenemyAttackState();//デストラクタ
+	CRastEnemyAttackState();//コンストラクタ
+	~CRastEnemyAttackState();//デストラクタ
 	void Start()override;//開始
 	void Update()override;//更新
 	void Uninit()override;//終了
@@ -124,36 +124,36 @@ public:
 //==============================================================================
 
 //1回目の攻撃
-class CFirstSmallWeaponEenemyAttack :public CAttackEenemyState
+class CFirstSmallWeaponEnemyAttack :public CAttackEnemyState
 {
 public:
 	//メンバ関数
-	CFirstSmallWeaponEenemyAttack();//コンストラクタ
-	~CFirstSmallWeaponEenemyAttack();//デストラクタ
+	CFirstSmallWeaponEnemyAttack();//コンストラクタ
+	~CFirstSmallWeaponEnemyAttack();//デストラクタ
 	void Start()override;//開始
 	void Update()override;//更新
 	void Uninit()override;//終了
 };
 
 //2回目の攻撃
-class CSecondSmallWeaponEenemyAttack :public CAttackEenemyState
+class CSecondSmallWeaponEnemyAttack :public CAttackEnemyState
 {
 public:
 	//メンバ関数
-	CSecondSmallWeaponEenemyAttack();//コンストラクタ
-	~CSecondSmallWeaponEenemyAttack();//デストラクタ
+	CSecondSmallWeaponEnemyAttack();//コンストラクタ
+	~CSecondSmallWeaponEnemyAttack();//デストラクタ
 	void Start()override;//開始
 	void Update()override;//更新
 	void Uninit()override;//終了
 };
 
 //3回目の攻撃
-class CRastSmallWeaponEenemyAttack :public CAttackEenemyState
+class CRastSmallWeaponEnemyAttack :public CAttackEnemyState
 {
 public:
 	//メンバ関数
-	CRastSmallWeaponEenemyAttack();//コンストラクタ
-	~CRastSmallWeaponEenemyAttack();//デストラクタ
+	CRastSmallWeaponEnemyAttack();//コンストラクタ
+	~CRastSmallWeaponEnemyAttack();//デストラクタ
 	void Start()override;//開始
 	void Update()override;//更新
 	void Uninit()override;//終了

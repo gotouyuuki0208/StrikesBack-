@@ -88,8 +88,8 @@ void CWeaponEnemy::Update()
 		return;
 	}
 
-	if (CManager::GetInstance()->GetTutorial()->GetTutorial())
-	{//‘€ìà–¾•\¦’†
+	if (CManager::GetInstance()->GetGameManager()->GetPlayGame())
+	{//—V‚×‚È‚¢ó‘Ô
 		return;
 	}
 

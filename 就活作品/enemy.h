@@ -28,7 +28,6 @@ public:
 
 	//定数
 	static const int PRIORITY;//描画順
-	static const int POINT=10;//移動地点の数
 	static const float DUSH_DISTANCE;//走る距離
 	static const float DUSH_SPEED;//走る速さ
 	static const float STOP_DISTANCE;//歩く距離
@@ -62,6 +61,7 @@ public:
 	void ChangeAttackable();//攻撃可能判定を変更
 	bool JudgeAttackRange();//攻撃範囲にプレイヤーがいるか判定	
 	void ChangePlayMotion(bool play);//モーションの再生判定を変更
+	bool GetPlayMotion();//モーションの再生判定を取得
 	void ResetDamageNum();//被弾回数初期化
 	int GetDamageNum();//被弾回数取得
 	void AddDamegeNum();//ダメージ回数を増やす
@@ -69,7 +69,10 @@ public:
 	void ResetAttack();//攻撃判定をリセット
 	void AttackMove();//攻撃時の移動
 	void SetCoolTime(int time);//攻撃のクールタイムを設定
-	
+	int GetCoolTime();//攻撃のクールタイムを取得
+	void SubCoolTime();//クールタイムを減らす
+	void SetHitMotion(MOTION_TYPE motion);//攻撃を受けたモーションを保存
+	MOTION_TYPE GetHitMotion();//攻撃を受けたモーションを取得
 private:
 
 	//メンバ関数
@@ -80,6 +83,7 @@ private:
 	D3DXMATRIX m_Mtx;//ワールドマトリックス
 	ENEMY_TYPE m_EnemyType;//敵の種類
 	CPlayer* m_player;//プレイヤーの情報
+	MOTION_TYPE m_HitMotion;//前回攻撃を受けたモーション
 	bool m_Movable;//行動可能判定
 	float m_Angle;//向き
 	bool Attackable;//攻撃可能判定

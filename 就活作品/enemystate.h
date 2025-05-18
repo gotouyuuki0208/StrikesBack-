@@ -12,8 +12,8 @@
 
 //前方宣言
 class CWeakEnemy;
-class CEenemyAttackStateMachine;
-class CAttackEenemyState;
+class CEnemyAttackStateMachine;
+class CAttackEnemyState;
 
 //==============================================================================
 //敵の状態クラス
@@ -148,14 +148,14 @@ public:
 	void Uninit()override;//終了
 	void ChangeCombo();//コンボ判定を取得
 	void ResetInfo();//情報を初期化
-	void ChangeAttack(CAttackEenemyState* State);//攻撃を変更
+	void ChangeAttack(CAttackEnemyState* State);//攻撃を変更
 	int GetFrame();//攻撃フレーム数を取得
 private:
 
 	//メンバ変数
 	int m_FlameCount;//攻撃のフレーム数
 	bool m_Combo;//コンボ判定
-	CEenemyAttackStateMachine* m_EenemyAttackStateMachine;//攻撃の状態管理
+	CEnemyAttackStateMachine* m_EnemyAttackStateMachine;//攻撃の状態管理
 };
 
 #endif

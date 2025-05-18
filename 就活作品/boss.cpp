@@ -9,6 +9,10 @@
 #include "boss.h"
 #include "manager.h"
 #include "model.h"
+#include "weapon.h"
+#include "bosshpgauge.h"
+#include "bossState.h"
+#include "bat.h"
 
 //静的メンバ初期化
 const int CBoss::PRIORITY = 1;//描画順
@@ -17,30 +21,23 @@ const int CBoss::NEAR_ACTION_COUNT = 240;//プレイヤーが近いときにする行動の長さ
 const int CBoss::HITATTACK_PROBABILITY = 80;//プレイヤーが近いときに殴る確率
 const int CBoss::WEAPONATTACK_PROBABILITY = 70;//武器が近いときに武器攻撃する確率
 const int CBoss::ATTACKFINISH_COOLTIME = 300;//攻撃終了後のクールタイム
-const float CBoss::DUSH_DISTANCE = 10.0f;//走る距離
-const float CBoss::WALK_DISTANCE = 5.0f;//歩く距離
-const float CBoss::GUARD_DISTANCE = 3.0f;//守る距離
-const float CBoss::DUSH_SPEED = 3.5f;//走る速さ
-const float CBoss::WALK_SPEED = 2.0f;//歩く速さ
+const float CBoss::GUARD_DISTANCE = 5.0f;//守る距離
+
 //==========================
 //コンストラクタ
 //==========================
 CBoss::CBoss(int nPriority):
 CEnemy(nPriority),//基底コンストラクタ
 m_weapon(nullptr),//武器の情報
-m_Attack(false),//攻撃判定
-m_AttackCoolTime(0),//攻撃のクールタイム
+m_HaveWeapon(nullptr),//持ってる武器
 m_FlameCount(0),//攻撃のフレーム数をカウント
-m_AttackNum(0),//攻撃回数
-Attackable(true),//攻撃可能か判定
-m_ComboStack{},//攻撃コンボのスタック
-m_StackIdx(0),//スタックのTOPの位置
-m_Angle(0.0f),//向き
 m_NearCount(0),//プレイヤーが近づいた時の行動のカウント
 m_NearAction(false),//プレイヤーが近づいた時の行動をしているか判定
-m_BossHPGauge(nullptr)
+m_StateMachine(nullptr),//状態管理
+m_NextAttack(false),//次の攻撃(false:素手 true:武器)
+m_Guard(false)//ガード判定
 {
-	SetComboList();//コンボリストの生成
+	
 }
 
 //==========================
@@ -59,11 +56,16 @@ HRESULT CBoss::Init()
 	//初期設定
 	CEnemy::Init();
 
-	//攻撃方法を設定
-	//SetAttackState(ATTACK_STATE::ATTACK);
+	//HPゲージの生成
+	CManager::GetInstance()->GetHudManager()->CreateBossHPGauge();
+
+	//状態管理クラスの作成
+	m_StateMachine = DBG_NEW CStateMachine;
+	auto NewState = DBG_NEW CBossMovableState;
+	ChangeState(NewState);
 
 	if (GetPlayer() != nullptr)
-	{
+	{//プレイヤーにボスの情報を持たせる
 		GetPlayer()->GetBoss(this);
 	}
 
@@ -90,16 +92,16 @@ void  CBoss::Uninit()
 	//終了処理
 	CEnemy::Uninit();
 
-	if (m_BossHPGauge != nullptr)
-	{
-		m_BossHPGauge = nullptr;
-	}
-
 	if (m_weapon != nullptr)
 	{
 		m_weapon = nullptr;
 	}
 
+	if (m_StateMachine != nullptr)
+	{
+		delete m_StateMachine;
+		m_StateMachine = nullptr;
+	}
 }
 
 //==========================
@@ -109,45 +111,32 @@ void CBoss::Update()
 {
 	//更新処理
 	CEnemy::Update();
+
+	//モーションの更新
 	MotionUpdate();
 
-	if (CManager::GetInstance()->GetGameManager()->GetDirection())
-	{
-		return;
-	}
+	//ステートの更新
+	m_StateMachine->Update();
 
-	if (!CManager::GetInstance()->GetDebug()->GetPlayerTest())
-	{
-		Count();//カウントする
+	if (!GetAttackable())
+	{//攻撃できないとき
 
-		if (!GetDamage())
-		{//ダメージ状態じゃない時
+		//クールタイムを減らす
+		SubCoolTime();
 
-			
-			//if(GetAttackState() == ATTACK_STATE::WEAPONATTACK)
-			{
-				WeaponMove();//武器攻撃時の行動を設定
-			}
-			//else
-			{
-				MoveAction();//移動時の行動を設定
-			}
-			Move();//移動処理
-			Attack();//攻撃処理
+		if (GetCoolTime() <= 0)
+		{//クールタイムがなくなった
+
+			//次の攻撃を設定
+			ChoiceAttack();
+
+			//攻撃可能にする
+			ChangeAttackable();
 		}
-			Guard();//ガード処理
-	}
-	
-	if (CManager::GetInstance()->GetDebug()->GetPlayerTest())
-	{
-		ChangeDirection();
 	}
 
-	if (m_BossHPGauge != nullptr)
-	{
-		m_BossHPGauge->SetHP(GetLife());
-	}
-	
+	//HPゲージの更新
+	CManager::GetInstance()->GetHudManager()->ChangeBossHP(GetLife());
 }
 
 //==========================
@@ -176,9 +165,6 @@ CBoss* CBoss::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 	//寿命の設定
 	pBoss->SetLife(50);
 
-	//HPゲージの生成
-	pBoss->m_BossHPGauge = CBossHPGauge::Create(D3DXVECTOR3(1200.0f, 680.0f, 0.0f), 10, 200, pBoss->GetLife());
-
 	//ファイルを読み込む
 	pBoss->LoadFile("data\\MOTION\\boss.txt", scale);
 
@@ -191,6 +177,9 @@ CBoss* CBoss::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 	//敵の種類を設定
 	pBoss->SetEnemyType(ENEMY_TYPE::BOSS);
 
+	//ボスに武器を持たせる
+	pBoss->InitHaveWeapon();
+
 	return pBoss;
 }
 
@@ -201,12 +190,13 @@ void CBoss::MotionUpdate()
 {
 	//パーツの数値の計算
 	CalParts();
-	if (m_weapon != nullptr)
+
+	if (m_HaveWeapon != nullptr)
 	{//武器を持ってる
-		if (m_weapon->GetGrab())
+		if (m_HaveWeapon->GetGrab())
 		{
-			m_weapon->SetRot(CalMotionRot(15));
-			m_weapon->SetPos(CalMotionPos(15));
+			m_HaveWeapon->SetRot(CalMotionRot(15));
+			m_HaveWeapon->SetPos(CalMotionPos(15));
 		}
 	}
 
@@ -216,18 +206,30 @@ void CBoss::MotionUpdate()
 	if (ExceedMaxFlame())
 	{//モーションのカウンターが再生フレームを超えたとき
 
-		if (m_weapon != nullptr)
+		if (m_HaveWeapon != nullptr)
 		{//武器を持ってる
-			if (m_weapon->GetGrab())
+			if (m_HaveWeapon->GetGrab())
 			{
-				KeepFirstPos(m_weapon->GetPos(), 15);
-				KeepFirstRot(m_weapon->GetRot(), 15);
+				KeepFirstPos(m_HaveWeapon->GetPos(), 15);
+				KeepFirstRot(m_HaveWeapon->GetRot(), 15);
 			}
 		}
 	}
 
 	//モーションの情報を更新
 	UpdateMotionInfo();
+}
+
+//==========================
+//状態を変更
+//==========================
+void CBoss::ChangeState(CBossStateBase* NewState)
+{
+	//stateの所有者を設定
+	NewState->SetOwner(this);
+
+	//stateを変更
+	m_StateMachine->ChangeState(NewState);
 }
 
 //==========================
@@ -241,8 +243,8 @@ void CBoss::ChoiceAttack()
 	if (m_weapon == nullptr)
 	{//武器が存在していない
 
-		//攻撃方法を設定
-		//SetAttackState(ATTACK_STATE::ATTACK);
+		//攻撃方法を素手攻撃に変更
+		m_NextAttack = false;
 
 		return;
 	}
@@ -256,139 +258,47 @@ void CBoss::ChoiceAttack()
 	if (!Near)
 	{//武器が近い
 
-		if (Attack <= WEAPONATTACK_PROBABILITY
-			|| m_weapon != nullptr)
-		{
-			//攻撃方法を設定
-		//	SetAttackState(ATTACK_STATE::WEAPONATTACK);
+		if (Attack <= WEAPONATTACK_PROBABILITY)
+		{//武器攻撃する
+
+			//攻撃方法を武器攻撃に変更
+			m_NextAttack = true;
 		}
 		else
 		{
-			//攻撃方法を設定
-		//	SetAttackState(ATTACK_STATE::ATTACK);
+			//武器を持っていたら捨てる
 			ReleseWeapon();
+
+			//攻撃方法を素手攻撃に変更
+			m_NextAttack = false;
 		}
 	}
 	else
 	{//プレイヤーが近い
 
-		if (Attack <= HITATTACK_PROBABILITY
-			&& m_weapon==nullptr)
-		{
-			//攻撃方法を設定
-		//	SetAttackState(ATTACK_STATE::ATTACK);
+		if (Attack <= HITATTACK_PROBABILITY)
+		{//素手攻撃する
+
+			//武器を持っていたら捨てる
 			ReleseWeapon();
+
+			//攻撃方法を素手攻撃に変更
+			m_NextAttack = false;
 		}
 		else
 		{
-			//攻撃方法を設定
-		//	SetAttackState(ATTACK_STATE::WEAPONATTACK);
+			//攻撃方法を武器攻撃に変更
+			m_NextAttack = true;
 		}
 	}
 }
 
 //==========================
-//移動処理
+//次の攻撃方法を取得
 //==========================
-void CBoss::Move()
+bool CBoss::GetNextAttack()
 {
-	if (GetState() != STATE::NEUTRAL)
-	{//攻撃状態の時終了
-		return;
-	}
-
-	//前回の位置を保存
-	SetPosOld(GetPos());
-
-	SetMove(D3DXVECTOR3(GetMove().x += (0 - GetMove().x) * 0.25f,
-		GetMove().y,
-		GetMove().z += (0 - GetMove().z) * 0.25f));
-
-	//位置を変更
-	SetPos(GetPos() + GetMove());
-
-	//モーションを設定
-	SetOldMotion(GetMotion());
-}
-
-//==========================
-//移動時の行動
-//==========================
-void CBoss::MoveAction()
-{
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if ((GetState() != STATE::NEUTRAL)
-		|| m_AttackCoolTime > (ATTACKFINISH_COOLTIME - 60))
-	{//通常状態以外の時または攻撃終了してから1秒たっていない時終了
-		return;
-	}
-	
-	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
-	{//プレイヤーの半径の10倍の距離より遠い
-
-		//移動値を設定
-		SetMove(D3DXVECTOR3(sinf(m_Angle) * DUSH_SPEED, 0.0f, cosf(m_Angle) * DUSH_SPEED));
-
-		//モーションを設定
-		SetMotion(MOTION_TYPE::DUSH);
-
-		if(m_NearAction)
-		{
-			m_NearAction = false;
-			m_NearCount = 0;
-		}
-	}
-	else if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * WALK_DISTANCE))
-	{//プレイヤーの半径の5倍の距離より遠い
-
-		//移動値を設定
-		SetMove(D3DXVECTOR3(sinf(m_Angle) * WALK_SPEED, 0.0f, cosf(m_Angle) * WALK_SPEED));
-
-		//モーションを設定
-		SetMotion(MOTION_TYPE::MOVE);
-		if (m_NearAction)
-		{
-			m_NearAction = false;
-			m_NearCount = 0;
-		}
-	}
-	else if (Attackable
-		&& !pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
-	{//攻撃可能かつプレイヤーより遠い
-
-		//移動値を設定
-		SetMove(D3DXVECTOR3(sinf(m_Angle) * WALK_SPEED, 0.0f, cosf(m_Angle) * WALK_SPEED));
-
-		//モーションを設定
-		SetMotion(MOTION_TYPE::MOVE);
-	}
-	else if (Attackable
-		&& pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
-	{
-		SetState(STATE::ATTACK);
-	}
-	else
-	{
-		if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * GUARD_DISTANCE))
-		{//プレイヤーの半径の3倍の距離にいる
-			if (!m_NearAction)
-			{
-				PlayerNearAction();
-			}
-		}
-		else
-		{
-			//移動値を設定
-			SetMove(D3DXVECTOR3(sinf(m_Angle) * 1.0f, 0.0f, cosf(m_Angle) * 1.0f));
-
-			//モーションを設定
-			SetMotion(MOTION_TYPE::MOVE);
-		}
-	}
-
-	//向きの設定
-	ChangeDirection();
+	return m_NextAttack;
 }
 
 //==========================
@@ -396,14 +306,8 @@ void CBoss::MoveAction()
 //==========================
 void CBoss::WeaponMove()
 {
-	if ((GetState() != STATE::NEUTRAL)
-		|| m_AttackCoolTime > (ATTACKFINISH_COOLTIME - 60))
-	{//通常状態以外の時または攻撃終了してから1秒たっていない時終了
-		return;
-	}
-
-	if (m_weapon != nullptr&& !m_weapon->GetGrab())
-	{
+	if (!GetWeapon())
+	{//武器が存在しているかつ掴まれていない
 
 		//向きの設定
 		float angle = atan2f(m_weapon->GetPos().x - GetPos().x, m_weapon->GetPos().z - GetPos().z);
@@ -412,204 +316,9 @@ void CBoss::WeaponMove()
 		//移動値を設定
 		SetMove(D3DXVECTOR3(sinf(angle) * DUSH_SPEED, 0.0f, cosf(angle) * DUSH_SPEED));
 
-		//モーションを設定
-		SetMotion(MOTION_TYPE::DUSH);
-		SetOldMotion(GetMotion());
-
 		//武器との当たり判定
 		ColisionWeapon();
 	}
-	else
-	{
-		MoveAction();//移動時の行動を設定
-	}
-}
-
-//==========================
-//向きの変更
-//==========================
-float CBoss::ChangeDirection()
-{
-	if (GetMotion() != MOTION_TYPE::GUARD)
-	{
-		//進む角度を計算
-		m_Angle = atan2f(GetPlayer()->GetPos().x - GetPos().x, GetPlayer()->GetPos().z - GetPos().z);
-
-		//向きを設定
-		SetRot(D3DXVECTOR3(GetRot().x, m_Angle + D3DX_PI, GetRot().z));
-	}
-
-	return m_Angle;
-}
-
-//==========================
-//攻撃処理
-//==========================
-void CBoss::Attack()
-{
-	if (GetState() != STATE::ATTACK || !Attackable)
-	{//攻撃状態以外の時または攻撃不可状態の時終了
-		return;
-	}
-
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if (GetOldMotion() == GetMotion())
-	{//前回のモーションと今のモーションが同じ
-
-		//今のモーションを保存
-		SetOldMotion(GetMotion());
-
-		if (m_weapon != nullptr)
-		{
-			SetWeaponMotion(Pop());
-		}
-		else
-		{
-			//攻撃モーションに変更
-			SetMotion(Pop());
-		}
-	}
-
-	if (m_FlameCount >= 10)
-	{
-		if (m_weapon!=nullptr)
-		{
-			ColisionWeaponAttack();
-		}
-		else
-		{
-			ColisionHitAttack();
-		}
-	}
-
-	m_FlameCount++;
-
-	bool Colision = pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), 17.0f);
-	if (m_FlameCount >= 26 && Colision&& m_StackIdx > 0)
-	{//フレーム数が24以上かつプレイヤーが近いかつコンボできる
-
-		if (m_weapon != nullptr)
-		{
-			SetWeaponMotion(Pop());
-		}
-		else
-		{
-			//攻撃モーションに変更
-			SetMotion(Pop());
-		}
-			m_FlameCount = 0;//カウントしてたフレーム数をリセット
-			m_Attack = false;//攻撃していない状態の戻す
-			ChangeDirection();//向きを変える
-	}
-	else if (m_FlameCount >= 24 &&(!Colision||m_StackIdx <= 0))
-	{//プレイヤーが遠いまたはコンボできない
-		
-		SetOldMotion(GetMotion());//今のモーションを保存
-		SetState(STATE::NEUTRAL);//通常状態に変更
-		//SetAttackState(ATTACK_STATE::ATTACK);
-		if (m_weapon != nullptr)
-		{//武器を持ってるとき
-
-			if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::SMALL)
-			{//片手武器のとき
-				SetWeaponMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション
-			}
-			else
-			{//両手武器のとき
-				SetWeaponMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション
-			}
-		}
-
-		ResetStak();//コンボのスタックをリセット
-		m_FlameCount = 0;//フレーム数をリセット
-		m_Attack = false;//攻撃判定をリセット
-		Attackable = false;//攻撃不可状態
-		m_AttackCoolTime = ATTACKFINISH_COOLTIME;
-	}
-}
-
-//==========================
-//攻撃の当たり判定
-//==========================
-void CBoss::ColisionHitAttack()
-{
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	bool Colision = pCollision->Sphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
-		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
-		GetRadius(),
-		GetPlayer()->GetRadius());
-	
-	if (Colision && !m_Attack)
-	{
-		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_ATTACK);
-		//GetPlayer()->Damage();
-		m_Attack = true;
-
-		if (m_StackIdx <= 0)
-		{
-			GetPlayer()->DamegeBlow(GetPos());
-		}
-	}
-}
-
-//==========================
-//武器攻撃の当たり判定
-//==========================
-void CBoss::ColisionWeaponAttack()
-{
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	bool Colision = pCollision->Sphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
-		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
-		30.0f,
-		30.0f);
-
-	if (Colision && !m_Attack)
-	{
-		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
-		//GetPlayer()->Damage();
-		m_Attack = true;
-
-		if (m_StackIdx <= 0)
-		{
-			GetPlayer()->DamegeBlow(GetPos());
-		}
-
-		if (m_weapon == nullptr)
-		{
-			return;
-		}
-
-		m_weapon->SubDurability();
-
-		if (m_weapon->GetDurability() <= 0)
-		{
-			SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
-			SetComboList();
-
-			//武器を削除
-			CManager::GetInstance()->GetStageManager()->DeleteObj(*m_weapon);
-			m_weapon->Uninit();
-			m_weapon = nullptr;
-		}
-	}
-}
-
-//==========================
-//攻撃可能か判定
-//==========================
-bool CBoss::JudgeAttackable()
-{
-	if (m_AttackCoolTime < 240)
-	{
-		m_AttackCoolTime++;
-		return false;
-	}
-
-	m_AttackCoolTime = 0;
-	return true;
 }
 
 //==========================
@@ -617,34 +326,48 @@ bool CBoss::JudgeAttackable()
 //==========================
 void CBoss::ColisionWeapon()
 {
+	//当たり判定の情報を取得
 	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
+	//当たり判定
 	bool Colision = pCollision->Sphere(GetPos(),
 		m_weapon->GetPos(),
 		GetRadius(),
 		m_weapon->GetRadius());
 
 	if (Colision)
-	{
+	{//衝突している
+		
 		//武器をパーツとして生成
 		if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
-		{
+		{//両手武器
+			
+			//武器の親モデルを設定
 			m_weapon->SetParent(GetParts(5));
+
+			//位置と向きを設定
 			m_weapon->SetPos(D3DXVECTOR3(10.0f, -2.0f, -5.0f));
 			m_weapon->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			SetWeaponMotion(MOTION_TYPE::WEAPONNEUTRAL);//待機モーション(武器持ち)
+
+			//持ってる武器として保存
+			m_HaveWeapon = m_weapon;
+			m_weapon = nullptr;
 		}
 		else
 		{
+			//武器の親モデルを設定
 			m_weapon->SetParent(GetParts(8));
+
+			//位置と向きを設定
 			m_weapon->SetPos(D3DXVECTOR3(-10.0f, 0.0f, 0.0f));
 			m_weapon->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			SetWeaponMotion(MOTION_TYPE::SMALLWEAPONNEUTRAL);//待機モーション(武器持ち)
+
+			//持ってる武器として保存
+			m_HaveWeapon = m_weapon;
+			m_weapon = nullptr;
 		}
 
-		m_weapon->GrabCharacter();//掴まれた状態にする
-
-		SetComboList();
+		m_HaveWeapon->GrabCharacter();//掴まれた状態にする
 	}
 }
 
@@ -653,10 +376,11 @@ void CBoss::ColisionWeapon()
 //==========================
 void CBoss::FindNearbyWeapons()
 {
-	if (m_weapon != nullptr)
-	{
+	if (m_HaveWeapon != nullptr)
+	{//すでに武器を持っている
 		return;
 	}
+
 	float distance = 0.0f;//距離
 
 	//オブジェクトを取得
@@ -723,91 +447,6 @@ bool CBoss::MeasureDistance()
 }
 
 //==========================
-//コンボリストの生成
-//==========================
-void CBoss::SetComboList()
-{
-	
-	if (m_weapon==nullptr)
-	{
-		m_ComboList[0] = MOTION_TYPE::ATTACK;
-		m_ComboList[1] = MOTION_TYPE::ATTACK2;
-		m_ComboList[2] = MOTION_TYPE::ATTACK3;
-	}
-	else
-	{
-		if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
-		{
-			m_ComboList[0] = MOTION_TYPE::WEAPONATTACK;
-			m_ComboList[1] = MOTION_TYPE::WEAPONATTACK2;
-			m_ComboList[2] = MOTION_TYPE::WEAPONATTACK3;
-		}
-		else
-		{
-			m_ComboList[0] = MOTION_TYPE::SMALLWEAPONATTACK;
-			m_ComboList[1] = MOTION_TYPE::SMALLWEAPONATTACK2;
-			m_ComboList[2] = MOTION_TYPE::SMALLWEAPONATTACK3;
-		}
-	}
-
-	ResetStak();//スタックのリセット
-}
-
-//==========================
-//スタックの情報を戻す
-//==========================
-void CBoss::ResetStak()
-{
-	m_StackIdx = 0;
-	for (int i = 2; i >= 0; i--)
-	{
-		Push(m_ComboList[i]);
-	}
-}
-
-//==========================
-//データの追加
-//==========================
-void CBoss::Push(MOTION_TYPE motion)
-{
-	if (m_StackIdx < 3)
-	{
-		m_ComboStack[m_StackIdx++] = motion;
-	}
-}
-
-//==========================
-//データの取り出し
-//==========================
-CMotionModel::MOTION_TYPE CBoss::Pop()
-{
-	if (m_StackIdx <= 0)
-	{
-		if (m_weapon!=nullptr)
-		{
-			if (m_weapon->GetGrab())
-			{
-				if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
-				{
-					return MOTION_TYPE::WEAPONNEUTRAL;
-				}
-				else
-				{
-					return MOTION_TYPE::SMALLWEAPONNEUTRAL;
-				}
-			}
-		}
-		else
-		{
-			return MOTION_TYPE::NEUTRAL;
-		}
-	}
-
-	return m_ComboStack[--m_StackIdx];
-
-}
-
-//==========================
 //ランダムな数値を取得
 //==========================
 int CBoss::RandomNum()
@@ -821,113 +460,20 @@ int CBoss::RandomNum()
 }
 
 //==========================
-//ガード処理
-//==========================
-void CBoss::Guard()
-{
-	if (GetState() != STATE::GUARD)
-	{
-		return;
-	}
-	
-	if (m_weapon != nullptr
-		&& m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
-	{
-		return;
-	}
-
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if (m_weapon != nullptr)
-	{
-		if (m_weapon->GetGrab())
-		{
-			SetWeaponMotion(MOTION_TYPE::SMALLWEAPONGUARD);
-		}
-	}
-	else
-	{
-		SetMotion(MOTION_TYPE::GUARD);
-
-	}
-
-	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * GUARD_DISTANCE))
-	{
-		m_NearAction = false;
-		m_NearCount = 0;
-		SetState(STATE::NEUTRAL);
-	}
-}
-
-//==========================
-//プレイヤーが近いときの行動
-//==========================
-void CBoss::PlayerNearAction()
-{
-	if (m_NearAction)
-	{
-		return;
-	}
-
-	m_NearAction = true;
-
-	int Action = RandomNum();
-	if (Action <= GUARD_PROBABILITY)
-	{
-		Guard();
-		SetState(STATE::GUARD);
-	}
-	else
-	{
-		SetMotion(MOTION_TYPE::NEUTRAL);
-	}
-}
-
-//==========================
-//カウントする
-//==========================
-void CBoss::Count()
-{
-	if (m_NearAction)
-	{//プレイヤーが近づいたときの行動をしている
-		m_NearCount++;
-		if (m_NearCount >= NEAR_ACTION_COUNT
-			&& GetPlayer()->GetState() != CPlayer::STATE::ATTACK)
-		{
-			m_NearAction = false;
-			m_NearCount = 0;
-			SetState(STATE::NEUTRAL);
-		}
-	}
-
-	if (!Attackable)
-	{//攻撃できないとき
-
-		m_AttackCoolTime--;
-
-		if (m_AttackCoolTime <= 0)
-		{
-			Attackable = true;
-			m_AttackCoolTime = 0;
-			ChoiceAttack();//次の攻撃を決める
-		}
-	}	
-}
-
-//==========================
 //武器を離す
 //==========================
 void CBoss::ReleseWeapon()
 {
-	if (m_weapon != nullptr)
+	if (m_HaveWeapon != nullptr)
 	{
-		if (m_weapon->GetGrab())
+		if (m_HaveWeapon->GetGrab())
 		{//武器を持ってるとき
-			m_weapon->ReleseCharacter(D3DXVECTOR3(GetParts(14)->GetMtxWorld()._41, 0.0f, GetParts(14)->GetMtxWorld()._43));
-			m_weapon = nullptr;
 
-			SetComboList();
+			//武器を置く
+			m_HaveWeapon->ReleseCharacter(D3DXVECTOR3(GetParts(14)->GetMtxWorld()._41, 0.0f, GetParts(14)->GetMtxWorld()._43));
 		}
+		
+		m_HaveWeapon = nullptr;
 	}
 }
 
@@ -948,20 +494,232 @@ void CBoss::GrabChangeWeapon(CWeapon* weapon)
 }
 
 //==========================
-//武器所持時のモーションを設定
+//武器を所持しているか判定
 //==========================
-void CBoss::SetWeaponMotion(CMotionModel::MOTION_TYPE motion)
+bool CBoss::GetWeapon()
 {
-	if (GetMotion() == motion)
+	if (m_HaveWeapon != nullptr)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//==========================
+//武器のタイプを取得
+//==========================
+bool CBoss::GetWeaponType()
+{
+	if (m_HaveWeapon->GetWeaponType() == CWeapon::WEAPONTYPE::SMALL)
+	{//武器が片手武器
+		return false;
+	}
+	else if (m_HaveWeapon->GetWeaponType() == CWeapon::WEAPONTYPE::BIG)
+	{//両手武器
+		return true;
+	}
+}
+
+//==========================
+//攻撃被弾処理
+//==========================
+void CBoss::hit(D3DXVECTOR3 pos, int damage,MOTION_TYPE hitmotion)
+{
+	
+	if (GetDamageNum() >= 3 || GetHitMotion() == hitmotion)
+	{//3回攻撃を受けてる
+
+		return;
+	}
+
+	//被弾回数を増やす
+	AddDamegeNum();
+
+	//モーションを保存
+	SetHitMotion(hitmotion);
+
+	//ダメージの数値を取得
+	int DamageNum = damage;
+
+	//現在の状態を取得
+	auto State = m_StateMachine->GetState();
+
+	if (typeid(*State) == typeid(CGuardState))
+	{//ガード状態の時
+
+		//ダメージを減らす
+		DamageNum /= 2;
+	}
+	else if (typeid(*State) == typeid(CSmallWeaponGuardState))
+	{//武器ガード状態の時
+
+		//ダメージを減らす
+		DamageNum /= 2;
+
+		//武器の耐久を減らす
+		WeaponDamage();
+	}
+
+	//ライフを減らす
+	int Life = GetLife();
+	SetLife(Life -= DamageNum);
+
+	if (typeid(*State) != typeid(CGuardState))
+	{//ガード状態ではない
+		SetDamage(true);
+
+		if (GetDamageNum() >= 3)
+		{//3回被弾している
+			DamegeBlow(pos);
+		}
+	}
+}
+
+//==========================
+//武器の耐久値を減らす
+//==========================
+void CBoss::WeaponDamage()
+{
+	//武器の耐久値を減らす
+	m_HaveWeapon->SubDurability();
+
+	if (m_HaveWeapon->GetDurability() <= 0)
+	{//耐久値がなくなったとき
+		DeleteParts(15);
+
+		//武器を削除する
+		CManager::GetInstance()->GetStageManager()->DeleteObj(*m_HaveWeapon);
+		m_HaveWeapon->Uninit();
+		m_HaveWeapon = nullptr;
+	}
+}
+
+//==========================
+//ガードの情報をリセット
+//==========================
+void CBoss::GuardReset()
+{
+	//近くのときの行動をしていない
+	m_NearAction = false;
+
+	//ガードしない状態に変更
+	m_Guard = false;
+}
+
+//==========================
+//プレイヤーが近いときの行動
+//==========================
+void CBoss::PlayerNearAction()
+{
+	if (m_NearAction)
 	{
 		return;
 	}
 
-	SetMotion(motion);
+	//プレイヤーが近いときの行動をしている状態
+	m_NearAction = true;
 
-	if (m_weapon != nullptr)
+	//ランダムな数字を取得
+	int Action = RandomNum();
+
+	if (Action <= GUARD_PROBABILITY)
+	{//数字がガードする確率の数字より小さい
+
+		//ガードする
+		m_Guard = true;
+	}
+	else
 	{
-		KeepFirstPos(m_weapon->GetPos(), 15);
-		KeepFirstRot(m_weapon->GetRot(), 15);
+		//ガードしない
+		m_Guard = false;
 	}
 }
+
+//==========================
+//ガードするか取得
+//==========================
+bool CBoss::GetGuard()
+{
+	return m_Guard;
+}
+
+//==========================
+//ガードする距離にいるか判定
+//==========================
+bool CBoss::JudgeGuard()
+{
+	//当たり判定の情報を取得
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius()* GUARD_DISTANCE))
+	{//プレイヤーがガードする距離にいる
+
+		return true;
+	}
+
+	return false;
+}
+
+//==========================
+//最初に武器を持たせる
+//==========================
+void CBoss::InitHaveWeapon()
+{
+	//バットを持たせる
+	m_HaveWeapon = CBat::Create({ 0.0f,0.0f,0.0f }, { 1.5f,1.5f,1.5f }, { 0.0f,0.0f,0.0f });
+
+	//武器の親モデルを設定
+	m_HaveWeapon->SetParent(GetParts(8));
+
+	//位置と向きを設定
+	m_HaveWeapon->SetPos(D3DXVECTOR3(-10.0f, 0.0f, 0.0f));
+	m_HaveWeapon->SetRot(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+	//掴まれた状態にする
+	m_HaveWeapon->GrabCharacter();
+
+}
+
+////==========================
+////武器攻撃の当たり判定
+////==========================
+//void CBoss::ColisionWeaponAttack()
+//{
+//	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+//
+//	bool Colision = pCollision->Sphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
+//		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
+//		30.0f,
+//		30.0f);
+//
+//	if (Colision && !m_Attack)
+//	{
+//		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
+//		//GetPlayer()->Damage();
+//		m_Attack = true;
+//
+//		if (m_StackIdx <= 0)
+//		{
+//			GetPlayer()->DamegeBlow(GetPos());
+//		}
+//
+//		if (m_weapon == nullptr)
+//		{
+//			return;
+//		}
+//
+//		m_weapon->SubDurability();
+//
+//		if (m_weapon->GetDurability() <= 0)
+//		{
+//			SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
+//			SetComboList();
+//
+//			//武器を削除
+//			CManager::GetInstance()->GetStageManager()->DeleteObj(*m_weapon);
+//			m_weapon->Uninit();
+//			m_weapon = nullptr;
+//		}
+//	}
+//}

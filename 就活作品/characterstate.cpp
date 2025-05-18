@@ -14,7 +14,7 @@
 //コンストラクタ
 //==========================
 CStateMachine::CStateMachine() :
-	m_State(nullptr)//プレイヤーの状態
+	m_State(nullptr)//キャラクターの状態
 {
 
 }
@@ -25,7 +25,9 @@ CStateMachine::CStateMachine() :
 CStateMachine::~CStateMachine()
 {
 	if (m_State != nullptr)
-	{
+	{//ステートがある
+
+		//現在のステートの終了
 		m_State->Uninit();
 		m_State = nullptr;
 	}
@@ -37,13 +39,17 @@ CStateMachine::~CStateMachine()
 void CStateMachine::ChangeState(CStateBase* NewState)
 {
 	if (m_State != nullptr)
-	{
+	{//ステートがある
+
+		//現在のステートの終了
 		m_State->Uninit();
 		m_State = nullptr;
 	}
 
+	//新しいステートを保存
 	m_State = NewState;
 
+	//初期設定
 	m_State->Start();
 }
 
@@ -53,7 +59,9 @@ void CStateMachine::ChangeState(CStateBase* NewState)
 void CStateMachine::Update()
 {
 	if (m_State != nullptr)
-	{
+	{//ステートがある
+
+		//ステートの更新
 		m_State->Update();
 	}
 }

@@ -15,19 +15,19 @@ const int CObject2D::PRIORITY = 2;//描画優先度
 //========================
 //コンストラクタ
 //========================
-CObject2D::CObject2D(int nPriority):CObjectgame(nPriority)
+CObject2D::CObject2D(int nPriority):
+CObjectgame(nPriority),//基底コンストラクタ
+m_pTexture(nullptr),//テクスチャへのポインタ
+m_pVtxBuff(nullptr),//頂点バッファへのポインタ
+m_col(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)),//色
+m_fAngle(0.0f),//対角線の角度
+m_fLength(0.0f),//対角線の長さ
+m_fVertical(0.0f),//縦のサイズ
+m_fWidth(0.0f),//横のサイズ
+m_nCntAnim(0),//テクスチャアニメーションの切り替え
+m_nPatternAnim(0)//テクスチャアニメーションの分割数
 {
-	m_pTexture = nullptr;
-	m_pVtxBuff = nullptr;
-
-	m_cor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	m_fAngle = 0.0f;
-	m_fLength = 0.0f;//対角線の長さ
-	m_fVertical = 0.0f;//縦のサイズ
-	m_fWidth = 0.0f;//横のサイズ
-	m_nCntAnim = 0;//テクスチャアニメーションの切り替え
-	m_nPatternAnim = 0;//テクスチャアニメーションの分割数
+	
 }
 
 //========================
@@ -83,10 +83,10 @@ HRESULT CObject2D::Init(void)
 	pVtx[3].rhw = 1.0f;
 
 	//頂点カラーの設定
-	pVtx[0].col = m_cor;
-	pVtx[1].col = m_cor;
-	pVtx[2].col = m_cor;
-	pVtx[3].col = m_cor;
+	pVtx[0].col = m_col;
+	pVtx[1].col = m_col;
+	pVtx[2].col = m_col;
+	pVtx[3].col = m_col;
 
 	//テクスチャ座標の設定
 	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
@@ -133,10 +133,10 @@ void CObject2D::Update()
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	//頂点カラーの設定
-	pVtx[0].col = m_cor;
-	pVtx[1].col = m_cor;
-	pVtx[2].col = m_cor;
-	pVtx[3].col = m_cor;
+	pVtx[0].col = m_col;
+	pVtx[1].col = m_col;
+	pVtx[2].col = m_col;
+	pVtx[3].col = m_col;
 	
 	pVtx[0].pos = D3DXVECTOR3(GetPos().x - m_fWidth, GetPos().y - m_fVertical, 0.0f);
 	pVtx[1].pos = D3DXVECTOR3(GetPos().x + m_fWidth, GetPos().y - m_fVertical, 0.0f);
@@ -235,17 +235,17 @@ float CObject2D::GetLength(void)
 //========================
 //色の設定
 //========================
-void CObject2D::SetCor(D3DCOLOR cor)
+void CObject2D::SetCol(D3DCOLOR col)
 {
-	m_cor = cor;
+	m_col = col;
 }
 
 //========================
 //色の取得
 //========================
-D3DCOLOR CObject2D::GetCor()
+D3DCOLOR CObject2D::GetCol()
 {
-	return m_cor;
+	return m_col;
 }
 
 //========================

@@ -84,7 +84,7 @@ CBossGaugeFrame* CBossGaugeFrame::Create(D3DXVECTOR3 pos, float vertical, float 
 	pBossHPGauge->SetSize(vertical, width);
 
 	//色の設定
-	pBossHPGauge->SetCor(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	pBossHPGauge->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 
 	//初期化処理
 	pBossHPGauge->Init();
@@ -111,10 +111,10 @@ void CBossGaugeFrame::SetVtx()
 	pVtx[3].pos = D3DXVECTOR3(GetPos().x + 1.0f, GetPos().y + GetVertical(), 0.0f);
 
 	//頂点カラーの設定
-	pVtx[0].col = GetCor();
-	pVtx[1].col = GetCor();
-	pVtx[2].col = GetCor();
-	pVtx[3].col = GetCor();
+	pVtx[0].col = GetCol();
+	pVtx[1].col = GetCol();
+	pVtx[2].col = GetCol();
+	pVtx[3].col = GetCol();
 
 	//頂点バッファをアンロックする
 	pVtxBuff->Unlock();

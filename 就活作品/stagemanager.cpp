@@ -54,22 +54,26 @@
 #include"corridorceiling.h"
 #include"illumination.h"
 #include"sky.h"
+#include"player.h"
+#include"darkbg.h"
 
 //==========================
 //コンストラクタ
 //==========================
 CStageManager::CStageManager():
-m_Stage(STAGE::STAGE_FIRST),
+m_Stage(STAGE::STAGE_FIRST),//ステージの番号
 m_Change(false),//ステージ切り替わり判定
-m_DarkBg(nullptr),//暗転するための頃ポリゴン
+m_DarkBg(nullptr),//暗転するための黒ポリゴン
 m_Rast(0),//最終ステージの番号
-m_player(nullptr),//プレイヤーの情報
-m_PlalyerHPGauge(nullptr),//プレイヤーのHPゲージの情報
-m_playerlife(0)
+m_player(nullptr)//プレイヤーの情報
 {
+	//最終ステージの番号
 	m_Rast = static_cast<int>(STAGE::STAGE_BOSS);
+
+	//暗転のための黒ポリゴンを生成
 	m_DarkBg = CDarkBg::Create();
 
+	//リストを初期化
 	m_Obj.clear();
 }
 
@@ -87,15 +91,17 @@ CStageManager::~CStageManager()
 void CStageManager::Uninit()
 {
 	if (m_DarkBg != nullptr)
-	{
+	{//黒ポリゴンを削除
+
 		m_DarkBg->CObject2D::Uninit();
 		delete m_DarkBg;
 		m_DarkBg = nullptr;
 	}
 
+	//プレイヤーの情報を消す
 	m_player = nullptr;
-	m_PlalyerHPGauge = nullptr;
 
+	//リストを削除
 	m_Obj.clear();
 }
 
@@ -104,15 +110,22 @@ void CStageManager::Uninit()
 //==========================
 void CStageManager::SetStage()
 {
+	//現在のステージ番号を取得
 	int stage = static_cast<int>(m_Stage);
 
 	if (stage >= m_Rast)
-	{
+	{//ステージ番号が最終ステージ
+
 		stage = -1;
 	}
 
+	//ステージを次のステージに変更
 	m_Stage = static_cast<STAGE>(stage + 1);
+
+	//ステージの切り替わり判定
 	m_Change = true;
+
+	//フェードを開始
 	m_DarkBg->SetFade();
 }
 
@@ -145,8 +158,9 @@ void CStageManager::ChangeReset()
 //==========================
 bool CStageManager::ChangeObject()
 {
-	if (m_DarkBg->GetCor() >= 1.0f)
-	{
+	if (m_DarkBg->GetCol() >= 1.0f)
+	{//画面が完全に暗い
+
 		return true;
 	}
 
@@ -158,16 +172,11 @@ bool CStageManager::ChangeObject()
 //==========================
 void CStageManager::StageReset()
 {
+	//登録されているオブジェクトの情報を消す
 	m_Obj.clear();
-	m_Stage = STAGE::STAGE_FIRST;
-}
 
-//==========================
-//プレイヤーのHPゲージの更新
-//==========================
-void CStageManager::HPGaugeUpdate()
-{
-	m_PlalyerHPGauge->SetHP(m_player->GetLife());
+	//現在のステージをステージ1に戻す
+	m_Stage = STAGE::STAGE_FIRST;
 }
 
 //==========================
@@ -175,36 +184,46 @@ void CStageManager::HPGaugeUpdate()
 //==========================
 void CStageManager::ChangeStage()
 {
-	CGameManager* pGemeManeger = CManager::GetInstance()->GetGameManager();
-
+	
 	if (GetChange()&&ChangeObject())
-	{//ステージが切り替わってるとき
+	{//ステージが切り替わっていて画面が暗くなってる
+
+		//ゲームマネージャーの情報を取得
+		CGameManager* pGemeManeger = CManager::GetInstance()->GetGameManager();
+
+		//カメラの情報を取得
+		CCamera* pCamera = CManager::GetInstance()->GetCamera();
 
 		//ステージを生成
 		DeleteAll();//全てのオブジェクトを削除
 		Load();//オブジェクトを読み込む
-		CManager::GetInstance()->GetCamera()->Init();//カメラの情報を初期化
+
+		//カメラの情報を初期化
+		pCamera->Init();
 
 		//現在のステージを取得
 		int StageNum = static_cast<int>(GetStage());
 
-		if (StageNum == 2)
-		{
-			//pGemeManeger->SetDirection();//演出を開始
-			pGemeManeger->SetChange();
-			pGemeManeger->GetBossInfo();//ボスの情報を取得
-			m_player->SetPos(D3DXVECTOR3(-736.0f, 0.0f, 600.0f));//プレイヤーの位置を変更
-			m_player->SetPosOld(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//プレイヤーの前回の位置を変更
+		if (StageNum == 3)
+		{//ボスステージの時
+
+			pGemeManeger->SetDirection();//演出中に変更
+			m_player->SetPos({ -736.0f, 0.0f, 600.0f });//プレイヤーの位置を変更
+			m_player->SetPosOld({ 0.0f, 0.0f, 0.0f });//プレイヤーの前回の位置を変更
 		}
 		else
-		{
-			m_player->SetPos(D3DXVECTOR3(0.0f, 0.0f, 100.0f));//プレイヤーの位置を変更
-			m_player->SetPosOld(D3DXVECTOR3(0.0f, 0.0f, 0.0f));//プレイヤーの前回の位置を変更
+		{//ステージ2
+			m_player->SetPos({ 0.0f, 0.0f, 100.0f });//プレイヤーの位置を変更
+			m_player->SetPosOld({ 0.0f, 0.0f, 0.0f });//プレイヤーの前回の位置を変更
 		}
 
-		m_player->DeleteWeapon();//持っている武器を消す
-		m_player->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));//プレイヤーの向きを変更
+		//持っている武器を消す
+		m_player->DeleteWeapon();
 
+		//プレイヤーの向きを変更
+		m_player->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
+
+		//切り替わり判定をリセット
 		ChangeReset();
 	}
 }
@@ -271,14 +290,15 @@ void CStageManager::DeleteObj(CObjectgame& obj)
 void CStageManager::Load()
 {
 	if (m_Stage == STAGE::STAGE_FIRST)
-	{
+	{//最初のステージ
+
+		//空とプレイヤーを生成
 		CSky::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(2000.0f, 2000.0f, 2000.0f));
 		m_player = CPlayer::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(1.5f, 1.5f, 1.5f));
-		m_PlalyerHPGauge = CPlayerHPGauge::Create(D3DXVECTOR3(10.0f, 20.0f, 0.0f), 10, 300, m_player->GetLife());
 	}
 
 	FildLoad();//フィールドの情報を読み込む
-	//EnemyLoad();//敵の情報を読み込む
+	EnemyLoad();//敵の情報を読み込む
 	WeaponLoad();//武器の情報を読み込む
 	BuildingLoad();//建物の情報を読み込む
 	ItemLoad();//アイテムの情報を読み込む
@@ -300,15 +320,15 @@ void CStageManager::FildLoad()
 
 	switch (stage)
 	{
-	case 0:
+	case 1:
 		inputfile.open("data\\DATAFILE\\FildData.txt");//テキストファイルを開く
 		break;
 
-	case 1:
+	case 2:
 		inputfile.open("data\\DATAFILE\\FildDataSecond.txt");//テキストファイルを開く
 		break;
 
-	case 2:
+	case 3:
 		inputfile.open("data\\DATAFILE\\FildDataLast.txt");//テキストファイルを開く
 		break;
 
@@ -406,15 +426,15 @@ void CStageManager::EnemyLoad()
 
 	switch (stage)
 	{
-	case 0:
+	case 1:
 		inputfile.open("data\\DATAFILE\\EnemyData.txt");//テキストファイルを開く
 		break;
 
-	case 1:
+	case 2:
 		inputfile.open("data\\DATAFILE\\EnemyDataSecond.txt");//テキストファイルを開く
 		break;
 
-	case 2:
+	case 3:
 		inputfile.open("data\\DATAFILE\\EnemyDataLast.txt");//テキストファイルを開く
 		break;
 
@@ -496,15 +516,15 @@ void CStageManager::BuildingLoad()
 
 	switch (stage)
 	{
-	case 0:
+	case 1:
 		inputfile.open("data\\DATAFILE\\BuildingData.txt");//テキストファイルを開く
 		break;
 
-	case 1:
+	case 2:
 		inputfile.open("data\\DATAFILE\\BuildingDataSecond.txt");//テキストファイルを開く
 		break;
 
-	case 2:
+	case 3:
 		inputfile.open("data\\DATAFILE\\BuildingDataLast.txt");//テキストファイルを開く
 		break;
 
@@ -705,15 +725,15 @@ void CStageManager::WeaponLoad()
 
 	switch (stage)
 	{
-	case 0:
+	case 1:
 		inputfile.open("data\\DATAFILE\\WeaponData.txt");//テキストファイルを開く
 		break;
 
-	case 1:
+	case 2:
 		inputfile.open("data\\DATAFILE\\WeaponDataSecond.txt");//テキストファイルを開く
 		break;
 
-	case 2:
+	case 3:
 		inputfile.open("data\\DATAFILE\\WeaponDataLast.txt");//テキストファイルを開く
 		break;
 
@@ -839,15 +859,15 @@ void CStageManager::ItemLoad()
 
 	switch (stage)
 	{
-	case 0:
+	case 1:
 		inputfile.open("data\\DATAFILE\\ItemData.txt");//テキストファイルを開く
 		break;
 
-	case 1:
+	case 2:
 		inputfile.open("data\\DATAFILE\\ItemDataSecond.txt");//テキストファイルを開く
 		break;
 
-	case 2:
+	case 3:
 		inputfile.open("data\\DATAFILE\\ItemDataLast.txt");//テキストファイルを開く
 		break;
 

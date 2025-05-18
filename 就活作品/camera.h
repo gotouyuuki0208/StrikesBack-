@@ -30,8 +30,10 @@ public:
 	void OutGame(D3DXVECTOR3 pos);//インゲーム以外のカメラ
 	D3DXVECTOR3& GetRot();//向きの取得
 	void Overhead(D3DXVECTOR3 pos);//頭上から写す
-	void SetTargetPos(D3DXVECTOR3 pos);//カメラの追従変更後の位置を設定
+	void SetTargetPos(D3DXVECTOR3 pos, int flame);//カメラの追従変更後の位置を設定
+	void SetPos(D3DXVECTOR3 pos);
 	void TarGetMove();//ターゲットの位置へ移動
+	bool FinishDirection();//演出が終了したか取得
 private:
 	//メンバ関数
 	void Input();//入力処理
@@ -49,6 +51,8 @@ private:
 	float m_PosVY;//視点のY座標
 	float m_PosRY;//注視点のY座標
 	int m_nFlame;//フレーム数
+	int m_DrectionFlame;//演出のフレーム数
+	int m_NowFlame;//現在のフレーム数
 	int m_fShapeScale;//揺れの量
 };
 

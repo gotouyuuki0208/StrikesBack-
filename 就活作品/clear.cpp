@@ -82,7 +82,7 @@ CClear* CClear::Create(D3DXVECTOR3 pos)
 	pClear->SetSize(100.0f, 350.0f);
 
 	//F‚ðÝ’è
-	pClear->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pClear->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰ŠúÝ’è
 	pClear->Init();

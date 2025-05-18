@@ -88,7 +88,7 @@ CSampleObject2D* CSampleObject2D::Create(D3DXVECTOR3 pos,float vertical, float w
 	pSampleObject2D->Init();
 	
 	//色の設定
-	pSampleObject2D->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pSampleObject2D->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//テクスチャの設定
 	/*CTexture* pTex = CManager::GetInstance()->GetTexture();

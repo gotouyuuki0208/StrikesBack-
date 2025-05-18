@@ -13,6 +13,8 @@
 #include"opeUI.h"
 #include"objectMesh.h"
 #include"hitenemy.h"
+#include"TutorialPopup.h"
+#include"directionbg.h"
 
 //==========================
 // コンストラクタ
@@ -36,21 +38,20 @@ CGame::~CGame()
 //==========================
 HRESULT CGame::Init()
 {
-	CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_INGAME);//BGMの再生
-	CManager::GetInstance()->GetStageManager()->StageReset();//ステージ情報を初期化
-
-	//CStageChangePoint::Create(D3DXVECTOR3(100.0f, 0.0f, 200.0f), D3DXVECTOR3(10.0f, 10.0f, 0.0f));
-	//CStageChangePoint::Create(D3DXVECTOR3(100.0f, 0.0f, 300.0f), D3DXVECTOR3(10.0f, 10.0f, 0.0f));
-	
-	//ステージを生成
-	CManager::GetInstance()->GetStageManager()->Load();
-	
+	//ゲームの初期設定
 	CManager::GetInstance()->GetGameManager()->Init();
 
-	CHitEnemy::Create({ 0.0f,0.0f ,500.0f }, { 1.5f,1.5f ,1.5f });
-	CHitEnemy::Create({ 0.0f,0.0f ,1000.0f }, { 1.5f,1.5f ,1.5f });
+	CStageChangePoint::Create(D3DXVECTOR3(100.0f, 0.0f, 200.0f), D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+	CStageChangePoint::Create(D3DXVECTOR3(100.0f, 0.0f, 300.0f), D3DXVECTOR3(10.0f, 10.0f, 0.0f));
+
+
+	//CHitEnemy::Create({ 0.0f,0.0f ,500.0f }, { 1.5f,1.5f ,1.5f });
+	//CHitEnemy::Create({ 0.0f,0.0f ,1000.0f }, { 1.5f,1.5f ,1.5f });
+
+	//CBoss::Create({ 0.0f,0.0f ,500.0f }, { 1.5f,1.5f ,1.5f });
+
 	//UI表示
-	DisplayUI();
+	//DisplayUI();
 
 	return S_OK;
 }
@@ -67,12 +68,7 @@ void CGame::Uninit()
 		m_Edit = nullptr;
 	}
 	
-	CManager::GetInstance()->GetStageManager()->StageReset();
-
-	CObject::ReleaseAll();
-
-	CManager::GetInstance()->GetSound()->Stop();
-
+	//ゲームの終了処理
 	CManager::GetInstance()->GetGameManager()->Uninit();
 }
 
@@ -81,27 +77,26 @@ void CGame::Uninit()
 //==========================
 void CGame::Update()
 {
-	
-	CManager::GetInstance()->GetGameManager()->a();
+	//ゲームの更新処理
+	CManager::GetInstance()->GetGameManager()->Update();
 
-	/*if (m_PlalyerHPGauge != nullptr)
-	{
-		m_PlalyerHPGauge->SetHP(m_player->GetLife());
-	}*/
+#ifdef _DEBUG//デバッグ時
 
+	//配置エディタの使用
 	UseEdit();
 
-#ifdef _DEBUG
+	//エンターキーでリザルトへ
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_RETURN))
-	{//ゲーム画面に遷移
+	{//リザルト画面に遷移
 		CManager::GetInstance()->GetFade()->SetFade(MODE::RESULT);
 	}
 #endif
 
 	if (CManager::GetInstance()->GetGameManager()->GetGame() != CGameManager::GAME::NONE)
-	{
-		//ゲーム画面に遷移
-		CManager::GetInstance()->GetGameManager()->SetGame(CManager::GetInstance()->GetGameManager()->GetGame());
+	{//ゲームが終了した
+
+		//CManager::GetInstance()->GetGameManager()->SetGame(CManager::GetInstance()->GetGameManager()->GetGame());
+		//リザルト画面に遷移
 		CManager::GetInstance()->GetFade()->SetFade(MODE::RESULT);
 	}
 }
@@ -113,8 +108,6 @@ void CGame::Draw()
 {
 
 }
-
-
 
 //==========================
 //配置ツールの使用

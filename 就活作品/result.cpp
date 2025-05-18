@@ -8,7 +8,6 @@
 //include
 #include"result.h"
 #include"manager.h"
-#include"bg.h"
 #include"fild.h"
 #include"outgamecharactar.h"
 #include"OutGameWall.h"

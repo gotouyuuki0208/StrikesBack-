@@ -83,7 +83,7 @@ CKnockDown* CKnockDown::Create(D3DXVECTOR3 pos)
 	pKnockDown->SetSize(50.0f, 200.0f);
 
 	//F‚ðÝ’è
-	pKnockDown->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pKnockDown->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰ŠúÝ’è
 	pKnockDown->Init();

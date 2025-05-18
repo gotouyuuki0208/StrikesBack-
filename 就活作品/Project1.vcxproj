@@ -26,6 +26,7 @@
     <ClCompile Include="bicycle.cpp" />
     <ClCompile Include="bicycleparking.cpp" />
     <ClCompile Include="board.cpp" />
+    <ClCompile Include="bossattackstate.cpp" />
     <ClCompile Include="bossgaugeframe.cpp" />
     <ClCompile Include="bosshpgauge.cpp" />
     <ClCompile Include="character.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="dark.cpp" />
     <ClCompile Include="darkbg.cpp" />
     <ClCompile Include="deliveryperson.cpp" />
+    <ClCompile Include="direction.cpp" />
     <ClCompile Include="drink.cpp" />
     <ClCompile Include="effect.cpp" />
     <ClCompile Include="enemyattackstate.cpp" />
@@ -61,6 +63,7 @@
     <ClCompile Include="gym_wall.cpp" />
     <ClCompile Include="gym_wall_top.cpp" />
     <ClCompile Include="house_white.cpp" />
+    <ClCompile Include="hudmanager.cpp" />
     <ClCompile Include="illumination.cpp" />
     <ClCompile Include="knockdown.cpp" />
     <ClCompile Include="objectMesh.cpp" />
@@ -76,7 +79,7 @@
     <ClCompile Include="hpgauge3D.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="apartment.cpp" />
-    <ClCompile Include="bg.cpp" />
+    <ClCompile Include="tutorialbg.cpp" />
     <ClCompile Include="bigweapon.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="boss.cpp" />
@@ -147,12 +150,15 @@
     <ClCompile Include="titlestart.cpp" />
     <ClCompile Include="trajectory.cpp" />
     <ClCompile Include="TutorialManager.cpp" />
+    <ClCompile Include="TutorialPopup.cpp" />
     <ClCompile Include="UIbg.cpp" />
     <ClCompile Include="wall.cpp" />
     <ClCompile Include="weakenemy.cpp" />
     <ClCompile Include="weapon.cpp" />
     <ClCompile Include="weaponenemy.cpp" />
     <ClCompile Include="weaponpoint.cpp" />
+    <ClCompile Include="bossState.cpp" />
+    <ClCompile Include="directionbg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="apartment.h" />
@@ -160,7 +166,9 @@
     <ClInclude Include="basketgoal.h" />
     <ClInclude Include="bat.h" />
     <ClInclude Include="benchpress.h" />
-    <ClInclude Include="bg.h" />
+    <ClInclude Include="direction.h" />
+    <ClInclude Include="directionbg.h" />
+    <ClInclude Include="tutorialbg.h" />
     <ClInclude Include="bicycle.h" />
     <ClInclude Include="bicycleparking.h" />
     <ClInclude Include="bigweapon.h" />
@@ -168,8 +176,10 @@
     <ClInclude Include="block.h" />
     <ClInclude Include="board.h" />
     <ClInclude Include="boss.h" />
+    <ClInclude Include="bossattackstate.h" />
     <ClInclude Include="bossgaugeframe.h" />
     <ClInclude Include="bosshpgauge.h" />
+    <ClInclude Include="bossState.h" />
     <ClInclude Include="buil.h" />
     <ClInclude Include="building.h" />
     <ClInclude Include="camera.h" />
@@ -214,6 +224,7 @@
     <ClInclude Include="gym_wall.h" />
     <ClInclude Include="gym_wall_top.h" />
     <ClInclude Include="house_white.h" />
+    <ClInclude Include="hudmanager.h" />
     <ClInclude Include="illumination.h" />
     <ClInclude Include="knockdown.h" />
     <ClInclude Include="objectMesh.h" />
@@ -275,6 +286,7 @@
     <ClInclude Include="titlestart.h" />
     <ClInclude Include="trajectory.h" />
     <ClInclude Include="TutorialManager.h" />
+    <ClInclude Include="TutorialPopup.h" />
     <ClInclude Include="UIbg.h" />
     <ClInclude Include="wall.h" />
     <ClInclude Include="weakenemy.h" />

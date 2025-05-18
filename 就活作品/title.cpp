@@ -8,7 +8,6 @@
 //include
 #include"title.h"
 #include"manager.h"
-#include"bg.h"
 #include"fild.h"
 #include"outgamecharactar.h"
 #include"OutGameWall.h"
@@ -39,7 +38,6 @@ CTitle::~CTitle()
 //==========================
 HRESULT CTitle::Init()
 {
-	//CBg::Create("data\\TEXTURE\\title.png");
 
 	CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_TITLE);
 

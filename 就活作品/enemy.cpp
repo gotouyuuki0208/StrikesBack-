@@ -89,25 +89,6 @@ void CEnemy::Update()
 
 	//地面との当たり判定
 	CollisionFild();
-
-	if (m_PlayMotion)
-	{//モーションを再生する
-
-		//モーションの更新
-		Motion();
-	}
-
-	if (!Attackable)
-	{//攻撃できないとき
-
-		m_AttackCoolTime--;
-
-		if (m_AttackCoolTime <= 0)
-		{
-			Attackable = true;
-			m_AttackCoolTime = 0;
-		}
-	}
 }
 
 //==========================
@@ -505,6 +486,14 @@ void CEnemy::ChangePlayMotion(bool play)
 }
 
 //==========================
+//モーションの再生判定を取得
+//==========================
+bool CEnemy::GetPlayMotion()
+{
+	return m_PlayMotion;
+}
+
+//==========================
 //被弾回数初期化
 //==========================
 void CEnemy::ResetDamageNum()
@@ -568,4 +557,36 @@ void CEnemy::ResetAttack()
 void CEnemy::SetCoolTime(int time)
 {
 	m_AttackCoolTime = time;
+}
+
+//==========================
+//攻撃のクールタイムを取得
+//==========================
+int CEnemy::GetCoolTime()
+{
+	return m_AttackCoolTime;
+}
+
+//==========================
+//クールタイムを減らす
+//==========================
+void CEnemy::SubCoolTime()
+{
+	m_AttackCoolTime--;
+}
+
+//==========================
+//攻撃を受けたモーションを保存
+//==========================
+void CEnemy::SetHitMotion(MOTION_TYPE motion)
+{
+	m_HitMotion = motion;
+}
+
+//==========================
+//攻撃を受けたモーションを取得
+//==========================
+CMotionModel::MOTION_TYPE CEnemy::GetHitMotion()
+{
+	return m_HitMotion;
 }

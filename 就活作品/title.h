@@ -9,7 +9,6 @@
 
 //include
 #include "scene.h"
-#include"bg.h"
 
 //タイトルクラスの定義
 class CTitle:public CScene

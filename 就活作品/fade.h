@@ -38,12 +38,12 @@ public:
 	FADE GetFade();//フェードの状態取得
 	static CFade* Create();//生成
 	void InGameFade();//ゲーム内でのフェード
-	float GetCor();//透明度の取得
+	float GetTransparency();//透明度の取得
 
 private:
 	FADE m_fade;//フェードの状態
 	CScene::MODE g_modenext;//次のシーン
-	float m_cor;//色の透明度
+	float m_Transparency;//色の透明度
 	bool m_InGame;//ゲーム中か判定
 };
 

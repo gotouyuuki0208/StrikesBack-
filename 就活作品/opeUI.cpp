@@ -83,7 +83,7 @@ COpeUI* COpeUI::Create(D3DXVECTOR3 pos, D3DXVECTOR3 size, const char texname[256
 	pOpeUI->SetSize(size.y, size.x);
 
 	//F‚ðÝ’è
-	pOpeUI->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pOpeUI->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰ŠúÝ’è
 	pOpeUI->Init();

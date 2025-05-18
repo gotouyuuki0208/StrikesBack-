@@ -77,7 +77,7 @@ void CDarkBg::Update()
 		}
 	}
 
-	SetCor(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_cor));//色の設定
+	SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, m_cor));//色の設定
 	CObject2D::Update();//更新処理
 
 }
@@ -122,7 +122,7 @@ CDarkBg* CDarkBg::Create()
 //==========================
 //透明度の取得
 //==========================
-float CDarkBg::GetCor()
+float CDarkBg::GetCol()
 {
 	return m_cor;
 }

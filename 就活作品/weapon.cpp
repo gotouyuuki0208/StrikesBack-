@@ -412,6 +412,7 @@ void CWeapon::ColisionPlayer()
 			
 			pPlayer->SetPosOld(pPlayer->GetPos());
 
+			CManager::GetInstance()->GetTutorial()->WeaponTutorialDisplay();
 		}
 
 		Colision = pCollision->Sphere(GetPos(),

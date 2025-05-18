@@ -24,7 +24,7 @@ public:
 	void Uninit() override;//終了処理
 	void Update() override;//更新処理
 	void Draw() override;//描画処理
-	static CBossHPGauge* Create(D3DXVECTOR3 pos, float vertical, float width, int hp);//オブジェクト生成
+	static CBossHPGauge* Create(D3DXVECTOR3 pos, float vertical, float width);//オブジェクト生成
 	void SetHP(int hp);//hpを設定
 private:
 

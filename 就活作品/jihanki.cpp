@@ -190,6 +190,8 @@ void CJihanki::ColisionPlayer()
 			pPlayer->SetPos(D3DXVECTOR3(GetPos().x + NormalizeVec.x * floor((GetRadius() + pPlayer->GetRadius())),
 				GetPos().y,
 				GetPos().z + NormalizeVec.z * floor((GetRadius() + pPlayer->GetRadius()))));
+
+			CManager::GetInstance()->GetTutorial()->RecoveryTutorialDisplay();
 		}
 
 		break;

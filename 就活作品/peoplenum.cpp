@@ -82,7 +82,7 @@ CPeopleNum* CPeopleNum::Create(D3DXVECTOR3 pos)
 	pPeopleNum->SetSize(50.0f, 50.0f);
 
 	//F‚ðÝ’è
-	pPeopleNum->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pPeopleNum->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰ŠúÝ’è
 	pPeopleNum->Init();

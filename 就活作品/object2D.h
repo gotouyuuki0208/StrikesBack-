@@ -29,8 +29,8 @@ public:
 	void BindTexture(LPDIRECT3DTEXTURE9 pTex);//テクスチャ割り当て
 	void Animetion(float vertical, int width);//アニメーション
 	float GetLength();//対角線の長さ取得
-	void SetCor(D3DCOLOR cor);//色の設定
-	D3DCOLOR GetCor();//色の取得
+	void SetCol(D3DCOLOR col);//色の設定
+	D3DCOLOR GetCol();//色の取得
 	void SetSize(float vertical, float width);//大きさ設定
 	void SetTexSize(float vertical, float width ,float TexPos);//テクスチャの大きさ設定
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff();//頂点バッファのポインタを取得
@@ -41,7 +41,7 @@ private:
 	//メンバ変数
 	LPDIRECT3DTEXTURE9 m_pTexture;//テクスチャへのポインタ
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;//頂点バッファへのポインタ
-	D3DCOLOR m_cor;//色
+	D3DCOLOR m_col;//色
 	float m_fLength;//対角線の長さ
 	float m_fAngle;//対角線の角度
 	float m_fVertical;//縦のサイズ

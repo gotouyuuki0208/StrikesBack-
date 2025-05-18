@@ -26,7 +26,8 @@ m_pScene(nullptr),//現在の画面
 m_Stage(nullptr),//ステージ
 m_Tutorial(nullptr),//チュートリアル
 m_GameManager(nullptr),//ゲーム管理
-m_Collision(nullptr)//当たり判定
+m_Collision(nullptr),//当たり判定
+m_HudManager(nullptr)//HUDの管理
 {
 	
 }
@@ -86,13 +87,16 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	m_Stage = DBG_NEW CStageManager;
 
 	//チュートリアル
-	m_Tutorial = DBG_NEW CTutorial;
+	m_Tutorial = DBG_NEW CTutorialManager;
 
 	//ゲーム管理
 	m_GameManager = DBG_NEW CGameManager;
 
 	//当たり判定
 	m_Collision = DBG_NEW CCollision;
+
+	//HUDの管理
+	m_HudManager = DBG_NEW CHudManager;
 
 	return S_OK;
 }
@@ -205,6 +209,12 @@ void CManager::Uninit(void)
 	{//当たり判定
 		delete m_Collision;
 		m_Collision = nullptr;
+	}
+
+	if (m_HudManager != nullptr)
+	{//HUDの管理
+		delete m_HudManager;
+		m_HudManager = nullptr;
 	}
 }
 
@@ -342,7 +352,7 @@ CStageManager* CManager::GetStageManager()
 //=====================
 //チュートリアルの取得
 //=====================
-CTutorial* CManager::GetTutorial()
+CTutorialManager* CManager::GetTutorial()
 {
 	return m_Tutorial;
 }
@@ -369,6 +379,14 @@ CGameManager* CManager::GetGameManager()
 CCollision* CManager::GetCollision()
 {
 	return m_Collision;
+}
+
+//=====================
+//HUDの管理
+//=====================
+CHudManager* CManager::GetHudManager()
+{
+	return m_HudManager;
 }
 
 //=====================

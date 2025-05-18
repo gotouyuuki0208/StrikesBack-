@@ -5,97 +5,123 @@
 //
 //==========================
 
+//include
+#include"manager.h"
 #include"TutorialManager.h"
+#include"TutorialPopup.h"
+#include"tutorialbg.h"
 
 //==========================
 //コンストラクタ
 //==========================
-CTutorial::CTutorial() :
-m_Tutorial(false),//説明表示判定
+CTutorialManager::CTutorialManager():
 m_Action(false),//行動説明
 m_Weapon(false),//武器説明
-m_Recovery(false)//回復説明
+m_Recovery(false),//回復説明
+m_pTutorialPopup(nullptr),//ポップアップ表示するチュートリアルの情報
+m_pTutorialBg(nullptr)//背景の情報
 {
 
 }
-
 
 //==========================
 //デストラクタ
 //==========================
-CTutorial::~CTutorial()
+CTutorialManager::~CTutorialManager()
 {
 
 }
 
 //==========================
-//説明を表示しているかを取得
+//行動の説明を表示
 //==========================
-bool CTutorial::GetTutorial()
+void CTutorialManager::ActionTutorialDisplay()
 {
-	return m_Tutorial;
-}
+	if (m_Action)
+	{//すでに行動説明をしている
 
-//==========================
-//説明を開始
-//==========================
-void CTutorial::StartTutorial()
-{
-	m_Tutorial = true;
-}
+		return;
+	}
 
-//==========================
-//説明を終了
-//==========================
-void CTutorial::FinishTutorial()
-{
-	m_Tutorial = false;
-}
+	//背景の生成
+	m_pTutorialBg = CTutorialBg::Create();
 
-//==========================
-//行動説明を表示した状態に変更
-//==========================
-void CTutorial::SetAction()
-{
+	//ポップアップ表示を生成
+	m_pTutorialPopup = CTutorialPopup::Create();
+
+	//行動説明をした状態に変更
 	m_Action = true;
+
+	//プレイヤーを操作できないように変更
+	CManager::GetInstance()->GetGameManager()->ChangePlayGame(false);
 }
 
 //==========================
-//武器説明を表示した状態に変更
+//武器の説明を表示
 //==========================
-void CTutorial::SetWeapon()
+void CTutorialManager::WeaponTutorialDisplay()
 {
+	if (m_Weapon)
+	{//すでに武器説明をしている
+
+		return;
+	}
+
+	//背景の生成
+	m_pTutorialBg = CTutorialBg::Create();
+
+	//ポップアップ表示を生成
+	m_pTutorialPopup = CTutorialPopup::Create();
+
+	//武器説明をした状態に変更
 	m_Weapon = true;
+
+	//プレイヤーを操作できないように変更
+	CManager::GetInstance()->GetGameManager()->ChangePlayGame(false);
 }
 
 //==========================
-//回復説明を表示した状態に変更
+//回復の説明を表示
 //==========================
-void CTutorial::SetRecovery()
+void CTutorialManager::RecoveryTutorialDisplay()
 {
+	if (m_Recovery)
+	{//すでに回復説明をしている
+
+		return;
+	}
+
+	//背景の生成
+	m_pTutorialBg = CTutorialBg::Create();
+
+	//ポップアップ表示を生成
+	m_pTutorialPopup = CTutorialPopup::Create();
+
+	//回復説明をした状態に変更
 	m_Recovery = true;
+
+	//プレイヤーを操作できないように変更
+	CManager::GetInstance()->GetGameManager()->ChangePlayGame(false);
 }
 
 //==========================
-//行動説明を表示した状態に取得
+//説明を消す
 //==========================
-bool CTutorial::GetAction()
+void CTutorialManager::TutorialDelete()
 {
-	return m_Action;
-}
 
-//==========================
-//武器説明を表示した状態に取得
-//==========================
-bool CTutorial::GetWeapon()
-{
-	return m_Weapon;
-}
+	if (m_pTutorialPopup != nullptr)
+	{//ポップアップ表示がされていない
 
-//==========================
-//回復説明を表示した状態に取得
-//==========================
-bool CTutorial::GetRecovery()
-{
-	return m_Recovery;
+		//キー入力されたことを通知
+		m_pTutorialPopup->KeyInput();
+		m_pTutorialPopup = nullptr;
+
+		//背景削除
+		m_pTutorialBg->Uninit();
+		m_pTutorialPopup = nullptr;
+
+		//プレイヤーを操作できるようにに変更
+		CManager::GetInstance()->GetGameManager()->ChangePlayGame(true);
+	}
 }

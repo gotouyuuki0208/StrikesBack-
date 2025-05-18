@@ -82,7 +82,7 @@ CTitleStart* CTitleStart::Create(D3DXVECTOR3 pos)
 	pTitleStart->SetSize(50.0f, 200.0f);
 
 	//F‚ðÝ’è
-	pTitleStart->SetCor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	pTitleStart->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 	//‰ŠúÝ’è
 	pTitleStart->Init();

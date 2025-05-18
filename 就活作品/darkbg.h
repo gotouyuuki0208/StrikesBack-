@@ -36,7 +36,7 @@ public:
 	void SetFade();//フェードの設定処理
 	FADE GetFade();//フェードの状態取得
 	static CDarkBg* Create();//生成
-	float GetCor();//透明度の取得
+	float GetCol();//透明度の取得
 
 private:
 
