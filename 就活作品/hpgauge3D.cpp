@@ -24,7 +24,7 @@ m_MaxHP(0),//Å‘åHP‚Ì”’l
 m_Targetlength(0.0f),//–Ú“I‚Ì’·‚³
 m_length(0.0f),//’·‚³
 m_Ratio(0.0f),//HP‚ÌŠ„‡
-m_Draw(false)//•`‰æ”»’è
+m_Draw(true)//•`‰æ”»’è
 {	
 
 }

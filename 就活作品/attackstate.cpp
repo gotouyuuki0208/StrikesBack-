@@ -238,6 +238,7 @@ void CFirstAttackState::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->HitEnemy(RIGHT_HAND);
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
 	}
 
 	if (m_OwnerState->GetCombo())
@@ -316,6 +317,8 @@ void CSecondAttackState::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->HitEnemy(LEFT_HAND);
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
+
 	}
 	
 	if (m_OwnerState->GetCombo())
@@ -394,6 +397,8 @@ void CRastAttackState::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->HitEnemy(RIGHT_HAND);
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
+
 	}
 }
 
@@ -453,6 +458,13 @@ void CFirstBigWeaponAttack::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->WeaponHitEnemy();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{//•Ší‚ª‰ó‚ê‚½
+			return;
+		}
+
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
 	}
 
 	if (m_OwnerState->GetCombo())
@@ -519,6 +531,13 @@ void CSecondBigWeaponAttack::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->WeaponHitEnemy();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{//•Ší‚ª‰ó‚ê‚½
+			return;
+		}
+
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
 	}
 
 	if (m_OwnerState->GetCombo())
@@ -585,6 +604,13 @@ void CRastBigWeaponAttack::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->WeaponHitEnemy();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{//•Ší‚ª‰ó‚ê‚½
+			return;
+		}
+
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
 	}
 }
 
@@ -644,6 +670,13 @@ void CFirstSmallWeaponAttack::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->WeaponHitEnemy();
+		
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{//•Ší‚ª‰ó‚ê‚½
+			return;
+		}
+
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
 	}
 
 	if (m_OwnerState->GetCombo())
@@ -710,6 +743,13 @@ void CSecondSmallWeaponAttack::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->WeaponHitEnemy();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{//•Ší‚ª‰ó‚ê‚½
+			return;
+		}
+
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
 	}
 
 	if (m_OwnerState->GetCombo())
@@ -776,6 +816,13 @@ void CRastSmallWeaponAttack::Update()
 
 		//UŒ‚‚Ì“–‚½‚è”»’è
 		m_OwnerState->GetOwner()->WeaponHitEnemy();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{//•Ší‚ª‰ó‚ê‚½
+			return;
+		}
+
+		m_OwnerState->GetOwner()->CollisionJihankiAttack();
 	}
 }
 

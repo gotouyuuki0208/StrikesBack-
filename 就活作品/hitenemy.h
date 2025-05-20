@@ -9,7 +9,9 @@
 
 //include
 #include "weakenemy.h"
-#include "hpgauge3D.h"
+
+//前方宣言
+class CHPGauge3D;
 
 //クラスの定義
 class CHitEnemy :public CWeakEnemy

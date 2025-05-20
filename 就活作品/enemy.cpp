@@ -590,3 +590,19 @@ CMotionModel::MOTION_TYPE CEnemy::GetHitMotion()
 {
 	return m_HitMotion;
 }
+
+//==========================
+//UŒ‚”»’è‚ğæ“¾
+//==========================
+bool CEnemy::GetAttack()
+{
+	return m_Attack;
+}
+
+//==========================
+//UŒ‚”»’è‚ğİ’è
+//==========================
+void CEnemy::SetAttack()
+{
+	m_Attack = true;
+}

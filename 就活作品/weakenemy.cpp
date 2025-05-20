@@ -12,6 +12,7 @@
 #include "enemymovepoint.h"
 #include "player.h"
 #include "enemystate.h"
+#include "hpgauge3D.h"
 
 //静的メンバ初期化
 const int CWeakEnemy::PRIORITY = 1;//描画順
@@ -23,7 +24,8 @@ CWeakEnemy::CWeakEnemy(int nPriority) :
 	CEnemy(nPriority),//基底コンストラクタ
 	m_CurPoint(0),//現在の移動地点
 	m_StateMachine(nullptr),//状態管理
-	m_Color(1.0f)
+	m_Color(1.0f),
+	m_Patrol(true)
 {
 	for (int i = 0; i < POINT; i++)
 	{
@@ -46,13 +48,12 @@ CWeakEnemy::~CWeakEnemy()
 //==========================
 HRESULT CWeakEnemy::Init()
 {
-
 	//初期設定
 	CEnemy::Init();
 
 	//状態管理クラスの作成
 	m_StateMachine = DBG_NEW CStateMachine;
-	auto NewState = DBG_NEW CEnemyMovabeState;
+	auto NewState = DBG_NEW CEnemyNeutralState;
 	ChangeState(NewState);
 
 	return S_OK;
@@ -79,6 +80,11 @@ void  CWeakEnemy::Uninit()
 //==========================
 void CWeakEnemy::Update()
 {
+	if (!CManager::GetInstance()->GetGameManager()->GetPlayGame())
+	{//ゲームが遊べない状態
+		return;
+	}
+
 	//ステートの更新
 	m_StateMachine->Update();
 
@@ -113,6 +119,9 @@ void CWeakEnemy::Update()
 	if (m_Color <= 0.0f)
 	{
 		Uninit();
+
+		//自分を削除する
+		CManager::GetInstance()->GetStageManager()->DeleteObj(*this);
 	}
 }
 
@@ -341,14 +350,30 @@ void CWeakEnemy::Patrol()
 }
 
 //==========================
+//
+//==========================
+bool CWeakEnemy::GetPatrol()
+{
+	return m_Patrol;
+}
+
+//==========================
+//
+//==========================
+void CWeakEnemy::SetEndPatrol()
+{
+	m_Patrol = false;
+}
+
+//==========================
 //攻撃被弾処理
 //==========================
-void CWeakEnemy::Hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE HitMotion)
+bool CWeakEnemy::Hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE HitMotion)
 {
 	
 	if (GetDamageNum() >= 3 || GetHitMotion() == HitMotion)
 	{//ダメージ回数が3回以上か前回と同じ攻撃
-		return;
+		return false;
 	}
 
 	//被弾回数を増やす
@@ -372,6 +397,7 @@ void CWeakEnemy::Hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE HitMotion)
 		DamegeBlow(pos);
 	}
 
+	return true;
 }
 
 //==========================

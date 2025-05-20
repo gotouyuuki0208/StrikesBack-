@@ -14,6 +14,7 @@
 class CEnemyStateBase;
 class CStateMachine;
 class CEnemyMovePoint;
+class CHPGauge3D;
 
 //クラスの定義
 class CWeakEnemy :public CEnemy
@@ -34,9 +35,11 @@ public:
 	static CWeakEnemy* Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale);//オブジェクト生成
 
 	void ChangeState(CEnemyStateBase* NewState);//状態を変更
-	void Hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE HitMotion);//攻撃被弾処理
+	bool Hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE HitMotion);//攻撃被弾処理
 	void SubPartsCol();//パーツの透明度を減らす
 	void Patrol();//移動地点を巡回
+	bool GetPatrol();
+	void SetEndPatrol();
 private:
 
 	//メンバ関数
@@ -48,5 +51,6 @@ private:
 	CEnemyMovePoint* m_Point[POINT];//移動地点の情報
 	int m_CurPoint;//現在の移動地点
 	float m_Color;
+	bool m_Patrol;//移動地点を移動するか判定
 };
 #endif

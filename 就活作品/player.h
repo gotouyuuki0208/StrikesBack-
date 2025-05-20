@@ -62,12 +62,16 @@ public:
 	int GetDamageNum();//被弾回数取得
 	void HitEnemy(int PartsNum);//敵を殴るときの当たり判定
 	void WeaponHitEnemy();//敵を武器で殴るときの当たり判定
+	void CollisionJihankiAttack();//自販機に攻撃時の当たり判定
+	void RecoveryLife();//ライフの回復
+	bool GetWeaponBreak();//武器が壊れたか取得
+	void BreakReset();//武器破壊判定をリセット
+	void StageChangeState();//ステージ変更時のステートの変更
 private:
 	
 	//メンバ関数
 	void CollisionEnemy();//敵との当たり判定
 	void CollisionFild();//地面との当たり判定
-	void CollisionJihankiAttack();//自販機に攻撃時の当たり判定
 	void SetWeaponMotion(MOTION_TYPE motion);//武器所持時のモーションを設定
 	void MotionUpdate();//モーションの更新
 	void Damage();//ダメージ処理
@@ -83,7 +87,8 @@ private:
 	bool m_VisualCor;//当たり判定の色の設定
 	float LeftStickAngle;//左スティックの角度
 	int m_DamageNum;//ダメージ回数カウント
-	
+	bool m_Attack;//攻撃がヒットしたか判定
+	bool m_breakweapon;//武器が壊れた判定
 };
 
 #endif

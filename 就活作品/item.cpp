@@ -157,7 +157,8 @@ void CItem::ColisionPlayer()
 		if (Colision)
 		{
 			Uninit();
-			pPlayer->SetLife(pPlayer->GetLife()+10);//ƒAƒCƒeƒ€‚Ì”‚ð‘‚â‚·
+			pPlayer->RecoveryLife();//‰ñ•œ
+			
 			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_RECOVERY);
 		}
 

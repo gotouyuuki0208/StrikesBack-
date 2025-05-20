@@ -33,21 +33,6 @@ protected:
 };
 
 //==============================================================================
-//仮状態クラス
-//==============================================================================
-class CEnemyMovabeState :public CEnemyStateBase
-{
-public:
-	//メンバ関数
-	CEnemyMovabeState();//コンストラクタ
-	~CEnemyMovabeState();//デストラクタ
-	void Start()override;//開始
-	void Update()override;//更新
-	void Uninit()override;//終了
-};
-
-
-//==============================================================================
 //待機状態クラス
 //==============================================================================
 class CEnemyNeutralState :public CEnemyStateBase

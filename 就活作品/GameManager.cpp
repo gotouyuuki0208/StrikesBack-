@@ -71,6 +71,10 @@ void CGameManager::Uninit()
 		m_direction = nullptr;
 	}
 
+	m_count = 0;//フレーム数カウント用
+	m_PlayGame = false;//ゲームを遊べるか判定(false:遊べない true:遊べる)
+	m_GameStartTutorial = false;//ゲームの開始時の操作説明を表示したか判定
+
 	//ステージ情報を削除
 	CManager::GetInstance()->GetStageManager()->StageReset();
 
@@ -79,6 +83,12 @@ void CGameManager::Uninit()
 
 	//BGMを停止
 	CManager::GetInstance()->GetSound()->Stop();
+
+	//HUD管理クラスの情報を初期化
+	CManager::GetInstance()->GetHudManager()->Reset();
+
+	//チュートリアル管理クラスの情報を初期化
+	CManager::GetInstance()->GetTutorial()->Reset();
 }
 
 //==========================
@@ -214,6 +224,13 @@ void CGameManager::SetDirection()
 
 	//ボスの情報を取得する
 	m_direction->GetBossInfo();
+}
+//==========================
+//演出中か取得
+//==========================
+bool CGameManager::GetDirection()
+{
+	return m_Direction;
 }
 
 //==========================

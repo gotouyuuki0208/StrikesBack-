@@ -100,6 +100,6 @@ void CHudManager::Reset()
 
 	if (m_pPlayerHPGauge != nullptr)
 	{
-		m_pBossHPGauge = nullptr;
+		m_pPlayerHPGauge = nullptr;
 	}
 }

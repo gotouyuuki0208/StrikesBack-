@@ -9,6 +9,7 @@
 #include "bossState.h"
 #include "boss.h"
 #include "bossattackstate.h"
+#include"manager.h"
 
 //静的メンバ初期化
 const int CBossDamageState::DAMEGE_FLAME = 54;//ダメージ状態を終了するまでのフレーム数
@@ -51,13 +52,13 @@ CBoss* CBossStateBase::GetOwner()
 }
 
 //========================================================================================================
-//仮状態クラス
+//演出状態クラス
 //========================================================================================================
 
 //==========================
 //コンストラクタ
 //==========================
-CBossMovableState::CBossMovableState()
+CBossDirectionState::CBossDirectionState()
 {
 	m_count = 0;
 }
@@ -65,7 +66,7 @@ CBossMovableState::CBossMovableState()
 //==========================
 //デストラクタ
 //==========================
-CBossMovableState::~CBossMovableState()
+CBossDirectionState::~CBossDirectionState()
 {
 
 }
@@ -73,34 +74,31 @@ CBossMovableState::~CBossMovableState()
 //==========================
 //開始
 //==========================
-void CBossMovableState::Start()
+void CBossDirectionState::Start()
 {
-
+	m_pBoss->SetMotion(CMotionModel::MOTION_TYPE::BOSS_DIRECTION);
 }
 
 //==========================
 //更新
 //==========================
-void CBossMovableState::Update()
-{
-	
-	m_count ++ ;
-
-	if (m_count > 300)
+void CBossDirectionState::Update()
+{	
+	if (m_pBoss->GetMotion() == CMotionModel::MOTION_TYPE::NEUTRAL)
 	{
 		//モーションを設定
 		m_pBoss->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONNEUTRAL);
-
 	}
 
 	//行動可能か判定
 	m_pBoss->JudgeMovable();
 
-	if (m_pBoss->GetMovable())
+	if (CManager::GetInstance()->GetGameManager()->GetPlayGame()
+		&& !CManager::GetInstance()->GetGameManager()->GetDirection())
 	{//行動可能
 
 		//待機状態に変更
-		auto NewState = DBG_NEW CBossNeutralState;
+		auto NewState = DBG_NEW CBossSmallWeaponNeutralState;
 		m_pBoss->ChangeState(NewState);
 		return;
 	}
@@ -109,7 +107,7 @@ void CBossMovableState::Update()
 //==========================
 //終了
 //==========================
-void CBossMovableState::Uninit()
+void CBossDirectionState::Uninit()
 {
 	CBossStateBase::Uninit();
 }
@@ -1001,14 +999,23 @@ void CBossAttackState::Update()
 	}
 
 	m_FlameCount++;
-	m_AttackStateMachine->Update();
+
+	if (m_AttackStateMachine != nullptr)
+	{
+		m_AttackStateMachine->Update();
+	}
+
+	if (m_pBoss->GetWeaponBreak())
+	{
+		//待機状態に変更
+		auto NewState = DBG_NEW CBossNeutralState;
+		m_pBoss->ChangeState(NewState);
+	}
 
 	if (m_Combo)
 	{//攻撃中は終了
 		return;
 	}
-
-
 
 	//攻撃出来ない状態に変更
 	m_pBoss->ChangeAttackable();

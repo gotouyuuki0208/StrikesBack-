@@ -34,8 +34,9 @@ m_FlameCount(0),//攻撃のフレーム数をカウント
 m_NearCount(0),//プレイヤーが近づいた時の行動のカウント
 m_NearAction(false),//プレイヤーが近づいた時の行動をしているか判定
 m_StateMachine(nullptr),//状態管理
-m_NextAttack(false),//次の攻撃(false:素手 true:武器)
-m_Guard(false)//ガード判定
+m_NextAttack(true),//次の攻撃(false:素手 true:武器)
+m_Guard(false),//ガード判定
+m_weaponbreak(false)//武器破壊判定
 {
 	
 }
@@ -61,7 +62,7 @@ HRESULT CBoss::Init()
 
 	//状態管理クラスの作成
 	m_StateMachine = DBG_NEW CStateMachine;
-	auto NewState = DBG_NEW CBossMovableState;
+	auto NewState = DBG_NEW CBossDirectionState;
 	ChangeState(NewState);
 
 	if (GetPlayer() != nullptr)
@@ -109,14 +110,14 @@ void  CBoss::Uninit()
 //==========================
 void CBoss::Update()
 {
-	//更新処理
-	CEnemy::Update();
-
 	//モーションの更新
 	MotionUpdate();
 
 	//ステートの更新
 	m_StateMachine->Update();
+
+	//更新処理
+	CEnemy::Update();
 
 	if (!GetAttackable())
 	{//攻撃できないとき
@@ -137,6 +138,14 @@ void CBoss::Update()
 
 	//HPゲージの更新
 	CManager::GetInstance()->GetHudManager()->ChangeBossHP(GetLife());
+
+	if (GetLife() <= 0)
+	{//ライフがない
+
+		//終了処理
+		Uninit();
+	}
+
 }
 
 //==========================
@@ -240,7 +249,8 @@ void CBoss::ChoiceAttack()
 	//近い武器を探す
 	FindNearbyWeapons();
 
-	if (m_weapon == nullptr)
+	if (m_weapon == nullptr
+		&&m_HaveWeapon==nullptr)
 	{//武器が存在していない
 
 		//攻撃方法を素手攻撃に変更
@@ -429,6 +439,11 @@ void CBoss::FindNearbyWeapons()
 //==========================
 bool CBoss::MeasureDistance()
 {
+	if (m_weapon == nullptr)
+	{//武器がない
+		return true;
+	}
+
 	//一番近い武器との距離を測定
 	float WeaponDistance = (m_weapon->GetPos().x - GetPos().x) * (m_weapon->GetPos().x - GetPos().x) +
 		(m_weapon->GetPos().z - GetPos().z) * (m_weapon->GetPos().z - GetPos().z);
@@ -469,11 +484,14 @@ void CBoss::ReleseWeapon()
 		if (m_HaveWeapon->GetGrab())
 		{//武器を持ってるとき
 
-			//武器を置く
-			m_HaveWeapon->ReleseCharacter(D3DXVECTOR3(GetParts(14)->GetMtxWorld()._41, 0.0f, GetParts(14)->GetMtxWorld()._43));
+			//プレイヤーが持つ武器の位置を取得
+			D3DXVECTOR3 pos = D3DXVECTOR3(m_HaveWeapon->GetMtxWorld()._41, 0.0f, m_HaveWeapon->GetMtxWorld()._43);
+			m_HaveWeapon->SetParent(nullptr);
+			m_HaveWeapon->ReleseCharacter(pos);//武器を放す
+			m_HaveWeapon->CorrectInfo();
+			m_HaveWeapon = nullptr;//武器の情報を削除
+
 		}
-		
-		m_HaveWeapon = nullptr;
 	}
 }
 
@@ -524,13 +542,13 @@ bool CBoss::GetWeaponType()
 //==========================
 //攻撃被弾処理
 //==========================
-void CBoss::hit(D3DXVECTOR3 pos, int damage,MOTION_TYPE hitmotion)
+bool CBoss::hit(D3DXVECTOR3 pos, int damage,MOTION_TYPE hitmotion)
 {
 	
 	if (GetDamageNum() >= 3 || GetHitMotion() == hitmotion)
 	{//3回攻撃を受けてる
 
-		return;
+		return false;
 	}
 
 	//被弾回数を増やす
@@ -567,13 +585,15 @@ void CBoss::hit(D3DXVECTOR3 pos, int damage,MOTION_TYPE hitmotion)
 
 	if (typeid(*State) != typeid(CGuardState))
 	{//ガード状態ではない
-		SetDamage(true);
+		Damage();
 
 		if (GetDamageNum() >= 3)
 		{//3回被弾している
 			DamegeBlow(pos);
 		}
 	}
+
+	return true;
 }
 
 //==========================
@@ -592,6 +612,8 @@ void CBoss::WeaponDamage()
 		CManager::GetInstance()->GetStageManager()->DeleteObj(*m_HaveWeapon);
 		m_HaveWeapon->Uninit();
 		m_HaveWeapon = nullptr;
+
+		m_weaponbreak = true;
 	}
 }
 
@@ -681,45 +703,63 @@ void CBoss::InitHaveWeapon()
 
 }
 
-////==========================
-////武器攻撃の当たり判定
-////==========================
-//void CBoss::ColisionWeaponAttack()
-//{
-//	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-//
-//	bool Colision = pCollision->Sphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
-//		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
-//		30.0f,
-//		30.0f);
-//
-//	if (Colision && !m_Attack)
-//	{
-//		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
-//		//GetPlayer()->Damage();
-//		m_Attack = true;
-//
-//		if (m_StackIdx <= 0)
-//		{
-//			GetPlayer()->DamegeBlow(GetPos());
-//		}
-//
-//		if (m_weapon == nullptr)
-//		{
-//			return;
-//		}
-//
-//		m_weapon->SubDurability();
-//
-//		if (m_weapon->GetDurability() <= 0)
-//		{
-//			SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
-//			SetComboList();
-//
-//			//武器を削除
-//			CManager::GetInstance()->GetStageManager()->DeleteObj(*m_weapon);
-//			m_weapon->Uninit();
-//			m_weapon = nullptr;
-//		}
-//	}
-//}
+//==========================
+//ダメージ処理
+//==========================
+void CBoss::Damage()
+{
+	SetDamage(true);
+
+	if (GetLife() <= 0)
+	{
+		if (CManager::GetInstance()->GetGameManager()->GetGame() == CGameManager::GAME::NONE)
+		{
+			CManager::GetInstance()->GetGameManager()->SetGame(CGameManager::GAME::CLEAR);
+		}
+	}
+}
+
+//==========================
+//武器攻撃の当たり判定
+//==========================
+void CBoss::ColisionWeaponAttack()
+{
+	if (m_HaveWeapon == nullptr)
+	{
+		return;
+	}
+
+	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+
+	bool Colision = pCollision->Sphere(D3DXVECTOR3(m_HaveWeapon->GetMtxWorld()._41, m_HaveWeapon->GetMtxWorld()._42, m_HaveWeapon->GetMtxWorld()._43),
+		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
+		30.0f,
+		30.0f);
+
+	
+	if (Colision && !GetAttack())
+	{
+		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
+		SetAttack();
+
+		GetPlayer()->hit(GetPos(),2);
+		
+		WeaponDamage();
+	}
+}
+
+//==========================
+//武器が壊れたか取得
+//==========================
+bool CBoss::GetWeaponBreak()
+{
+	return m_weaponbreak;
+}
+
+//==========================
+//武器破壊判定をリセット
+//==========================
+void CBoss::BreakReset()
+{
+	m_weaponbreak = false;
+}

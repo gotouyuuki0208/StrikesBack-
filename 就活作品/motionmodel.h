@@ -67,6 +67,7 @@ public:
 		SMALLWEAPONGUARD,//片手武器所持時ガード
 		WEAPONMOVE,//武器を持った状態の移動
 		AVOIDANCE_BACK,//後ろに回避
+		BOSS_DIRECTION,//ボスの演出
 		MAX
 	};
 

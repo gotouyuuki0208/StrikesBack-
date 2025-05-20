@@ -32,14 +32,14 @@ protected:
 };
 
 //==============================================================================
-//仮状態クラス
+//演出状態クラス
 //==============================================================================
-class CBossMovableState :public CBossStateBase
+class CBossDirectionState :public CBossStateBase
 {
 public:
 	//メンバ関数
-	CBossMovableState();//コンストラクタ
-	~CBossMovableState();//デストラクタ
+	CBossDirectionState();//コンストラクタ
+	~CBossDirectionState();//デストラクタ
 	void Start()override;//開始
 	void Update()override;//更新
 	void Uninit()override;//終了

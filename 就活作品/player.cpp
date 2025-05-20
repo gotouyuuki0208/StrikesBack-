@@ -45,7 +45,9 @@ m_WeaponType(false),//武器の種類
 m_VisualCor(false),//当たり判定の色の設定
 LeftStickAngle(0.0f),//左スティックの角度
 m_StateMachine(nullptr),//状態管理
-m_DamageNum(0)//ダメージ回数カウント
+m_DamageNum(0),//ダメージ回数カウント
+m_Attack(false),//攻撃がヒットしたか判定
+m_breakweapon(false)//武器が壊れたか判定
 {
 	SetLife(MAX_LIFE);//寿命の設定
 }
@@ -226,7 +228,15 @@ void CPlayer::InputMove()
 
 	if (CManager::GetInstance()->GetJoypad()->GetTriggerPedal(CInputJoypad::JOYKEY_LEFT_TRIGGER))
 	{//ダッシュ
-		move = DASH_VALUE;
+
+		//現在の状態を取得
+		auto State = m_StateMachine->GetState();
+
+		if (typeid(*State) != typeid(CBigWeaponMoveState))
+		{//両手武器を持ってない
+
+			move = DASH_VALUE;
+		}
 	}
 
 	if (CManager::GetInstance()->GetJoypad()->Connection())
@@ -549,6 +559,14 @@ void CPlayer::HitEnemy(int PartsNum)
 //==========================
 void CPlayer::WeaponHitEnemy()
 {
+	if (m_weapon == nullptr)
+	{//武器がないとき
+		return;
+	}
+
+	//攻撃をヒット判定を初期化
+	m_Attack = false;
+
 	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
 	//オブジェクトを取得
@@ -584,24 +602,6 @@ void CPlayer::WeaponHitEnemy()
 			continue;
 		}
 
-		CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
-
-		for (int i = 0; i < 20; i++)
-		{//パーティクルの生成
-			CParticle::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
-				D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f),
-				10,
-				1.0f,
-				1.0f,
-				10.0f);
-
-		}
-
-		for (int i = 0; i < 3; i++)
-		{//エフェクトの表示
-			CEffect::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f), 15.0f, 15.0f);
-		}
-
 		if (m_weapon->GetWeaponType() == CWeapon::WEAPONTYPE::SMALL)
 		{//片手武器のとき
 
@@ -609,6 +609,10 @@ void CPlayer::WeaponHitEnemy()
 			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
 			{//敵がボス
 
+				CBoss* pBoss = dynamic_cast<CBoss*>(pObj);
+
+				//ダメージ処理
+				m_Attack = pBoss->hit(GetPos(), 2, GetMotion());
 			}
 			else
 			{//雑魚敵
@@ -626,6 +630,10 @@ void CPlayer::WeaponHitEnemy()
 			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
 			{//敵がボス
 
+				CBoss* pBoss = dynamic_cast<CBoss*>(pObj);
+
+				//ダメージ処理
+				m_Attack = pBoss->hit(GetPos(), 2, GetMotion());
 			}
 			else
 			{//雑魚敵
@@ -633,13 +641,43 @@ void CPlayer::WeaponHitEnemy()
 				CWeakEnemy* pWeakEnemy = dynamic_cast<CWeakEnemy*>(pObj);
 
 				//ダメージ処理
-				pWeakEnemy->Hit(GetPos(), 1, GetMotion());
+				m_Attack = pWeakEnemy->Hit(GetPos(), 2, GetMotion());
 			}
 		}
 
-		//武器の耐久を減らす
-		WeaponDamage();
+		if (m_Attack)
+		{//敵にダメージが入った
 
+			//SEを再生
+			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
+
+			for (int i = 0; i < 20; i++)
+			{//パーティクルの生成
+				CParticle::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
+					D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f),
+					10,
+					1.0f,
+					1.0f,
+					10.0f);
+
+			}
+
+			for (int i = 0; i < 3; i++)
+			{//エフェクトの表示
+				CEffect::Create(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f), 15.0f, 15.0f);
+			}
+
+			//武器の耐久を減らす
+			WeaponDamage();
+
+			if (m_breakweapon)
+			{
+				break;
+			}
+
+			m_Attack = false;
+		}
+		
 		pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);
 	}
 }
@@ -756,6 +794,9 @@ void CPlayer::PickUpWeapon()
 				CBoss* pBoss = dynamic_cast<CBoss*>(m_boss);
 				pBoss->GrabChangeWeapon(pWeapon);
 			}
+
+			m_breakweapon = false;
+
 			break;
 		}
 
@@ -787,10 +828,9 @@ void CPlayer::ReleaseWeapon()
 	m_weapon->ReleseCharacter(pos);//武器を放す
 	m_weapon->CorrectInfo();
 	m_weapon = nullptr;//武器の情報を削除
-
-	SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
 	
 }
+
 //==========================
 //角度の補正
 //==========================
@@ -927,8 +967,6 @@ void CPlayer::ThrowWeapon()
 		m_weapon->GetMove().z + cosf(CameraRot * D3DX_PI + LeftStickAngle) * 30.0f));
 
 	m_weapon = nullptr;//武器の情報を削除
-
-	SetMotion(MOTION_TYPE::NEUTRAL);//待機モーション
 }
 
 //==========================
@@ -980,13 +1018,25 @@ void CPlayer::hit(D3DXVECTOR3 pos, int damage)
 		
 		//武器の耐久を減らす
 		WeaponDamage();
+
+		if (m_breakweapon)
+		{//武器が壊れた
+
+			//待機状態に変更
+			auto NewState = DBG_NEW CNeutralState;
+			ChangeState(NewState);
+		}
 	}
+
+	//武器が壊れてないか判定
+	State = m_StateMachine->GetState();
 
 	//ライフを減らす
 	int Life = GetLife();
 	SetLife(Life -= DamageNum);
 
-	if (typeid(*State) != typeid(CGuardState))
+	if (typeid(*State) != typeid(CGuardState)
+		&& typeid(*State) != typeid(CSmallWeaponGuardState))
 	{//ガード状態ではない
 		Damage();
 
@@ -1012,6 +1062,7 @@ void CPlayer::WeaponDamage()
 {
 	//武器の耐久値を減らす
 	m_weapon->SubDurability();
+	int a = m_weapon->GetDurability();
 
 	if (m_weapon->GetDurability() <= 0)
 	{//耐久値がなくなったとき
@@ -1022,5 +1073,47 @@ void CPlayer::WeaponDamage()
 		m_weapon->Uninit();
 		m_weapon = nullptr;
 		m_WeaponType = false;
+
+		//武器が壊れた判定に変更
+		m_breakweapon = true;
 	}
+}
+
+//==========================
+//ライフの回復
+//==========================
+void CPlayer::RecoveryLife()
+{
+	//ライフを回復
+	SetLife(GetLife() + 5);
+
+	if (GetLife() >= MAX_LIFE)
+	{
+		SetLife(MAX_LIFE);
+	}
+}
+
+//==========================
+//武器が壊れたか取得
+//==========================
+bool CPlayer::GetWeaponBreak()
+{
+	return m_breakweapon;
+}
+
+//==========================
+//武器破壊判定をリセット
+//==========================
+void CPlayer::BreakReset()
+{
+	m_breakweapon = false;
+}
+
+//==========================
+//ステージ変更時のステートの変更
+//==========================
+void CPlayer::StageChangeState()
+{
+	auto NewState = DBG_NEW CNeutralState;
+	ChangeState(NewState);
 }

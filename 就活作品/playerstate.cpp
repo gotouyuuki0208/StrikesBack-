@@ -419,6 +419,17 @@ void CMoveState::Update()
 	//パッドの情報を取得
 	CInputJoypad* pJoypad = CManager::GetInstance()->GetJoypad();
 
+	if (m_pPlayer->GetDamage())
+	{//ダメージを受けた
+
+		m_pPlayer->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CDamageState;
+		m_pPlayer->ChangeState(NewState);
+		return;
+	}
+
 	if (!pJoypad->Connection())
 	{//パッドが接続されていない
 		return;
@@ -520,6 +531,17 @@ void CBigWeaponMoveState::Update()
 	m_pPlayer->InputMove();
 	m_pPlayer->Move();
 
+	if (m_pPlayer->GetDamage())
+	{//ダメージを受けた
+
+		m_pPlayer->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CDamageState;
+		m_pPlayer->ChangeState(NewState);
+		return;
+	}
+
 	if (pJoypad->Connection())
 	{//パッドが接続されているとき
 
@@ -590,6 +612,17 @@ void CDushState::Update()
 
 	//パッドの情報を取得
 	CInputJoypad* pJoypad = CManager::GetInstance()->GetJoypad();
+
+	if (m_pPlayer->GetDamage())
+	{//ダメージを受けた
+
+		m_pPlayer->SetDamage(false);
+
+		//ダメージ状態に変更
+		auto NewState = DBG_NEW CDamageState;
+		m_pPlayer->ChangeState(NewState);
+		return;
+	}
 
 	if (pJoypad->Connection())
 	{//パッドが接続されているとき
@@ -743,6 +776,11 @@ void CSmallWeaponGuardState::Update()
 	//モーションを設定
 	m_pPlayer->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONGUARD);
 
+	if (m_pPlayer->GetDamageNum() >= 3)
+	{//連続で3回被弾した
+		m_pPlayer->ResetDamageNum();//被弾回数を初期化
+	}
+
 	//パッドの情報を取得
 	CInputJoypad* pJoypad = CManager::GetInstance()->GetJoypad();
 
@@ -843,6 +881,9 @@ void CAttackState::Update()
 		if (m_FlameCount > INPUT_START_FLAME)
 		{//入力受付時間中に入力
 			m_Combo = true;
+			
+			//角度を補正
+			m_pPlayer->CorrectionAngle();
 			return;
 		}
 	}
@@ -870,7 +911,21 @@ void CAttackState::Update()
 		}
 	}
 
-	m_AttackStateMachine->Update();
+	if (m_AttackStateMachine != nullptr)
+	{
+		m_AttackStateMachine->Update();
+	}
+
+	if (m_pPlayer->GetWeaponBreak())
+	{//武器が壊れた
+
+		//武器破壊判定をリセット
+		m_pPlayer->BreakReset();
+
+		auto NewState = DBG_NEW CNeutralState;
+		m_pPlayer->ChangeState(NewState);
+		return;
+	}
 }
 
 //==========================
@@ -964,9 +1019,26 @@ void CDamageState::Update()
 		m_DmageCount = 0;
 		m_pPlayer->ResetDamageNum();//被弾回数を初期化
 		
-		//移動状態に変更
-		auto NewState = DBG_NEW CNeutralState;
-		m_pPlayer->ChangeState(NewState);
+		//待機状態に変更
+		if (m_pPlayer->GetHaveWeapon())
+		{//武器を持ってる
+
+			if (m_pPlayer->GetWeaponType())
+			{//片手
+				auto NewState = DBG_NEW CSmallWeaponNeutralState;
+				m_pPlayer->ChangeState(NewState);
+			}
+			else
+			{//両手
+				auto NewState = DBG_NEW CBigWeaponNeutralState;
+				m_pPlayer->ChangeState(NewState);
+			}
+		}
+		else
+		{//武器を持っない
+			auto NewState = DBG_NEW CNeutralState;
+			m_pPlayer->ChangeState(NewState);
+		}
 		
 		return;
 	}
@@ -1115,9 +1187,26 @@ void CDamageBrrowState::Update()
 		m_DmageCount = 0;
 		m_pPlayer->ResetDamageNum();//被弾回数を初期化
 
-		//移動状態に変更
-		auto NewState = DBG_NEW CNeutralState;
-		m_pPlayer->ChangeState(NewState);
+		//待機状態に変更
+		if (m_pPlayer->GetHaveWeapon())
+		{//武器を持ってる
+
+			if (m_pPlayer->GetWeaponType())
+			{//片手
+				auto NewState = DBG_NEW CSmallWeaponNeutralState;
+				m_pPlayer->ChangeState(NewState);
+			}
+			else
+			{//両手
+				auto NewState = DBG_NEW CBigWeaponNeutralState;
+				m_pPlayer->ChangeState(NewState);
+			}
+		}
+		else
+		{//武器を持っない
+			auto NewState = DBG_NEW CNeutralState;
+			m_pPlayer->ChangeState(NewState);
+		}
 
 		return;
 	}

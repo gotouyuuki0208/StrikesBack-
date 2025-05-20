@@ -47,7 +47,7 @@ void CTutorialManager::ActionTutorialDisplay()
 	m_pTutorialBg = CTutorialBg::Create();
 
 	//ポップアップ表示を生成
-	m_pTutorialPopup = CTutorialPopup::Create();
+	m_pTutorialPopup = CTutorialPopup::Create("data\\TEXTURE\\opetutorial.png");
 
 	//行動説明をした状態に変更
 	m_Action = true;
@@ -71,7 +71,7 @@ void CTutorialManager::WeaponTutorialDisplay()
 	m_pTutorialBg = CTutorialBg::Create();
 
 	//ポップアップ表示を生成
-	m_pTutorialPopup = CTutorialPopup::Create();
+	m_pTutorialPopup = CTutorialPopup::Create("data\\TEXTURE\\wepontutorial.png");
 
 	//武器説明をした状態に変更
 	m_Weapon = true;
@@ -95,7 +95,7 @@ void CTutorialManager::RecoveryTutorialDisplay()
 	m_pTutorialBg = CTutorialBg::Create();
 
 	//ポップアップ表示を生成
-	m_pTutorialPopup = CTutorialPopup::Create();
+	m_pTutorialPopup = CTutorialPopup::Create("data\\TEXTURE\\itemtutorial.png");
 
 	//回復説明をした状態に変更
 	m_Recovery = true;
@@ -123,5 +123,27 @@ void CTutorialManager::TutorialDelete()
 
 		//プレイヤーを操作できるようにに変更
 		CManager::GetInstance()->GetGameManager()->ChangePlayGame(true);
+	}
+}
+
+//==========================
+//情報リセット
+//==========================
+void CTutorialManager::Reset()
+{
+	m_Action = false;//行動説明
+
+	m_Weapon = false;//武器説明
+
+	m_Recovery = false;//回復説明
+
+	if (m_pTutorialPopup != nullptr)
+	{//ポップアップ表示するチュートリアルの情報
+		m_pTutorialPopup = nullptr;
+	}
+
+	if (m_pTutorialBg != nullptr)
+	{//背景の情報
+		m_pTutorialBg = nullptr;
 	}
 }

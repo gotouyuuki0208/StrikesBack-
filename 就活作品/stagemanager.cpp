@@ -219,7 +219,10 @@ void CStageManager::ChangeStage()
 
 		//持っている武器を消す
 		m_player->DeleteWeapon();
-
+		
+		//ステートの変更
+		m_player->StageChangeState();
+		
 		//プレイヤーの向きを変更
 		m_player->SetRot(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 

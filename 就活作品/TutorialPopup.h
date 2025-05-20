@@ -24,7 +24,7 @@ public:
 	void Uninit() override;//終了処理
 	void Update() override;//更新処理
 	void Draw() override;//描画処理
-	static CTutorialPopup* Create();//オブジェクト生成
+	static CTutorialPopup* Create(const char texname[256]);//オブジェクト生成
 	void KeyInput();//キー入力
 private:
 

@@ -51,60 +51,6 @@ CWeakEnemy* CEnemyStateBase::GetOwner()
 }
 
 //========================================================================================================
-//仮状態クラス
-//========================================================================================================
-
-//==========================
-//コンストラクタ
-//==========================
-CEnemyMovabeState::CEnemyMovabeState()
-{
-
-}
-
-//==========================
-//デストラクタ
-//==========================
-CEnemyMovabeState::~CEnemyMovabeState()
-{
-
-}
-
-//==========================
-//開始
-//==========================
-void CEnemyMovabeState::Start()
-{
-	
-}
-
-//==========================
-//更新
-//==========================
-void CEnemyMovabeState::Update()
-{
-	//行動可能か判定
-	m_pEnemy->JudgeMovable();
-
-	if (m_pEnemy->GetMovable())
-	{//行動可能
-
-		//待機状態に変更
-		auto NewState = DBG_NEW CEnemyNeutralState;
-		m_pEnemy->ChangeState(NewState);
-		return;
-	}
-}
-
-//==========================
-//終了
-//==========================
-void CEnemyMovabeState::Uninit()
-{
-	CEnemyStateBase::Uninit();
-}
-
-//========================================================================================================
 //待機状態クラス
 //========================================================================================================
 
@@ -152,7 +98,18 @@ void CEnemyNeutralState::Update()
 		return;
 	}
 
-	if (m_pEnemy->JudgeDush())
+	if (m_pEnemy->JudgeWalk()//歩いて近づく範囲にいる
+		||m_pEnemy->GetAttackable()//攻撃可能か
+		|| m_pEnemy->GetPatrol())//移動地点を巡回
+	{
+
+		//待機状態に変更
+		auto NewState = DBG_NEW CEnemyMoveState;
+		m_pEnemy->ChangeState(NewState);
+		return;
+	}
+	else if (m_pEnemy->JudgeDush()
+		&&!m_pEnemy->GetPatrol())
 	{//走って近づく範囲にいる
 
 		//待機状態に変更
@@ -160,16 +117,6 @@ void CEnemyNeutralState::Update()
 		m_pEnemy->ChangeState(NewState);
 		return;
 	}
-	else if (m_pEnemy->JudgeWalk()
-		||m_pEnemy->GetAttackable())
-	{//歩いて近づく範囲にいるか攻撃可能のとき
-
-		//待機状態に変更
-		auto NewState = DBG_NEW CEnemyMoveState;
-		m_pEnemy->ChangeState(NewState);
-		return;
-	}
-
 }
 
 //==========================
@@ -218,7 +165,24 @@ void CEnemyMoveState::Update()
 	m_pEnemy->SetMotion(CMotionModel::MOTION_TYPE::MOVE);
 
 	//移動処理
-	m_pEnemy->Walk();
+	if (!m_pEnemy->GetPatrol())
+	{//移動地点を巡回しない
+
+		//プレイヤーに向かう
+		m_pEnemy->Walk();
+	}
+	else
+	{
+		//移動地点を巡回
+		m_pEnemy->Patrol();
+
+		if (m_pEnemy->JudgeWalk())
+		{//プレイヤーが近づく範囲にいる
+
+			//巡回を終了
+			m_pEnemy->SetEndPatrol();
+		}
+	}
 	m_pEnemy->Move();
 
 	if (m_pEnemy->GetDamage())
@@ -232,7 +196,8 @@ void CEnemyMoveState::Update()
 		return;
 	}
 
-	if (m_pEnemy->JudgeDush())
+	if (m_pEnemy->JudgeDush()
+		&& !m_pEnemy->GetPatrol())
 	{//走って近づく状態
 
 		//待機状態に変更
@@ -322,7 +287,8 @@ void CEnemyDamageState::Update()
 		return;
 	}
 
-	if (m_pEnemy->GetDamageNum() >= 3)
+	if (m_pEnemy->GetDamageNum() >= 3
+		|| m_pEnemy->GetLife() <= 0)
 	{//連続で3回被弾した
 
 		m_pEnemy->SetDamage(false);
@@ -484,7 +450,6 @@ void CEnemyDamageBrrowState::Update()
 	{
 		m_DmageCount = 0;
 		m_pEnemy->ResetDamageNum();//被弾回数を初期化
-		m_pEnemy->SetDamage(false);
 
 		//待機状態に変更
 		auto NewState = DBG_NEW CEnemyNeutralState;

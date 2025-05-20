@@ -392,6 +392,9 @@ CBossFirstBigWeaponAttack::~CBossFirstBigWeaponAttack()
 //==========================
 void CBossFirstBigWeaponAttack::Start()
 {
+	//UŒ‚ƒqƒbƒg”»’è‚ð‰ðœ
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::WEAPONATTACK);
 }
 
@@ -411,6 +414,13 @@ void CBossFirstBigWeaponAttack::Update()
 	if (m_OwnerState->GetFrame() <= 20)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
+		//“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->ColisionWeaponAttack();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{
+			return;
+		}
 	}
 	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
 	{//UŒ‚”ÍˆÍ‚ÉƒvƒŒƒCƒ„[‚ª‚¢‚é
@@ -456,6 +466,9 @@ CBossSecondBigWeaponAttack::~CBossSecondBigWeaponAttack()
 //==========================
 void CBossSecondBigWeaponAttack::Start()
 {
+	//UŒ‚ƒqƒbƒg”»’è‚ð‰ðœ
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::WEAPONATTACK2);
 }
 
@@ -475,7 +488,13 @@ void CBossSecondBigWeaponAttack::Update()
 	if (m_OwnerState->GetFrame() <= 20)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
-		//UŒ‚‚Ì“–‚½‚è”»’è
+		//“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->ColisionWeaponAttack();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{
+			return;
+		}
 		
 	}
 	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
@@ -522,6 +541,9 @@ CBossRastBigWeaponAttack::~CBossRastBigWeaponAttack()
 //==========================
 void CBossRastBigWeaponAttack::Start()
 {
+	//UŒ‚ƒqƒbƒg”»’è‚ð‰ðœ
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::WEAPONATTACK3);
 }
 
@@ -541,7 +563,13 @@ void CBossRastBigWeaponAttack::Update()
 	if (m_OwnerState->GetFrame() <= 20)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
-		//UŒ‚‚Ì“–‚½‚è”»’è
+		//“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->ColisionWeaponAttack();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{
+			return;
+		}
 		
 	}
 	else
@@ -589,6 +617,9 @@ CBossFirstSmallWeaponAttack::~CBossFirstSmallWeaponAttack()
 //==========================
 void CBossFirstSmallWeaponAttack::Start()
 {
+	//UŒ‚ƒqƒbƒg”»’è‚ð‰ðœ
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONATTACK);
 }
 
@@ -608,7 +639,13 @@ void CBossFirstSmallWeaponAttack::Update()
 	if (m_OwnerState->GetFrame() <= 20)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
-		//UŒ‚‚Ì“–‚½‚è”»’è
+		//“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->ColisionWeaponAttack();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{
+			return;
+		}
 		
 	}
 	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
@@ -655,6 +692,9 @@ CBossSecondSmallWeaponAttack::~CBossSecondSmallWeaponAttack()
 //==========================
 void CBossSecondSmallWeaponAttack::Start()
 {
+	//UŒ‚ƒqƒbƒg”»’è‚ð‰ðœ
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONATTACK2);
 }
 
@@ -674,7 +714,13 @@ void CBossSecondSmallWeaponAttack::Update()
 	if (m_OwnerState->GetFrame() <= 20)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
-		//UŒ‚‚Ì“–‚½‚è”»’è
+		//“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->ColisionWeaponAttack();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{
+			return;
+		}
 		
 	}
 	else if (!m_OwnerState->GetOwner()->JudgeAttackRange())
@@ -721,6 +767,9 @@ CBossRastSmallWeaponAttack::~CBossRastSmallWeaponAttack()
 //==========================
 void CBossRastSmallWeaponAttack::Start()
 {
+	//UŒ‚ƒqƒbƒg”»’è‚ð‰ðœ
+	m_OwnerState->GetOwner()->ResetAttack();
+
 	m_OwnerState->GetOwner()->SetMotion(CMotionModel::MOTION_TYPE::SMALLWEAPONATTACK3);
 }
 
@@ -740,7 +789,13 @@ void CBossRastSmallWeaponAttack::Update()
 	if (m_OwnerState->GetFrame() <= 20)
 	{//UŒ‚ŠJŽn‚©‚ç20ƒtƒŒ[ƒ€ˆÈ‰º
 
-		//UŒ‚‚Ì“–‚½‚è”»’è
+		//“–‚½‚è”»’è
+		m_OwnerState->GetOwner()->ColisionWeaponAttack();
+
+		if (m_OwnerState->GetOwner()->GetWeaponBreak())
+		{
+			return;
+		}
 	}
 	else
 	{

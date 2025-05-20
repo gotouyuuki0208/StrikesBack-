@@ -23,7 +23,7 @@ public:
 	void WeaponTutorialDisplay();//武器の説明を表示
 	void RecoveryTutorialDisplay();//回復の説明を表示
 	void TutorialDelete();//武器の説明を消す
-
+	void Reset();//情報リセット
 private:
 	//メンバ変数
 	bool m_Action;//行動説明

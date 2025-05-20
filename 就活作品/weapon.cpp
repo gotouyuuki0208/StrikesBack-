@@ -478,6 +478,10 @@ void CWeapon::HitEnemy()
 			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
 			{//敵がボス
 
+				CBoss* pWeakEnemy = dynamic_cast<CBoss*>(pObj);
+
+				//ダメージ処理
+				pWeakEnemy->hit(GetPos(), 1, CMotionModel::MOTION_TYPE::MAX);
 			}
 			else
 			{//雑魚敵
@@ -494,6 +498,10 @@ void CWeapon::HitEnemy()
 			if (pEnemy->GetEnemyType() == CEnemy::ENEMY_TYPE::BOSS)
 			{//敵がボス
 
+				CBoss* pWeakEnemy = dynamic_cast<CBoss*>(pObj);
+
+				//ダメージ処理
+				pWeakEnemy->hit(GetPos(), 1, CMotionModel::MOTION_TYPE::MAX);
 			}
 			else
 			{//雑魚敵
@@ -504,10 +512,6 @@ void CWeapon::HitEnemy()
 				pWeakEnemy->Hit(GetPos(), 1, CMotionModel::MOTION_TYPE::MAX);
 			}
 		}
-
-		//武器の耐久値を減らす
-		SubDurability();
-
 
 		break;
 	}

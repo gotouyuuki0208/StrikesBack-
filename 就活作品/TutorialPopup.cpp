@@ -94,7 +94,7 @@ void CTutorialPopup::Draw()
 //==========================
 //オブジェクト2D生成
 //==========================
-CTutorialPopup* CTutorialPopup::Create()
+CTutorialPopup* CTutorialPopup::Create(const char texname[256])
 {
 	//インスタンス生成
 	CTutorialPopup* pSampleObject2D = DBG_NEW CTutorialPopup;
@@ -103,7 +103,7 @@ CTutorialPopup* CTutorialPopup::Create()
 	pSampleObject2D->SetPos({ 640.0f, 340.0f, 0.0f });
 
 	//大きさの設定
-	pSampleObject2D->SetSize(250.0f, 350.0f);
+	pSampleObject2D->SetSize(250.0f, 400.0f);
 
 	//初期化処理
 	pSampleObject2D->Init();
@@ -113,7 +113,7 @@ CTutorialPopup* CTutorialPopup::Create()
 
 	//テクスチャの設定
 	CTexture* pTex = CManager::GetInstance()->GetTexture();
-	pSampleObject2D->m_nTexIdx = pTex->Regist("data\\TEXTURE\\33_Symmetry.png");
+	pSampleObject2D->m_nTexIdx = pTex->Regist(texname);
 	pSampleObject2D->BindTexture(pTex->GetAdress(pSampleObject2D->m_nTexIdx));
 
 	//テクスチャの大きさ設定

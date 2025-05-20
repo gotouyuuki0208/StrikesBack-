@@ -44,11 +44,15 @@ public:
 	bool GetNextAttack();//次の攻撃方法を取得
 	void WeaponMove();//武器攻撃の移動処理
 	bool GetWeaponType();//武器のタイプを取得
-	void hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE hitmotion);//攻撃被弾処理
+	bool hit(D3DXVECTOR3 pos, int damage, MOTION_TYPE hitmotion);//攻撃被弾処理
 	bool JudgeGuard();//ガードする距離にいるか判定
 	void PlayerNearAction();//プレイヤーが近いときの行動
 	bool GetGuard();//ガードするか取得
 	void GuardReset();//ガードの情報をリセット
+	void Damage();//ダメージ処理
+	bool GetWeaponBreak();//武器が壊れたか取得
+	void BreakReset();//武器破壊判定をリセット
+	void ColisionWeaponAttack();//武器攻撃の当たり判定
 private:
 
 	//メンバ関数
@@ -59,7 +63,6 @@ private:
 	void MotionUpdate();//モーションの更新
 	void ReleseWeapon();//武器を離す
 	void WeaponDamage();//武器の耐久値を減らす
-	void ColisionWeaponAttack();//武器攻撃の当たり判定
 	void InitHaveWeapon();//最初に武器を持たせる
 
 	//メンバ変数
@@ -71,6 +74,6 @@ private:
 	bool m_NearAction;//プレイヤーが近づいた時の行動をしているか判定
 	bool m_NextAttack;//次の攻撃(false:素手 true:武器)
 	bool m_Guard;//ガード判定
-
+	bool m_weaponbreak;//武器破壊判定
 };
 #endif

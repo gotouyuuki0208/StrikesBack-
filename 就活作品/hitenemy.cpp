@@ -9,6 +9,7 @@
 #include "hitenemy.h"
 #include "manager.h"
 #include "model.h"
+#include "hpgauge3D.h"
 
 //静的メンバ初期化
 const int CHitEnemy::PRIORITY = 1;//描画順
@@ -43,7 +44,9 @@ HRESULT CHitEnemy::Init()
 	//SetAttackState(ATTACK_STATE::ATTACK);
 
 	//HPゲージを生成
-	m_HPGauge = CHPGauge3D::Create(D3DXVECTOR3(GetParts(2)->GetMtxWorld()._41, GetParts(2)->GetMtxWorld()._42, GetParts(2)->GetMtxWorld()._43), D3DXVECTOR3(20.0f, 3.0f, 0.0f), GetLife());
+	m_HPGauge = CHPGauge3D::Create(D3DXVECTOR3(GetParts(2)->GetMtxWorld()._41, GetParts(2)->GetMtxWorld()._42, GetParts(2)->GetMtxWorld()._43),
+		D3DXVECTOR3(20.0f, 3.0f, 0.0f),
+		GetLife());
 
 	return S_OK;
 }
@@ -75,6 +78,12 @@ void CHitEnemy::Update()
 
 	//更新処理
 	CWeakEnemy::Update();
+
+	if (m_HPGauge != nullptr)
+	{
+		m_HPGauge->SetHP(GetLife());
+		m_HPGauge->SetPos({ GetParts(2)->GetMtxWorld()._41, GetParts(2)->GetMtxWorld()._42 + 20.0f, GetParts(2)->GetMtxWorld()._43 });
+	}
 }
 
 //==========================

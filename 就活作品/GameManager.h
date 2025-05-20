@@ -37,6 +37,7 @@ public:
 	void ChangePlayGame(bool play);//キャラクター操作の判定を変更
 	bool GetPlayGame();//遊べる状態か取得
 	void SetDirection();//演出中に変更
+	bool GetDirection();//演出中か取得
 private:
 
 	//メンバ関数

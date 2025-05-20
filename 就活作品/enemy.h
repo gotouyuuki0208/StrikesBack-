@@ -73,6 +73,8 @@ public:
 	void SubCoolTime();//クールタイムを減らす
 	void SetHitMotion(MOTION_TYPE motion);//攻撃を受けたモーションを保存
 	MOTION_TYPE GetHitMotion();//攻撃を受けたモーションを取得
+	bool GetAttack();//攻撃判定を取得
+	void SetAttack();//攻撃判定を設定
 private:
 
 	//メンバ関数
