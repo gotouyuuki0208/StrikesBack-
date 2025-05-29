@@ -544,6 +544,25 @@ void CPlayer::HitEnemy(int PartsNum)
 			
 			//カメラ揺れ
 			CManager::GetInstance()->GetCamera()->SetShape(5, 5);
+
+			//SEを再生
+			CManager::GetInstance()->GetSound()->PlaySoundA(CSound::SOUND_LABEL::SOUND_LABEL_SE_WEAOPNATTACK);
+
+			for (int i = 0; i < 20; i++)
+			{//パーティクルの生成
+				CParticle::Create(D3DXVECTOR3(GetParts(PartsNum)->GetMtxWorld()._41, GetParts(PartsNum)->GetMtxWorld()._42, GetParts(PartsNum)->GetMtxWorld()._43),
+					D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f),
+					10,
+					1.0f,
+					1.0f,
+					10.0f);
+
+			}
+
+			for (int i = 0; i < 3; i++)
+			{//エフェクトの表示
+				CEffect::Create(D3DXVECTOR3(GetParts(PartsNum)->GetMtxWorld()._41, GetParts(PartsNum)->GetMtxWorld()._42, GetParts(PartsNum)->GetMtxWorld()._43), D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f), 15.0f, 15.0f);
+			}
 		}
 
 		pObj = CObject::GetObj(pObj, CEnemy::PRIORITY);

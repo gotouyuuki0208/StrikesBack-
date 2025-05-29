@@ -358,7 +358,7 @@ void CEnemy::AttackMove()
 bool CEnemy::JudgeDush()
 {
 	
-	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
+	if (!Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
 	{//プレイヤーの半径の10倍の距離より遠い
 		return true;
 	}
@@ -383,8 +383,6 @@ void CEnemy::Dush()
 //==========================
 bool CEnemy::JudgeWalk()
 {
-	
-
 	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE)
 		&& !JudgeStop())
 	{//プレイヤーの半径の10倍の距離より近いかつ停止する距離より遠い
@@ -454,7 +452,7 @@ void CEnemy::ChangeAttackable()
 //==========================
 bool CEnemy::JudgeAttackRange()
 {
-	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius()+2.0f, GetPlayer()->GetRadius()+2.0f))
+	if (!Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius()+2.0f, GetPlayer()->GetRadius()+2.0f))
 	{//プレイヤーが攻撃範囲にいない
 
 		return true;
