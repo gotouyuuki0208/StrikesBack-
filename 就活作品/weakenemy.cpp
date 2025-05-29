@@ -13,6 +13,7 @@
 #include "player.h"
 #include "enemystate.h"
 #include "hpgauge3D.h"
+#include"collision.h"
 
 //静的メンバ初期化
 const int CWeakEnemy::PRIORITY = 1;//描画順
@@ -170,8 +171,6 @@ void CWeakEnemy::ChangeState(CEnemyStateBase* NewState)
 //==========================
 void CWeakEnemy::ColisionEnemy()
 {
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CWeakEnemy::PRIORITY);
 
@@ -200,7 +199,7 @@ void CWeakEnemy::ColisionEnemy()
 
 		CWeakEnemy* pEnemy = (CWeakEnemy*)pObj;
 
-		bool Colision = pCollision->Sphere(GetPos(),
+		bool Colision = Collision::Sphere(GetPos(),
 			pEnemy->GetPos(),
 			GetRadius(),
 			pEnemy->GetRadius());

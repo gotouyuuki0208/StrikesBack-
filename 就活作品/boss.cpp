@@ -13,6 +13,7 @@
 #include "bosshpgauge.h"
 #include "bossState.h"
 #include "bat.h"
+#include "collision.h"
 
 //静的メンバ初期化
 const int CBoss::PRIORITY = 1;//描画順
@@ -336,11 +337,9 @@ void CBoss::WeaponMove()
 //==========================
 void CBoss::ColisionWeapon()
 {
-	//当たり判定の情報を取得
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
 	//当たり判定
-	bool Colision = pCollision->Sphere(GetPos(),
+	bool Colision = Collision::Sphere(GetPos(),
 		m_weapon->GetPos(),
 		GetRadius(),
 		m_weapon->GetRadius());
@@ -491,6 +490,8 @@ void CBoss::ReleseWeapon()
 			m_HaveWeapon->CorrectInfo();
 			m_HaveWeapon = nullptr;//武器の情報を削除
 
+			auto NewState = DBG_NEW CBossNeutralState;
+			ChangeState(NewState);
 		}
 	}
 }
@@ -671,10 +672,7 @@ bool CBoss::GetGuard()
 //==========================
 bool CBoss::JudgeGuard()
 {
-	//当たり判定の情報を取得
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius()* GUARD_DISTANCE))
+	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius()* GUARD_DISTANCE))
 	{//プレイヤーがガードする距離にいる
 
 		return true;
@@ -729,9 +727,7 @@ void CBoss::ColisionWeaponAttack()
 		return;
 	}
 
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	bool Colision = pCollision->Sphere(D3DXVECTOR3(m_HaveWeapon->GetMtxWorld()._41, m_HaveWeapon->GetMtxWorld()._42, m_HaveWeapon->GetMtxWorld()._43),
+	bool Colision = Collision::Sphere(D3DXVECTOR3(m_HaveWeapon->GetMtxWorld()._41, m_HaveWeapon->GetMtxWorld()._42, m_HaveWeapon->GetMtxWorld()._43),
 		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
 		30.0f,
 		30.0f);

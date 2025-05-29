@@ -9,25 +9,9 @@
 #include"collision.h"
 
 //==========================
-//コンストラクタ
-//==========================
-CCollision::CCollision()
-{
-
-}
-
-//==========================
-//デストラクタ
-//==========================
-CCollision::~CCollision()
-{
-
-}
-
-//==========================
 //球の判定
 //==========================
-bool CCollision::Sphere(D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, float myradius, float partnerradius)
+bool Collision::Sphere(D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, float myradius, float partnerradius)
 {
 	D3DXVECTOR3 DisPos = D3DXVECTOR3(mypos.x - partnerpos.x, mypos.y - partnerpos.y, mypos.z - partnerpos.z);
 	float Distance = sqrtf((DisPos.x * DisPos.x) + (DisPos.y * DisPos.y) + (DisPos.z * DisPos.z));
@@ -43,7 +27,7 @@ bool CCollision::Sphere(D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, float myradiu
 //==========================
 //矩形の左
 //==========================
-bool CCollision::RectangleLeft(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
+bool Collision::RectangleLeft(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
 {
 	if (posold.x + myvtxmax.x <= partnerpos.x + partnervtxmin.x
 		&& mypos.x + myvtxmax.x > partnerpos.x + partnervtxmin.x
@@ -59,7 +43,7 @@ bool CCollision::RectangleLeft(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR
 //==========================
 //矩形の右
 //==========================
-bool CCollision::RectangleRight(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
+bool Collision::RectangleRight(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
 {
 	if (posold.x - myvtxmax.x >= partnerpos.x + partnervtxmax.x
 		&& mypos.x - myvtxmax.x < partnerpos.x + partnervtxmax.x
@@ -75,7 +59,7 @@ bool CCollision::RectangleRight(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTO
 //==========================
 //矩形の奥
 //==========================
-bool CCollision::RectangletBack(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
+bool Collision::RectangletBack(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
 {
 
 	if (posold.z - myvtxmin.z >= partnerpos.z + partnervtxmax.z
@@ -92,7 +76,7 @@ bool CCollision::RectangletBack(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTO
 //==========================
 //矩形の正面
 //==========================
-bool CCollision::RectangleFront(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
+bool Collision::RectangleFront(D3DXVECTOR3 posold, D3DXVECTOR3 mypos, D3DXVECTOR3 partnerpos, D3DXVECTOR3 myvtxmax, D3DXVECTOR3 myvtxmin, D3DXVECTOR3  partnervtxmax, D3DXVECTOR3  partnervtxmin)
 {
 	if (posold.z + myvtxmax.z <= partnerpos.z + partnervtxmin.z
 		&& mypos.z + myvtxmax.z > partnerpos.z + partnervtxmin.z

@@ -66,9 +66,6 @@
     <Filter Include="ソース ファイル\gameobject\billboard">
       <UniqueIdentifier>{84e6c6f7-6d2e-4b56-b618-0e40ccf2503e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\gameobject\MotionModel">
-      <UniqueIdentifier>{5e7b2be8-7bce-4eb9-a3c9-011b9d6f8c27}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\gameobject\objectX\building">
       <UniqueIdentifier>{35a4d479-df85-41d2-bbb9-6fdc8aad4eaa}</UniqueIdentifier>
     </Filter>
@@ -103,18 +100,6 @@
     <Filter Include="ヘッダー ファイル\gameobject\MotionModel\chracter\player">
       <UniqueIdentifier>{41afc2e9-7f40-4c60-b3d1-c0f1e2117a70}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\gameobject\MotionModel\character">
-      <UniqueIdentifier>{d8a18b86-d8b3-46d8-9553-7d5f6186961f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\gameobject\MotionModel\character\player">
-      <UniqueIdentifier>{e8c6678a-381a-4ae5-a0d3-b3494bfdffb1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\gameobject\MotionModel\character\enemy">
-      <UniqueIdentifier>{08e7bc2a-12b7-4c1e-97f7-dfa99a3db890}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\gameobject\MotionModel\character\enemy\boss">
-      <UniqueIdentifier>{2c1b0e10-9716-4f03-bb4c-d84aa074296c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\gameobject\MotionModel\chracter\enemy">
       <UniqueIdentifier>{e575b02e-79c5-4a25-9ad6-9e071960e0e4}</UniqueIdentifier>
     </Filter>
@@ -124,14 +109,29 @@
     <Filter Include="ヘッダー ファイル\gameobject\MotionModel\chracter\enemy\weakenemy">
       <UniqueIdentifier>{b8b1a724-8b50-4896-9bff-56e3231e8fbb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy">
-      <UniqueIdentifier>{222f38d5-94f6-4346-91d3-cd5d8e68a590}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\system\manager">
       <UniqueIdentifier>{367444c6-ca84-4439-bdef-04d06208861b}</UniqueIdentifier>
     </Filter>
     <Filter Include="ヘッダー ファイル\system\manager">
       <UniqueIdentifier>{c1335b62-38c3-410f-a64e-e571dfed1ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\base\MotionModel">
+      <UniqueIdentifier>{5e7b2be8-7bce-4eb9-a3c9-011b9d6f8c27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\base\MotionModel\character">
+      <UniqueIdentifier>{d8a18b86-d8b3-46d8-9553-7d5f6186961f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\base\MotionModel\character\player">
+      <UniqueIdentifier>{e8c6678a-381a-4ae5-a0d3-b3494bfdffb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\base\MotionModel\character\enemy">
+      <UniqueIdentifier>{08e7bc2a-12b7-4c1e-97f7-dfa99a3db890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\base\MotionModel\character\enemy\boss">
+      <UniqueIdentifier>{2c1b0e10-9716-4f03-bb4c-d84aa074296c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\base\MotionModel\character\enemy\weakenemy">
+      <UniqueIdentifier>{222f38d5-94f6-4346-91d3-cd5d8e68a590}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +181,6 @@
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
     <ClCompile Include="renderer.cpp">
-      <Filter>ソース ファイル\system</Filter>
-    </ClCompile>
-    <ClCompile Include="manager.cpp">
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
     <ClCompile Include="sound.cpp">
@@ -268,7 +265,7 @@
       <Filter>ソース ファイル\gameobject\objectX\item</Filter>
     </ClCompile>
     <ClCompile Include="deliveryperson.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel</Filter>
+      <Filter>ソース ファイル\base\MotionModel</Filter>
     </ClCompile>
     <ClCompile Include="effect.cpp">
       <Filter>ソース ファイル\gameobject\billboard</Filter>
@@ -451,19 +448,19 @@
       <Filter>ソース ファイル\gameobject\object3D</Filter>
     </ClCompile>
     <ClCompile Include="outgamecharactar.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel</Filter>
+      <Filter>ソース ファイル\base\MotionModel</Filter>
     </ClCompile>
     <ClCompile Include="trajectory.cpp">
       <Filter>ソース ファイル\gameobject\objectMesh</Filter>
     </ClCompile>
     <ClCompile Include="attackstate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\player</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\player</Filter>
     </ClCompile>
     <ClCompile Include="player.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\player</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\player</Filter>
     </ClCompile>
     <ClCompile Include="playerstate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\player</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\player</Filter>
     </ClCompile>
     <ClCompile Include="pullup.cpp">
       <Filter>ソース ファイル\gameobject\objectX\building</Filter>
@@ -475,37 +472,37 @@
       <Filter>ソース ファイル\system</Filter>
     </ClCompile>
     <ClCompile Include="character.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character</Filter>
     </ClCompile>
     <ClCompile Include="characterstate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character</Filter>
     </ClCompile>
     <ClCompile Include="enemy.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy</Filter>
     </ClCompile>
     <ClCompile Include="boss.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\boss</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\boss</Filter>
     </ClCompile>
     <ClCompile Include="bossState.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\boss</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\boss</Filter>
     </ClCompile>
     <ClCompile Include="enemyattackstate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\weakenemy</Filter>
     </ClCompile>
     <ClCompile Include="enemystate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\weakenemy</Filter>
     </ClCompile>
     <ClCompile Include="hitenemy.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\weakenemy</Filter>
     </ClCompile>
     <ClCompile Include="weakenemy.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\weakenemy</Filter>
     </ClCompile>
     <ClCompile Include="weaponenemy.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\weakenemy</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\weakenemy</Filter>
     </ClCompile>
     <ClCompile Include="bossattackstate.cpp">
-      <Filter>ソース ファイル\gameobject\MotionModel\character\enemy\boss</Filter>
+      <Filter>ソース ファイル\base\MotionModel\character\enemy\boss</Filter>
     </ClCompile>
     <ClCompile Include="GameManager.cpp">
       <Filter>ソース ファイル\system\manager</Filter>
@@ -527,6 +524,9 @@
     </ClCompile>
     <ClCompile Include="directionbg.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="manager.cpp">
+      <Filter>ソース ファイル\system\manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

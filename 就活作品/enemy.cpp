@@ -12,6 +12,7 @@
 #include "enemymovepoint.h"
 #include "player.h"
 #include "enemystate.h"
+#include"collision.h"
 
 //Ã“Iƒƒ“ƒo‰Šú‰»
 const int CEnemy::PRIORITY = 1;//•`‰æ‡
@@ -123,11 +124,6 @@ void CEnemy::Draw()
 
 	//ƒ‚ƒfƒ‹ƒp[ƒc‚Ì•`‰æ
 	PartsDraw();
-
-	//if (m_visual != nullptr)
-	{
-		//m_visual->Draw();
-	}
 }
 
 //==========================
@@ -335,8 +331,7 @@ void CEnemy::JudgeMovable()
 	}
 
 	//‹…‚Ì“–‚½‚è”»’è
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-	bool Colision = pCollision->Sphere(GetPos(), m_player->GetPos(), GetRadius() * 30, m_player->GetRadius());
+	bool Colision = Collision::Sphere(GetPos(), m_player->GetPos(), GetRadius() * 30, m_player->GetRadius());
 	
 	//”ÍˆÍ“à‚É“ü‚Á‚Ä‚¢‚é
 	if (Colision)
@@ -362,10 +357,8 @@ void CEnemy::AttackMove()
 //==========================
 bool CEnemy::JudgeDush()
 {
-	//“–‚½‚è”»’è‚Ìî•ñ‚ğæ“¾
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
+	
+	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
 	{//ƒvƒŒƒCƒ„[‚Ì”¼Œa‚Ì10”{‚Ì‹——£‚æ‚è‰“‚¢
 		return true;
 	}
@@ -390,10 +383,9 @@ void CEnemy::Dush()
 //==========================
 bool CEnemy::JudgeWalk()
 {
-	//“–‚½‚è”»’è‚Ìî•ñ‚ğæ“¾
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+	
 
-	if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE)
+	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE)
 		&& !JudgeStop())
 	{//ƒvƒŒƒCƒ„[‚Ì”¼Œa‚Ì10”{‚Ì‹——£‚æ‚è‹ß‚¢‚©‚Â’â~‚·‚é‹——£‚æ‚è‰“‚¢
 		return true;
@@ -419,10 +411,7 @@ void CEnemy::Walk()
 //==========================
 bool CEnemy::JudgeStop()
 {
-	//“–‚½‚è”»’è‚Ìî•ñ‚ğæ“¾
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if (pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * STOP_DISTANCE))
+	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * STOP_DISTANCE))
 	{//‹——£‚ª‹ß‚¢
 		return true;
 	}
@@ -465,10 +454,7 @@ void CEnemy::ChangeAttackable()
 //==========================
 bool CEnemy::JudgeAttackRange()
 {
-	//“–‚½‚è”»’è‚Ìî•ñ‚ğæ“¾
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius()+2.0f, GetPlayer()->GetRadius()+2.0f))
+	if (Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius()+2.0f, GetPlayer()->GetRadius()+2.0f))
 	{//ƒvƒŒƒCƒ„[‚ªUŒ‚”ÍˆÍ‚É‚¢‚È‚¢
 
 		return true;
@@ -522,11 +508,8 @@ void CEnemy::AddDamegeNum()
 //==========================
 void CEnemy::HitPlayer(int PartsNum)
 {
-	//“–‚½‚è”»’è‚Ìî•ñ‚ğæ“¾
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
 	//”»’è
-	bool Colision = pCollision->Sphere(D3DXVECTOR3(GetPartsMtx(PartsNum)._41, GetPartsMtx(PartsNum)._42, GetPartsMtx(PartsNum)._43),
+	bool Colision = Collision::Sphere(D3DXVECTOR3(GetPartsMtx(PartsNum)._41, GetPartsMtx(PartsNum)._42, GetPartsMtx(PartsNum)._43),
 		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
 		GetRadius(),
 		GetPlayer()->GetRadius());

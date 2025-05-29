@@ -10,6 +10,7 @@
 #include "texture.h"
 #include "manager.h"
 #include "player.h"
+#include"collision.h"
 
 //Ã“Iƒƒ“ƒo‰Šú‰»
 const int CStageChangePoint::PRIORITY = 3;//•`‰æ‡
@@ -141,9 +142,7 @@ void CStageChangePoint::ColisionPlayer()
 
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
 
-		CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-		bool Colision = pCollision->Sphere(GetPos(), pPlayer->GetPos(), GetRadius(), pPlayer->GetRadius());
+		bool Colision = Collision::Sphere(GetPos(), pPlayer->GetPos(), GetRadius(), pPlayer->GetRadius());
 
 		if (Colision)
 		{

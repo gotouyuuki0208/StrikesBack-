@@ -301,7 +301,7 @@ void CStageManager::Load()
 	}
 
 	FildLoad();//フィールドの情報を読み込む
-	EnemyLoad();//敵の情報を読み込む
+	//EnemyLoad();//敵の情報を読み込む
 	WeaponLoad();//武器の情報を読み込む
 	BuildingLoad();//建物の情報を読み込む
 	ItemLoad();//アイテムの情報を読み込む

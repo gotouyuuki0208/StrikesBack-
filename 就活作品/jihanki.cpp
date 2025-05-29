@@ -12,6 +12,7 @@
 #include "player.h"
 #include "drink.h"
 #include "particle.h"
+#include"collision.h"
 
 //静的メンバ初期化
 const int CJihanki::PRIORITY = 2;//描画順
@@ -144,8 +145,6 @@ CJihanki* CJihanki::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale, D3DXVECTOR3 rot)
 //==========================
 void CJihanki::ColisionPlayer()
 {
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CPlayer::PRIORITY);
 
@@ -168,7 +167,7 @@ void CJihanki::ColisionPlayer()
 
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
 
-		bool Colision = pCollision->Sphere(GetPos(),
+		bool Colision = Collision::Sphere(GetPos(),
 			pPlayer->GetPos(),
 			GetRadius(),
 			pPlayer->GetRadius());

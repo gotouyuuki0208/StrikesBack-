@@ -84,6 +84,7 @@ void CEnemyNeutralState::Start()
 //==========================
 void CEnemyNeutralState::Update()
 {
+
 	//ƒ‚[ƒVƒ‡ƒ“‚ðÝ’è
 	m_pEnemy->SetMotion(CMotionModel::MOTION_TYPE::NEUTRAL);
 

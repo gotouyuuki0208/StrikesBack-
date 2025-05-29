@@ -9,7 +9,7 @@
 #include "weaponenemy.h"
 #include "manager.h"
 #include "model.h"
-
+#include"collision.h"
 //静的メンバ初期化
 const int CWeaponEnemy::PRIORITY = 1;//描画順
 const int CWeaponEnemy::NEAR_ACTION_COUNT = 240;//プレイヤーが近いときにする行動の長さ
@@ -229,9 +229,7 @@ void CWeaponEnemy::MoveAction()
 		return;
 	}
 
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
+	if (!Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * DUSH_DISTANCE))
 	{//プレイヤーの半径の10倍の距離より遠い
 
 		//移動値を設定
@@ -246,7 +244,7 @@ void CWeaponEnemy::MoveAction()
 			m_NearCount = 0;
 		}
 	}
-	else if (!pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * WALK_DISTANCE))
+	else if (!Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() * WALK_DISTANCE))
 	{//プレイヤーの半径の5倍の距離より遠い
 
 		//移動値を設定
@@ -261,7 +259,7 @@ void CWeaponEnemy::MoveAction()
 		}
 	}
 	else if (Attackable
-		&& !pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
+		&& !Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
 	{//攻撃可能かつプレイヤーより遠い
 
 		//移動値を設定
@@ -271,7 +269,7 @@ void CWeaponEnemy::MoveAction()
 		SetMotion(MOTION_TYPE::MOVE);
 	}
 	else if (Attackable
-		&& pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
+		&& Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), GetPlayer()->GetRadius() + 2.0f))
 	{
 		SetState(STATE::ATTACK);
 	}
@@ -307,9 +305,7 @@ void CWeaponEnemy::Attack()
 
 	m_FlameCount++;
 
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	bool Colision = pCollision->Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), 17.0f);
+	bool Colision = Collision::Sphere(GetPos(), GetPlayer()->GetPos(), GetRadius(), 17.0f);
 	if (m_FlameCount >= 26 && Colision && m_StackIdx > 0)
 	{//フレーム数が24以上かつプレイヤーが近いかつコンボできる
 
@@ -342,9 +338,7 @@ void CWeaponEnemy::Attack()
 //==========================
 void CWeaponEnemy::ColisionWeaponAttack()
 {
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
-	bool Colision = pCollision->Sphere(D3DXVECTOR3(GetPartsMtx(15)._41, GetPartsMtx(15)._42, GetPartsMtx(15)._43),
+	bool Colision = Collision::Sphere(D3DXVECTOR3(GetPartsMtx(15)._41, GetPartsMtx(15)._42, GetPartsMtx(15)._43),
 		D3DXVECTOR3(GetPlayer()->GetPartsMtx(1)._41, GetPlayer()->GetPartsMtx(1)._42, GetPlayer()->GetPartsMtx(1)._43),
 		30.0f,
 		30.0f);

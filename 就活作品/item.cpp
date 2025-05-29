@@ -10,6 +10,7 @@
 #include "manager.h"
 #include "model.h"
 #include"player.h"
+#include"collision.h"
 
 //静的メンバ初期化
 const int CItem::PRIORITY = 2;//描画順
@@ -125,8 +126,6 @@ void CItem::SetModelIdx(int Idx)
 //==========================
 void CItem::ColisionPlayer()
 {
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CPlayer::PRIORITY);
 
@@ -149,7 +148,7 @@ void CItem::ColisionPlayer()
 
 		CPlayer* pPlayer = dynamic_cast<CPlayer*>(pObj);
 
-		bool Colision = pCollision->Sphere(GetPos(),
+		bool Colision = Collision::Sphere(GetPos(),
 			pPlayer->GetPos(),
 			GetRadius(),
 			pPlayer->GetRadius());

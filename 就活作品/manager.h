@@ -21,7 +21,6 @@
 #include"stagemanager.h"
 #include"TutorialManager.h"
 #include"GameManager.h"
-#include"collision.h"
 #include"hudmanager.h"
 
 //マネージャクラスの定義
@@ -51,7 +50,6 @@ public:
 	CTutorialManager* GetTutorial();//チュートリアルの取得
 	CScene* GetScene();//シーンの取得
 	CGameManager* GetGameManager();//ゲーム管理の取得
-	CCollision* GetCollision();//当たり判定の取得
 	CHudManager* GetHudManager();//HUDの管理
 	void SetMode(CScene::MODE mode);//画面の設定
 private:
@@ -74,7 +72,6 @@ private:
 	CStageManager* m_Stage;//ステージ管理
 	CTutorialManager* m_Tutorial;//チュートリアル管理
 	CGameManager* m_GameManager;//ゲーム管理
-	CCollision* m_Collision;//当たり判定
 	CHudManager* m_HudManager;//HUDの管理
 };
 

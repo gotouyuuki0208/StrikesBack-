@@ -44,7 +44,7 @@ HRESULT CGame::Init()
 	//CStageChangePoint::Create(D3DXVECTOR3(100.0f, 0.0f, 200.0f), D3DXVECTOR3(10.0f, 10.0f, 0.0f));
 	//CStageChangePoint::Create(D3DXVECTOR3(100.0f, 0.0f, 300.0f), D3DXVECTOR3(10.0f, 10.0f, 0.0f));
 	 
-	//CHitEnemy::Create({ 0.0f,0.0f ,500.0f }, { 1.5f,1.5f ,1.5f });
+	
 	//CHitEnemy::Create({ 0.0f,0.0f ,1000.0f }, { 1.5f,1.5f ,1.5f });
 
 	//CBoss::Create({ 0.0f,0.0f ,500.0f }, { 1.5f,1.5f ,1.5f });

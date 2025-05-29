@@ -19,7 +19,7 @@
 #include "weapon.h"
 #include "enemy.h"
 #include "weakenemy.h"
-
+#include"collision.h"
 //静的メンバ初期化
 const int CPlayer::PRIORITY = 1;//描画順
 const int CPlayer::MAX_LIFE = 25;//寿命の最大値
@@ -434,8 +434,6 @@ void CPlayer::CollisionFild()
 //==========================
 void CPlayer::CollisionEnemy()
 {
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CBoss::PRIORITY);
 
@@ -458,7 +456,7 @@ void CPlayer::CollisionEnemy()
 
 		CBoss* pBoss = (CBoss*)pObj;
 
-		bool Colision = pCollision->Sphere(GetPos(),
+		bool Colision = Collision::Sphere(GetPos(),
 			pBoss->GetPos(),
 			GetRadius(),
 			pBoss->GetRadius());
@@ -492,8 +490,6 @@ void CPlayer::CollisionEnemy()
 //==========================
 void CPlayer::HitEnemy(int PartsNum)
 {
-	//当たり判定の情報を取得
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
@@ -522,7 +518,7 @@ void CPlayer::HitEnemy(int PartsNum)
 		D3DXVECTOR3 mypos = { GetParts(PartsNum)->GetMtxWorld()._41,GetParts(PartsNum)->GetMtxWorld()._42,GetParts(PartsNum)->GetMtxWorld()._43 };
 		D3DXVECTOR3 pos = { pEnemy->GetParts(1)->GetMtxWorld()._41,pEnemy->GetParts(1)->GetMtxWorld()._42,pEnemy->GetParts(1)->GetMtxWorld()._43 };
 
-		bool Colision = pCollision->Sphere(mypos, pos,10.0f, 10.0f);
+		bool Colision = Collision::Sphere(mypos, pos,10.0f, 10.0f);
 
 		if (Colision)
 		{//攻撃が当たっている
@@ -567,8 +563,6 @@ void CPlayer::WeaponHitEnemy()
 	//攻撃をヒット判定を初期化
 	m_Attack = false;
 
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
 
@@ -591,7 +585,7 @@ void CPlayer::WeaponHitEnemy()
 
 		CEnemy* pEnemy = dynamic_cast<CEnemy*>(pObj);
 
-		bool Colision = pCollision->Sphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
+		bool Colision = Collision::Sphere(D3DXVECTOR3(m_weapon->GetMtxWorld()._41, m_weapon->GetMtxWorld()._42, m_weapon->GetMtxWorld()._43),
 			D3DXVECTOR3(pEnemy->GetPartsMtx(1)._41, pEnemy->GetPartsMtx(1)._42, pEnemy->GetPartsMtx(1)._43),
 			30.0f,
 			30.0f);
@@ -687,7 +681,7 @@ void CPlayer::WeaponHitEnemy()
 //==========================
 void CPlayer::CollisionJihankiAttack()
 {
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
+	
 
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CJihanki::PRIORITY);
@@ -711,7 +705,7 @@ void CPlayer::CollisionJihankiAttack()
 
 		CJihanki* pJihan = (CJihanki*)pObj;
 
-		bool Colision = pCollision->Sphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
+		bool Colision = Collision::Sphere(D3DXVECTOR3(GetPartsMtx(5)._41, GetPartsMtx(5)._42, GetPartsMtx(5)._43),
 			D3DXVECTOR3(pJihan->GetPos().x, pJihan->GetPos().y+20.0f, pJihan->GetPos().z),
 			10.0f,
 			30.0f);
@@ -734,8 +728,6 @@ void CPlayer::CollisionJihankiAttack()
 //==========================
 void CPlayer::PickUpWeapon()
 {
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
-
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CWeapon::PRIORITY);
 
@@ -764,7 +756,7 @@ void CPlayer::PickUpWeapon()
 			continue;
 		}
 
-		bool colision = pCollision->Sphere(GetPos(), pWeapon->GetPos(), GetRadius(), pWeapon->GetRadius());
+		bool colision = Collision::Sphere(GetPos(), pWeapon->GetPos(), GetRadius(), pWeapon->GetRadius());
 
 		if (colision)
 		{
@@ -838,7 +830,6 @@ void CPlayer::CorrectionAngle()
 {
 	float distance = 0.0f;
 	CEnemy* pNearEnemy = nullptr;
-	CCollision* pCollision = CManager::GetInstance()->GetCollision();
 
 	//オブジェクトを取得
 	CObject* pObj = CObject::GetObj(nullptr, CEnemy::PRIORITY);
@@ -894,7 +885,7 @@ void CPlayer::CorrectionAngle()
 		return;
 	}
 
-	bool colision = pCollision->Sphere(GetPos(), pNearEnemy->GetPos(), GetRadius() * 3, pNearEnemy->GetRadius());
+	bool colision = Collision::Sphere(GetPos(), pNearEnemy->GetPos(), GetRadius() * 3, pNearEnemy->GetRadius());
 
 	if (colision)
 	{
@@ -1062,7 +1053,6 @@ void CPlayer::WeaponDamage()
 {
 	//武器の耐久値を減らす
 	m_weapon->SubDurability();
-	int a = m_weapon->GetDurability();
 
 	if (m_weapon->GetDurability() <= 0)
 	{//耐久値がなくなったとき

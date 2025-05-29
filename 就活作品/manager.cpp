@@ -26,7 +26,6 @@ m_pScene(nullptr),//現在の画面
 m_Stage(nullptr),//ステージ
 m_Tutorial(nullptr),//チュートリアル
 m_GameManager(nullptr),//ゲーム管理
-m_Collision(nullptr),//当たり判定
 m_HudManager(nullptr)//HUDの管理
 {
 	
@@ -77,8 +76,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	//フェード
 	m_pFade = CFade::Create();
-	m_pFade->SetFade(CScene::MODE::TITLE);//最初のシーン設定
-	//m_pFade->SetFade(CScene::MODE::GAME);//最初のシーン設定
+	//m_pFade->SetFade(CScene::MODE::TITLE);//最初のシーン設定
+	m_pFade->SetFade(CScene::MODE::GAME);//最初のシーン設定
 	
 	//デバッグ
 	m_Debug = DBG_NEW CDebug;
@@ -91,9 +90,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	//ゲーム管理
 	m_GameManager = DBG_NEW CGameManager;
-
-	//当たり判定
-	m_Collision = DBG_NEW CCollision;
 
 	//HUDの管理
 	m_HudManager = DBG_NEW CHudManager;
@@ -203,12 +199,6 @@ void CManager::Uninit(void)
 	{//ゲーム管理
 		delete m_GameManager;
 		m_GameManager = nullptr;
-	}
-
-	if (m_Collision != nullptr)
-	{//当たり判定
-		delete m_Collision;
-		m_Collision = nullptr;
 	}
 
 	if (m_HudManager != nullptr)
@@ -371,14 +361,6 @@ CScene* CManager::GetScene()
 CGameManager* CManager::GetGameManager()
 {
 	return m_GameManager;
-}
-
-//=====================
-//当たり判定の取得
-//=====================
-CCollision* CManager::GetCollision()
-{
-	return m_Collision;
 }
 
 //=====================
