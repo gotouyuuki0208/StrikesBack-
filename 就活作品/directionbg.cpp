@@ -10,7 +10,7 @@
 #include"manager.h"
 
 //静的メンバの初期化
-const int CDirectionBg::PRIORITY = 3;//描画優先度
+const int CDirectionBg::PRIORITY = 4;//描画優先度
 //========================
 //コンストラクタ
 //========================

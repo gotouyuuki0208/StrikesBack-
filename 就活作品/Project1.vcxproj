@@ -42,7 +42,6 @@
     <ClCompile Include="curb.cpp" />
     <ClCompile Include="dark.cpp" />
     <ClCompile Include="darkbg.cpp" />
-    <ClCompile Include="deliveryperson.cpp" />
     <ClCompile Include="direction.cpp" />
     <ClCompile Include="drink.cpp" />
     <ClCompile Include="effect.cpp" />
@@ -198,7 +197,6 @@
     <ClInclude Include="dark.h" />
     <ClInclude Include="darkbg.h" />
     <ClInclude Include="debug.h" />
-    <ClInclude Include="deliveryperson.h" />
     <ClInclude Include="drawdebug.h" />
     <ClInclude Include="drink.h" />
     <ClInclude Include="edit.h" />

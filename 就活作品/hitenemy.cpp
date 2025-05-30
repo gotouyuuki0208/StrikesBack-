@@ -40,13 +40,8 @@ HRESULT CHitEnemy::Init()
 	//‰ŠúÝ’è
 	CWeakEnemy::Init();
 
-	//‰£‚èUŒ‚‚ÉÝ’è
-	//SetAttackState(ATTACK_STATE::ATTACK);
-
 	//HPƒQ[ƒW‚ð¶¬
-	m_HPGauge = CHPGauge3D::Create(D3DXVECTOR3(GetParts(2)->GetMtxWorld()._41, GetParts(2)->GetMtxWorld()._42, GetParts(2)->GetMtxWorld()._43),
-		D3DXVECTOR3(20.0f, 3.0f, 0.0f),
-		GetLife());
+	//m_HPGauge = CHPGauge3D::Create(D3DXVECTOR3(GetParts(2)->GetMtxWorld()._41, GetParts(2)->GetMtxWorld()._42, GetParts(2)->GetMtxWorld()._43),D3DXVECTOR3(20.0f, 3.0f, 0.0f),GetLife());
 
 	return S_OK;
 }
@@ -115,8 +110,6 @@ CHitEnemy* CHitEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 	//‰Šú‰»ˆ—
 	pHitEnemy->Init();
 
-	//pHitEnemy->SetDamageCor();
-
 	//”¼Œa‚ÌÝ’è
 	pHitEnemy->SetRadius(15.0f);
 
@@ -125,9 +118,6 @@ CHitEnemy* CHitEnemy::Create(D3DXVECTOR3 pos, D3DXVECTOR3 scale)
 
 	//“G‚ÌŽí—Þ‚ðÝ’è
 	pHitEnemy->SetEnemyType(ENEMY_TYPE::HitEnemy);
-
-	//“–‚½‚è”»’è‚ð‰ÂŽ‹‰»
-	//pHitEnemy->SetVisual();
 
 	return pHitEnemy;
 }

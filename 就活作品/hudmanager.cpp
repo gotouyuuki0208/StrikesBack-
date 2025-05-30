@@ -8,6 +8,8 @@
 #include"manager.h"
 #include"playerhpgauge.h"
 #include"bosshpgauge.h"
+#include"UIbg.h"
+#include"opeUI.h"
 
 //==========================
 //コンストラクタ
@@ -102,4 +104,20 @@ void CHudManager::Reset()
 	{
 		m_pPlayerHPGauge = nullptr;
 	}
+}
+
+//==========================
+//UI表示
+//==========================
+void CHudManager::DisplayUI()
+{
+	for (int i = 0; i < 5; i++)
+	{
+		CUIBg::Create(D3DXVECTOR3(1100.0f, 30.0f + (i * 40.0f), 0.0f));
+	}
+	COpeUI::Create(D3DXVECTOR3(1150.0f, 30.0f, 0.0f), D3DXVECTOR3(100.0f, 20.0f, 0.0f), "data\\TEXTURE\\dush.png");
+	COpeUI::Create(D3DXVECTOR3(1130.0f, 70.0f, 0.0f), D3DXVECTOR3(70.0f, 20.0f, 0.0f), "data\\TEXTURE\\camera.png");
+	COpeUI::Create(D3DXVECTOR3(1140.0f, 110.0f, 0.0f), D3DXVECTOR3(60.0f, 20.0f, 0.0f), "data\\TEXTURE\\attack.png");
+	COpeUI::Create(D3DXVECTOR3(1100.0f, 150.0f, 0.0f), D3DXVECTOR3(100.0f, 20.0f, 0.0f), "data\\TEXTURE\\grab.png");
+	COpeUI::Create(D3DXVECTOR3(1130.0f, 190.0f, 0.0f), D3DXVECTOR3(70.0f, 20.0f, 0.0f), "data\\TEXTURE\\guard.png");
 }

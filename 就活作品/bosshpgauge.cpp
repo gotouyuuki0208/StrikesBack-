@@ -12,7 +12,7 @@
 #include "bossgaugeframe.h"
 
 //静的メンバ初期化
-const int CBossHPGauge::PRIORITY = 4;//描画順
+const int CBossHPGauge::PRIORITY = 3;//描画順
 
 //==========================
 //コンストラクタ

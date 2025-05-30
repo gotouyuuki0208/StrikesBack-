@@ -27,7 +27,6 @@ private:
 
 	//メンバ関数
 	void UseEdit();//配置ツールの使用
-	void DisplayUI();//UI表示
 
 	//メンバ変数
 	CEdit* m_Edit;//オブジェクト配置クラスの情報

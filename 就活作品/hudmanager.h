@@ -24,6 +24,7 @@ public:
 	void CreatePlayerHPGauge();//プレイヤーのゲージを生成
 	void CreateBossHPGauge();//ボスのゲージを生成
 	void Reset();//リセット
+	void DisplayUI();//須佐説明のUI表示
 private:
 
 	//メンバ変数

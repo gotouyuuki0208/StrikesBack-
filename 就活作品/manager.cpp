@@ -76,8 +76,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	//フェード
 	m_pFade = CFade::Create();
-	//m_pFade->SetFade(CScene::MODE::TITLE);//最初のシーン設定
-	m_pFade->SetFade(CScene::MODE::GAME);//最初のシーン設定
+	m_pFade->SetFade(CScene::MODE::TITLE);//最初のシーン設定
 	
 	//デバッグ
 	m_Debug = DBG_NEW CDebug;
