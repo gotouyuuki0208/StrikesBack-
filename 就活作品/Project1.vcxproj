@@ -19,96 +19,107 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="attackstate.cpp" />
-    <ClCompile Include="basketgoal.cpp" />
-    <ClCompile Include="bat.cpp" />
-    <ClCompile Include="benchpress.cpp" />
-    <ClCompile Include="bicycle.cpp" />
-    <ClCompile Include="bicycleparking.cpp" />
-    <ClCompile Include="board.cpp" />
-    <ClCompile Include="bossattackstate.cpp" />
-    <ClCompile Include="bossgaugeframe.cpp" />
-    <ClCompile Include="bosshpgauge.cpp" />
-    <ClCompile Include="character.cpp" />
-    <ClCompile Include="characterstate.cpp" />
-    <ClCompile Include="clear.cpp" />
-    <ClCompile Include="collision.cpp" />
-    <ClCompile Include="cone.cpp" />
-    <ClCompile Include="construction_fence.cpp" />
-    <ClCompile Include="corridorceiling.cpp" />
-    <ClCompile Include="corridorExit.cpp" />
-    <ClCompile Include="corridorfloor.cpp" />
-    <ClCompile Include="corridorwall.cpp" />
-    <ClCompile Include="curb.cpp" />
-    <ClCompile Include="dark.cpp" />
-    <ClCompile Include="darkbg.cpp" />
-    <ClCompile Include="direction.cpp" />
-    <ClCompile Include="drink.cpp" />
-    <ClCompile Include="effect.cpp" />
-    <ClCompile Include="enemyattackstate.cpp" />
-    <ClCompile Include="enemymovepoint.cpp" />
-    <ClCompile Include="enemystate.cpp" />
-    <ClCompile Include="entrance.cpp" />
-    <ClCompile Include="fence.cpp" />
-    <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="GameOver.cpp" />
-    <ClCompile Include="garden.cpp" />
-    <ClCompile Include="guardeffect.cpp" />
-    <ClCompile Include="gymceiling.cpp" />
-    <ClCompile Include="gymdoor.cpp" />
-    <ClCompile Include="gymfild.cpp" />
-    <ClCompile Include="gym_entrance.cpp" />
-    <ClCompile Include="gym_front.cpp" />
-    <ClCompile Include="gym_wall.cpp" />
-    <ClCompile Include="gym_wall_top.cpp" />
-    <ClCompile Include="house_white.cpp" />
-    <ClCompile Include="hudmanager.cpp" />
-    <ClCompile Include="illumination.cpp" />
-    <ClCompile Include="knockdown.cpp" />
-    <ClCompile Include="objectMesh.cpp" />
-    <ClCompile Include="opeUI.cpp" />
-    <ClCompile Include="outgamecharactar.cpp" />
-    <ClCompile Include="OutGameWall.cpp" />
-    <ClCompile Include="particle.cpp" />
-    <ClCompile Include="peoplenum.cpp" />
-    <ClCompile Include="pipe.cpp" />
-    <ClCompile Include="playergaugeframe.cpp" />
-    <ClCompile Include="goalpoint.cpp" />
-    <ClCompile Include="playerhpgauge.cpp" />
-    <ClCompile Include="hpgauge3D.cpp" />
-    <ClCompile Include="item.cpp" />
-    <ClCompile Include="apartment.cpp" />
-    <ClCompile Include="tutorialbg.cpp" />
-    <ClCompile Include="bigweapon.cpp" />
-    <ClCompile Include="billboard.cpp" />
-    <ClCompile Include="boss.cpp" />
-    <ClCompile Include="buil.cpp" />
-    <ClCompile Include="building.cpp" />
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="conveni.cpp" />
-    <ClCompile Include="debug.cpp" />
-    <ClCompile Include="drawdebug.cpp" />
-    <ClCompile Include="edit.cpp" />
-    <ClCompile Include="enemy.cpp" />
-    <ClCompile Include="fade.cpp" />
-    <ClCompile Include="fild.cpp" />
-    <ClCompile Include="game.cpp" />
-    <ClCompile Include="hitenemy.cpp" />
-    <ClCompile Include="house.cpp" />
-    <ClCompile Include="input.cpp" />
-    <ClCompile Include="jihanki.cpp" />
-    <ClCompile Include="light.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="manager.cpp" />
-    <ClCompile Include="model.cpp" />
-    <ClCompile Include="Modelparts.cpp" />
-    <ClCompile Include="motionmodel.cpp" />
-    <ClCompile Include="object.cpp" />
-    <ClCompile Include="object2D.cpp" />
-    <ClCompile Include="object3D.cpp" />
-    <ClCompile Include="objectgame.cpp" />
-    <ClCompile Include="objectX.cpp" />
-    <ClCompile Include="Pch.cpp">
+    <ClCompile Include="src\arrowpoint.cpp" />
+    <ClCompile Include="src\arrowUI.cpp" />
+    <ClCompile Include="src\attackstate.cpp" />
+    <ClCompile Include="src\basketgoal.cpp" />
+    <ClCompile Include="src\bat.cpp" />
+    <ClCompile Include="src\benchpress.cpp" />
+    <ClCompile Include="src\bicycle.cpp" />
+    <ClCompile Include="src\bicycleparking.cpp" />
+    <ClCompile Include="src\board.cpp" />
+    <ClCompile Include="src\boss.cpp" />
+    <ClCompile Include="src\bossattackstate.cpp" />
+    <ClCompile Include="src\bossgaugeframe.cpp" />
+    <ClCompile Include="src\bosshpgauge.cpp" />
+    <ClCompile Include="src\bossState.cpp" />
+    <ClCompile Include="src\character.cpp" />
+    <ClCompile Include="src\characterstate.cpp" />
+    <ClCompile Include="src\clear.cpp" />
+    <ClCompile Include="src\collision.cpp" />
+    <ClCompile Include="src\cone.cpp" />
+    <ClCompile Include="src\construction_fence.cpp" />
+    <ClCompile Include="src\corridorceiling.cpp" />
+    <ClCompile Include="src\corridorExit.cpp" />
+    <ClCompile Include="src\corridorfloor.cpp" />
+    <ClCompile Include="src\corridorwall.cpp" />
+    <ClCompile Include="src\curb.cpp" />
+    <ClCompile Include="src\dark.cpp" />
+    <ClCompile Include="src\darkbg.cpp" />
+    <ClCompile Include="src\deliveryperson.cpp" />
+    <ClCompile Include="src\direction.cpp" />
+    <ClCompile Include="src\drink.cpp" />
+    <ClCompile Include="src\effect.cpp" />
+    <ClCompile Include="src\enemy.cpp" />
+    <ClCompile Include="src\enemyattackstate.cpp" />
+    <ClCompile Include="src\enemymovepoint.cpp" />
+    <ClCompile Include="src\enemystate.cpp" />
+    <ClCompile Include="src\entrance.cpp" />
+    <ClCompile Include="src\fence.cpp" />
+    <ClCompile Include="src\GameManager.cpp" />
+    <ClCompile Include="src\GameOver.cpp" />
+    <ClCompile Include="src\garden.cpp" />
+    <ClCompile Include="src\guardeffect.cpp" />
+    <ClCompile Include="src\gymceiling.cpp" />
+    <ClCompile Include="src\gymdoor.cpp" />
+    <ClCompile Include="src\gymfild.cpp" />
+    <ClCompile Include="src\gym_entrance.cpp" />
+    <ClCompile Include="src\gym_front.cpp" />
+    <ClCompile Include="src\gym_wall.cpp" />
+    <ClCompile Include="src\gym_wall_top.cpp" />
+    <ClCompile Include="src\house_white.cpp" />
+    <ClCompile Include="src\hudmanager.cpp" />
+    <ClCompile Include="src\illumination.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\knockdown.cpp" />
+    <ClCompile Include="src\objectMesh.cpp" />
+    <ClCompile Include="src\opeUI.cpp" />
+    <ClCompile Include="src\outgamecharactar.cpp" />
+    <ClCompile Include="src\OutGameWall.cpp" />
+    <ClCompile Include="src\particle.cpp" />
+    <ClCompile Include="src\peoplenum.cpp" />
+    <ClCompile Include="src\pipe.cpp" />
+    <ClCompile Include="src\playergaugeframe.cpp" />
+    <ClCompile Include="src\goalpoint.cpp" />
+    <ClCompile Include="src\playerhpgauge.cpp" />
+    <ClCompile Include="src\hpgauge3D.cpp" />
+    <ClCompile Include="src\item.cpp" />
+    <ClCompile Include="src\apartment.cpp" />
+    <ClCompile Include="src\tutorialbg.cpp" />
+    <ClCompile Include="src\bigweapon.cpp" />
+    <ClCompile Include="src\billboard.cpp" />
+    <ClCompile Include="src\buil.cpp" />
+    <ClCompile Include="src\building.cpp" />
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\conveni.cpp" />
+    <ClCompile Include="src\debug.cpp" />
+    <ClCompile Include="src\drawdebug.cpp" />
+    <ClCompile Include="src\edit.cpp" />
+    <ClCompile Include="src\fade.cpp" />
+    <ClCompile Include="src\fild.cpp" />
+    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\hitenemy.cpp" />
+    <ClCompile Include="src\house.cpp" />
+    <ClCompile Include="src\input.cpp" />
+    <ClCompile Include="src\jihanki.cpp" />
+    <ClCompile Include="src\light.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\manager.cpp" />
+    <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\Modelparts.cpp" />
+    <ClCompile Include="src\motionmodel.cpp" />
+    <ClCompile Include="src\object.cpp" />
+    <ClCompile Include="src\object2D.cpp" />
+    <ClCompile Include="src\object3D.cpp" />
+    <ClCompile Include="src\objectgame.cpp" />
+    <ClCompile Include="src\objectX.cpp" />
+    <ClCompile Include="src\Pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -118,179 +129,191 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="player.cpp" />
-    <ClCompile Include="playerstate.cpp" />
-    <ClCompile Include="pole.cpp" />
-    <ClCompile Include="pullup.cpp" />
-    <ClCompile Include="punchingbag.cpp" />
-    <ClCompile Include="renderer.cpp" />
-    <ClCompile Include="result.cpp" />
-    <ClCompile Include="room_door.cpp" />
-    <ClCompile Include="sample_billboard.cpp" />
-    <ClCompile Include="sample_MotionModel.cpp" />
-    <ClCompile Include="sample_object2D.cpp" />
-    <ClCompile Include="sample_object3D.cpp" />
-    <ClCompile Include="sample_objectX.cpp" />
-    <ClCompile Include="school.cpp" />
-    <ClCompile Include="shadow.cpp" />
-    <ClCompile Include="shingoki.cpp" />
-    <ClCompile Include="shoerack.cpp" />
-    <ClCompile Include="sky.cpp" />
-    <ClCompile Include="smallweapon.cpp" />
-    <ClCompile Include="stagechangepoint.cpp" />
-    <ClCompile Include="scene.cpp" />
-    <ClCompile Include="sound.cpp" />
-    <ClCompile Include="stagemanager.cpp" />
-    <ClCompile Include="syokaki.cpp" />
-    <ClCompile Include="texture.cpp" />
-    <ClCompile Include="title.cpp" />
-    <ClCompile Include="collisionvisual.cpp" />
-    <ClCompile Include="TitleLogo.cpp" />
-    <ClCompile Include="titlestart.cpp" />
-    <ClCompile Include="trajectory.cpp" />
-    <ClCompile Include="TutorialManager.cpp" />
-    <ClCompile Include="TutorialPopup.cpp" />
-    <ClCompile Include="UIbg.cpp" />
-    <ClCompile Include="wall.cpp" />
-    <ClCompile Include="weakenemy.cpp" />
-    <ClCompile Include="weapon.cpp" />
-    <ClCompile Include="weaponenemy.cpp" />
-    <ClCompile Include="weaponpoint.cpp" />
-    <ClCompile Include="bossState.cpp" />
-    <ClCompile Include="directionbg.cpp" />
+    <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\playerstate.cpp" />
+    <ClCompile Include="src\pole.cpp" />
+    <ClCompile Include="src\pullup.cpp" />
+    <ClCompile Include="src\punchingbag.cpp" />
+    <ClCompile Include="src\renderer.cpp" />
+    <ClCompile Include="src\result.cpp" />
+    <ClCompile Include="src\room_door.cpp" />
+    <ClCompile Include="src\sample_billboard.cpp" />
+    <ClCompile Include="src\sample_MotionModel.cpp" />
+    <ClCompile Include="src\sample_object2D.cpp" />
+    <ClCompile Include="src\sample_object3D.cpp" />
+    <ClCompile Include="src\sample_objectX.cpp" />
+    <ClCompile Include="src\school.cpp" />
+    <ClCompile Include="src\shadow.cpp" />
+    <ClCompile Include="src\shingoki.cpp" />
+    <ClCompile Include="src\shoerack.cpp" />
+    <ClCompile Include="src\sky.cpp" />
+    <ClCompile Include="src\smallweapon.cpp" />
+    <ClCompile Include="src\stagechangepoint.cpp" />
+    <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\sound.cpp" />
+    <ClCompile Include="src\stagemanager.cpp" />
+    <ClCompile Include="src\syokaki.cpp" />
+    <ClCompile Include="src\texture.cpp" />
+    <ClCompile Include="src\title.cpp" />
+    <ClCompile Include="src\collisionvisual.cpp" />
+    <ClCompile Include="src\TitleLogo.cpp" />
+    <ClCompile Include="src\titlestart.cpp" />
+    <ClCompile Include="src\trajectory.cpp" />
+    <ClCompile Include="src\TutorialManager.cpp" />
+    <ClCompile Include="src\TutorialPopup.cpp" />
+    <ClCompile Include="src\UIbg.cpp" />
+    <ClCompile Include="src\wall.cpp" />
+    <ClCompile Include="src\wavewall.cpp" />
+    <ClCompile Include="src\weakenemy.cpp" />
+    <ClCompile Include="src\weapon.cpp" />
+    <ClCompile Include="src\weaponenemy.cpp" />
+    <ClCompile Include="src\weaponpoint.cpp" />
+    <ClCompile Include="src\directionbg.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apartment.h" />
-    <ClInclude Include="attackstate.h" />
-    <ClInclude Include="basketgoal.h" />
-    <ClInclude Include="bat.h" />
-    <ClInclude Include="benchpress.h" />
-    <ClInclude Include="direction.h" />
-    <ClInclude Include="directionbg.h" />
-    <ClInclude Include="tutorialbg.h" />
-    <ClInclude Include="bicycle.h" />
-    <ClInclude Include="bicycleparking.h" />
-    <ClInclude Include="bigweapon.h" />
-    <ClInclude Include="billboard.h" />
-    <ClInclude Include="block.h" />
-    <ClInclude Include="board.h" />
-    <ClInclude Include="boss.h" />
-    <ClInclude Include="bossattackstate.h" />
-    <ClInclude Include="bossgaugeframe.h" />
-    <ClInclude Include="bosshpgauge.h" />
-    <ClInclude Include="bossState.h" />
-    <ClInclude Include="buil.h" />
-    <ClInclude Include="building.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="character.h" />
-    <ClInclude Include="characterstate.h" />
-    <ClInclude Include="clear.h" />
-    <ClInclude Include="collision.h" />
-    <ClInclude Include="cone.h" />
-    <ClInclude Include="construction_fence.h" />
-    <ClInclude Include="conveni.h" />
-    <ClInclude Include="corridorceiling.h" />
-    <ClInclude Include="corridorExit.h" />
-    <ClInclude Include="corridorfloor.h" />
-    <ClInclude Include="corridorwall.h" />
-    <ClInclude Include="curb.h" />
-    <ClInclude Include="dark.h" />
-    <ClInclude Include="darkbg.h" />
-    <ClInclude Include="debug.h" />
-    <ClInclude Include="drawdebug.h" />
-    <ClInclude Include="drink.h" />
-    <ClInclude Include="edit.h" />
-    <ClInclude Include="effect.h" />
-    <ClInclude Include="enemy.h" />
-    <ClInclude Include="enemyattackstate.h" />
-    <ClInclude Include="enemymovepoint.h" />
-    <ClInclude Include="enemystate.h" />
-    <ClInclude Include="entrance.h" />
-    <ClInclude Include="fade.h" />
-    <ClInclude Include="fence.h" />
-    <ClInclude Include="fild.h" />
-    <ClInclude Include="game.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="GameOver.h" />
-    <ClInclude Include="garden.h" />
-    <ClInclude Include="guardeffect.h" />
-    <ClInclude Include="gymceiling.h" />
-    <ClInclude Include="gymdoor.h" />
-    <ClInclude Include="gymfild.h" />
-    <ClInclude Include="gym_entrance.h" />
-    <ClInclude Include="gym_front.h" />
-    <ClInclude Include="gym_wall.h" />
-    <ClInclude Include="gym_wall_top.h" />
-    <ClInclude Include="house_white.h" />
-    <ClInclude Include="hudmanager.h" />
-    <ClInclude Include="illumination.h" />
-    <ClInclude Include="knockdown.h" />
-    <ClInclude Include="objectMesh.h" />
-    <ClInclude Include="opeUI.h" />
-    <ClInclude Include="outgamecharactar.h" />
-    <ClInclude Include="OutGameWall.h" />
-    <ClInclude Include="particle.h" />
-    <ClInclude Include="peoplenum.h" />
-    <ClInclude Include="pipe.h" />
-    <ClInclude Include="playergaugeframe.h" />
-    <ClInclude Include="goalpoint.h" />
-    <ClInclude Include="hitenemy.h" />
-    <ClInclude Include="house.h" />
-    <ClInclude Include="playerhpgauge.h" />
-    <ClInclude Include="hpgauge3D.h" />
-    <ClInclude Include="input.h" />
-    <ClInclude Include="item.h" />
-    <ClInclude Include="jihanki.h" />
-    <ClInclude Include="light.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="manager.h" />
-    <ClInclude Include="model.h" />
-    <ClInclude Include="modelparts.h" />
-    <ClInclude Include="motionmodel.h" />
-    <ClInclude Include="object.h" />
-    <ClInclude Include="object2D.h" />
-    <ClInclude Include="object3D.h" />
-    <ClInclude Include="objectgame.h" />
-    <ClInclude Include="objectX.h" />
-    <ClInclude Include="Pch.h" />
-    <ClInclude Include="player.h" />
-    <ClInclude Include="playerstate.h" />
-    <ClInclude Include="pole.h" />
-    <ClInclude Include="pullup.h" />
-    <ClInclude Include="punchingbag.h" />
-    <ClInclude Include="renderer.h" />
-    <ClInclude Include="result.h" />
-    <ClInclude Include="room_door.h" />
-    <ClInclude Include="sample_billboard.h" />
-    <ClInclude Include="sample_MotionModel.h" />
-    <ClInclude Include="sample_object2D.h" />
-    <ClInclude Include="sample_object3D.h" />
-    <ClInclude Include="sample_objectX.h" />
-    <ClInclude Include="school.h" />
-    <ClInclude Include="shadow.h" />
-    <ClInclude Include="shingoki.h" />
-    <ClInclude Include="shoerack.h" />
-    <ClInclude Include="sky.h" />
-    <ClInclude Include="smallweapon.h" />
-    <ClInclude Include="stagechangepoint.h" />
-    <ClInclude Include="scene.h" />
-    <ClInclude Include="sound.h" />
-    <ClInclude Include="stagemanager.h" />
-    <ClInclude Include="syokaki.h" />
-    <ClInclude Include="texture.h" />
-    <ClInclude Include="title.h" />
-    <ClInclude Include="collisionvisual.h" />
-    <ClInclude Include="TitleLogo.h" />
-    <ClInclude Include="titlestart.h" />
-    <ClInclude Include="trajectory.h" />
-    <ClInclude Include="TutorialManager.h" />
-    <ClInclude Include="TutorialPopup.h" />
-    <ClInclude Include="UIbg.h" />
-    <ClInclude Include="wall.h" />
-    <ClInclude Include="weakenemy.h" />
-    <ClInclude Include="weapon.h" />
-    <ClInclude Include="weaponenemy.h" />
-    <ClInclude Include="weaponpoint.h" />
+    <ClInclude Include="src\apartment.h" />
+    <ClInclude Include="src\arrowpoint.h" />
+    <ClInclude Include="src\arrowUI.h" />
+    <ClInclude Include="src\attackstate.h" />
+    <ClInclude Include="src\basketgoal.h" />
+    <ClInclude Include="src\bat.h" />
+    <ClInclude Include="src\benchpress.h" />
+    <ClInclude Include="src\direction.h" />
+    <ClInclude Include="src\directionbg.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="imgui\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="src\tutorialbg.h" />
+    <ClInclude Include="src\bicycle.h" />
+    <ClInclude Include="src\bicycleparking.h" />
+    <ClInclude Include="src\bigweapon.h" />
+    <ClInclude Include="src\billboard.h" />
+    <ClInclude Include="src\block.h" />
+    <ClInclude Include="src\board.h" />
+    <ClInclude Include="src\boss.h" />
+    <ClInclude Include="src\bossattackstate.h" />
+    <ClInclude Include="src\bossgaugeframe.h" />
+    <ClInclude Include="src\bosshpgauge.h" />
+    <ClInclude Include="src\bossState.h" />
+    <ClInclude Include="src\buil.h" />
+    <ClInclude Include="src\building.h" />
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\character.h" />
+    <ClInclude Include="src\characterstate.h" />
+    <ClInclude Include="src\clear.h" />
+    <ClInclude Include="src\collision.h" />
+    <ClInclude Include="src\cone.h" />
+    <ClInclude Include="src\construction_fence.h" />
+    <ClInclude Include="src\conveni.h" />
+    <ClInclude Include="src\corridorceiling.h" />
+    <ClInclude Include="src\corridorExit.h" />
+    <ClInclude Include="src\corridorfloor.h" />
+    <ClInclude Include="src\corridorwall.h" />
+    <ClInclude Include="src\curb.h" />
+    <ClInclude Include="src\dark.h" />
+    <ClInclude Include="src\darkbg.h" />
+    <ClInclude Include="src\debug.h" />
+    <ClInclude Include="src\deliveryperson.h" />
+    <ClInclude Include="src\drawdebug.h" />
+    <ClInclude Include="src\drink.h" />
+    <ClInclude Include="src\edit.h" />
+    <ClInclude Include="src\effect.h" />
+    <ClInclude Include="src\enemy.h" />
+    <ClInclude Include="src\enemyattackstate.h" />
+    <ClInclude Include="src\enemymovepoint.h" />
+    <ClInclude Include="src\enemystate.h" />
+    <ClInclude Include="src\entrance.h" />
+    <ClInclude Include="src\fade.h" />
+    <ClInclude Include="src\fence.h" />
+    <ClInclude Include="src\fild.h" />
+    <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\GameManager.h" />
+    <ClInclude Include="src\GameOver.h" />
+    <ClInclude Include="src\garden.h" />
+    <ClInclude Include="src\guardeffect.h" />
+    <ClInclude Include="src\gymceiling.h" />
+    <ClInclude Include="src\gymdoor.h" />
+    <ClInclude Include="src\gymfild.h" />
+    <ClInclude Include="src\gym_entrance.h" />
+    <ClInclude Include="src\gym_front.h" />
+    <ClInclude Include="src\gym_wall.h" />
+    <ClInclude Include="src\gym_wall_top.h" />
+    <ClInclude Include="src\house_white.h" />
+    <ClInclude Include="src\hudmanager.h" />
+    <ClInclude Include="src\illumination.h" />
+    <ClInclude Include="src\knockdown.h" />
+    <ClInclude Include="src\objectMesh.h" />
+    <ClInclude Include="src\opeUI.h" />
+    <ClInclude Include="src\outgamecharactar.h" />
+    <ClInclude Include="src\OutGameWall.h" />
+    <ClInclude Include="src\particle.h" />
+    <ClInclude Include="src\peoplenum.h" />
+    <ClInclude Include="src\pipe.h" />
+    <ClInclude Include="src\playergaugeframe.h" />
+    <ClInclude Include="src\goalpoint.h" />
+    <ClInclude Include="src\hitenemy.h" />
+    <ClInclude Include="src\house.h" />
+    <ClInclude Include="src\playerhpgauge.h" />
+    <ClInclude Include="src\hpgauge3D.h" />
+    <ClInclude Include="src\input.h" />
+    <ClInclude Include="src\item.h" />
+    <ClInclude Include="src\jihanki.h" />
+    <ClInclude Include="src\light.h" />
+    <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\manager.h" />
+    <ClInclude Include="src\model.h" />
+    <ClInclude Include="src\modelparts.h" />
+    <ClInclude Include="src\motionmodel.h" />
+    <ClInclude Include="src\object.h" />
+    <ClInclude Include="src\object2D.h" />
+    <ClInclude Include="src\object3D.h" />
+    <ClInclude Include="src\objectgame.h" />
+    <ClInclude Include="src\objectX.h" />
+    <ClInclude Include="src\Pch.h" />
+    <ClInclude Include="src\player.h" />
+    <ClInclude Include="src\playerstate.h" />
+    <ClInclude Include="src\pole.h" />
+    <ClInclude Include="src\pullup.h" />
+    <ClInclude Include="src\punchingbag.h" />
+    <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\result.h" />
+    <ClInclude Include="src\room_door.h" />
+    <ClInclude Include="src\sample_billboard.h" />
+    <ClInclude Include="src\sample_MotionModel.h" />
+    <ClInclude Include="src\sample_object2D.h" />
+    <ClInclude Include="src\sample_object3D.h" />
+    <ClInclude Include="src\sample_objectX.h" />
+    <ClInclude Include="src\school.h" />
+    <ClInclude Include="src\shadow.h" />
+    <ClInclude Include="src\shingoki.h" />
+    <ClInclude Include="src\shoerack.h" />
+    <ClInclude Include="src\sky.h" />
+    <ClInclude Include="src\smallweapon.h" />
+    <ClInclude Include="src\stagechangepoint.h" />
+    <ClInclude Include="src\scene.h" />
+    <ClInclude Include="src\sound.h" />
+    <ClInclude Include="src\stagemanager.h" />
+    <ClInclude Include="src\syokaki.h" />
+    <ClInclude Include="src\texture.h" />
+    <ClInclude Include="src\title.h" />
+    <ClInclude Include="src\collisionvisual.h" />
+    <ClInclude Include="src\TitleLogo.h" />
+    <ClInclude Include="src\titlestart.h" />
+    <ClInclude Include="src\trajectory.h" />
+    <ClInclude Include="src\TutorialManager.h" />
+    <ClInclude Include="src\TutorialPopup.h" />
+    <ClInclude Include="src\UIbg.h" />
+    <ClInclude Include="src\wall.h" />
+    <ClInclude Include="src\wavewall.h" />
+    <ClInclude Include="src\weakenemy.h" />
+    <ClInclude Include="src\weapon.h" />
+    <ClInclude Include="src\weaponenemy.h" />
+    <ClInclude Include="src\weaponpoint.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -346,7 +369,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;src;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -357,7 +380,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;src;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -372,10 +395,12 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>Lib\\json\include;$(SolutionDir)imgui;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>lib/$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -390,12 +415,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)Lib\json\include;$(SolutionDir)src;$(SolutionDir)imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>lib/$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -407,10 +434,12 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>Lib\\json\include;$(SolutionDir)imgui;$(SolutionDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>lib/$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -424,12 +453,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>Pch.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(SolutionDir)Lib\json\include;$(SolutionDir)src;$(SolutionDir)imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>lib/$(Configuration)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

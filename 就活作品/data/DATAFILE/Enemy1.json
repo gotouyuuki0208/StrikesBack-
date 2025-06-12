@@ -1,0 +1,62 @@
+[
+  {
+    "POS.x": 324.0,
+    "POS.y": 0.0,
+    "POS.z": -883.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 1
+  },
+  {
+    "POS.x": 287.0,
+    "POS.y": 0.0,
+    "POS.z": 2841.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 2
+  },
+  {
+    "POS.x": 4293.0,
+    "POS.y": 0.0,
+    "POS.z": 3090.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 3
+  },
+  {
+    "POS.x": 2290.0,
+    "POS.y": 0.0,
+    "POS.z": 2981.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 4
+  },
+  {
+    "POS.x": 3110.0,
+    "POS.y": 0.0,
+    "POS.z": 2972.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 5
+  },
+  {
+    "POS.x": 305.0,
+    "POS.y": 0.0,
+    "POS.z": 1887.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 6
+  }
+]

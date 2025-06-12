@@ -421,7 +421,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\ëfçﬁ\\UI\\construction.png";
+    "data\\TEXTURE\\construction.png";
    }
   }
   Material {

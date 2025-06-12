@@ -1,0 +1,110 @@
+[
+    {
+        "POS.x": 0.0,
+        "POS.y": 0.0,
+        "POS.z": 1980.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 1000.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 1000.0,
+        "TYPE": 1
+    },
+    {
+        "POS.x": 0.0,
+        "POS.y": 0.0,
+        "POS.z": 3944.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 1000.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 1000.0,
+        "TYPE": 1
+    },
+    {
+        "POS.x": 1966.0,
+        "POS.y": 0.0,
+        "POS.z": 3944.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 1000.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 1000.0,
+        "TYPE": 1
+    },
+    {
+        "POS.x": 1008.0,
+        "POS.y": 0.0,
+        "POS.z": 3166.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 10.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 100.0,
+        "TYPE": 4
+    },
+    {
+        "POS.x": -956.0,
+        "POS.y": 0.5,
+        "POS.z": 1096.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 10.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 10.0,
+        "TYPE": 3
+    },
+    {
+        "POS.x": -299.0,
+        "POS.y": 0.5,
+        "POS.z": 1096.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 10.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 10.0,
+        "TYPE": 3
+    },
+    {
+        "POS.x": -351.0,
+        "POS.y": 0.5,
+        "POS.z": 3224.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 10.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 10.0,
+        "TYPE": 3
+    },
+    {
+        "POS.x": 887.0,
+        "POS.y": 0.5,
+        "POS.z": 3149.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 10.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 10.0,
+        "TYPE": 3
+    },
+    {
+        "POS.x": 320.0,
+        "POS.y": 0.0,
+        "POS.z": 653.0,
+        "ROT.x": 0.0,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 1000.0,
+        "SCALE.y": 0.0,
+        "SCALE.z": 1000.0,
+        "TYPE": 1
+    }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "POS.x": 823.0,
+    "POS.y": 0.0,
+    "POS.z": 3257.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 7
+  },
+  {
+    "POS.x": 538.0,
+    "POS.y": 0.0,
+    "POS.z": 3280.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 8
+  },
+  {
+    "POS.x": -386.0,
+    "POS.y": 0.0,
+    "POS.z": 2267.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 9
+  },
+  {
+    "POS.x": -132.0,
+    "POS.y": 0.0,
+    "POS.z": 3166.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 10
+  },
+  {
+    "POS.x": -455.0,
+    "POS.y": 0.0,
+    "POS.z": 2910.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 11
+  },
+  {
+    "POS.x": -1283.0,
+    "POS.y": 0.0,
+    "POS.z": 1130.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 12
+  },
+  {
+    "POS.x": -886.0,
+    "POS.y": 0.0,
+    "POS.z": 1097.0,
+    "SCALE.x": 1.5,
+    "SCALE.y": 1.5,
+    "SCALE.z": 1.5,
+    "TYPE": 2,
+    "WAVE": 13
+  }
+]

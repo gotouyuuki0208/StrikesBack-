@@ -1,0 +1,41 @@
+[
+    {
+        "POS.x": -522.0,
+        "POS.y": 0.0,
+        "POS.z": 1724.0,
+        "ROT.x": 0.0,
+        "ROT.y": 3.141590118408203,
+        "ROT.z": 0.0,
+        "SCALE.x": 2.0,
+        "SCALE.y": 2.0,
+        "SCALE.z": 2.0,
+        "TYPE": 1,
+        "WEAPONTYPE": 1
+    },
+    {
+        "POS.x": 3168.0,
+        "POS.y": 0.0,
+        "POS.z": 3614.0,
+        "ROT.x": 0.0,
+        "ROT.y": -1.5707999467849731,
+        "ROT.z": 0.0,
+        "SCALE.x": 2.0,
+        "SCALE.y": 2.0,
+        "SCALE.z": 2.0,
+        "TYPE": 2,
+        "WEAPONTYPE": 2
+    },
+    {
+        "POS.x": 4068.0,
+        "POS.y": 0.0,
+        "POS.z": 3623.0,
+        "ROT.x": 0.0,
+        "ROT.y": -1.5707999467849731,
+        "ROT.z": 0.0,
+        "SCALE.x": 2.0,
+        "SCALE.y": 2.0,
+        "SCALE.z": 2.0,
+        "TYPE": 2,
+        "WEAPONTYPE": 2
+    }
+]

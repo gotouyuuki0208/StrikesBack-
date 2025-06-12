@@ -1,0 +1,28 @@
+[
+    {
+        "POS.x": -230.0,
+        "POS.y": 0.0,
+        "POS.z": 2758.0,
+        "ROT.x": 1.5700000524520874,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 1.0,
+        "SCALE.y": 1.0,
+        "SCALE.z": 1.0,
+        "TYPE": 3,
+        "WEAPONTYPE": 2
+    },
+    {
+        "POS.x": 602.0,
+        "POS.y": 0.0,
+        "POS.z": 3119.0,
+        "ROT.x": 1.5700000524520874,
+        "ROT.y": 0.0,
+        "ROT.z": 0.0,
+        "SCALE.x": 1.0,
+        "SCALE.y": 1.0,
+        "SCALE.z": 1.0,
+        "TYPE": 3,
+        "WEAPONTYPE": 2
+    }
+]
